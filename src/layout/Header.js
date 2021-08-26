@@ -1,43 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import logo from '../assets/images/logo.png';
-import {NavLink} from "react-router-dom";
-import {get} from "../api/Api";
+import {Link, NavLink} from "react-router-dom";
 
-const Header = () => {
-
-    const [menuList, setMenuList] = useState([]);
-    const [isFetchingData, setIsFetchingData] = useState(true);
-
-    useEffect(() => {
-        get(`/menu`).then(res => {
-            const menuListArr=[];
-            res.forEach(menu => {
-                get(`http://bpaws07l:8082/api/files/resource?resourceId=${menu.id}&bucket=mobi-c&folder=menu-logo`).then(file => {
-                    menuListArr.push({
-                        ...menu,
-                        file
-                    });
-                    menuListArr.sort(
-                        (a, b) => parseInt(a.id) - parseInt(b.id)
-                    );
-                    setMenuList(prevState => ([
-                        ...menuListArr
-                    ]))
-                })
-            })
-        }).catch(err => console.log(err)).finally(() => {
-            setIsFetchingData(false)
-        });
-    }, [])
-
-    if (isFetchingData) {
-        return (
-            <div className="d-flex align-items-center justify-content-center">
-
-            </div>
-        )
-    }
-
+const Header = (props) => {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container">
@@ -54,26 +19,27 @@ const Header = () => {
                 </button>
 
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                    <a className="navbar-brand mt-2 mt-lg-0" href="#">
+                    <Link className="navbar-brand mt-2 mt-lg-0" to="/">
                         <img
                             src={logo}
                             style={window.innerWidth > 586 ? {maxWidth: '200px'} : {maxWidth: '160px'}}
                             alt=""
                             loading="lazy"
                         />
-                    </a>
+                    </Link>
                     <div className="position-relative">
                         <span className="dropdown-toggle d-flex align-items-center"
                               data-mdb-toggle="dropdown"
                               aria-expanded="false"
+                              role="button"
                               id="navbarDropdownMenuLink"
                         >Kateqoriyalar</span>
                         <ul
                             className="dropdown-menu dropdown-menu-end"
                             aria-labelledby="navbarDropdownMenuLink"
                         >
-                            {menuList && menuList.map(menu => (
-                                <li key={menu.id}><NavLink to='/product/250' className="dropdown-item">{menu.nameAz}</NavLink></li>
+                            {props.menuData && props.menuData.map(menu => (
+                                <li key={menu.id}><Link to={`/category/${menu.attributes.id}`} className="dropdown-item">{menu.nameAz}</Link></li>
                             ))}
                         </ul>
                     </div>
@@ -105,13 +71,13 @@ const Header = () => {
                         </ul>
                     </div>
 
+                    <NavLink to="/wishlist"><i className="fas fa-heart me-3 text-body"/></NavLink>
+
                     <div>
                         <span
                             className="dropdown-toggle d-flex align-items-center hidden-arrow"
                             id="navbarDropdownProfile"
                             role="button"
-                            data-mdb-toggle="dropdown"
-                            aria-expanded="false"
                         >
                             <img
                                 src="https://mdbootstrap.com/img/new/avatars/2.jpg"

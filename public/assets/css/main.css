@@ -1,3 +1,116 @@
 .flex-1{
     flex:1;
 }
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.category-box {
+    background: #ededed;
+    text-align: center;
+    color: #45444c;
+    padding: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.26);
+}
+
+.category-hover-box {
+    border-radius: 4px;
+    transition: .3s;
+}
+
+.category-hover-box:hover{
+    background: #ffffff;
+}
+
+.category-box-image{
+    max-width: 80px;
+    width: 100%;
+}
+
+.category-box .category-name {
+    padding: 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Fira Sans', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.grid-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-left: 1px solid #dddddd;
+}
+
+.grid-item {
+    border-bottom: 1px solid #dddddd;
+    border-right: 1px solid #dddddd;
+}
+
+.grid-item:nth-child(1),
+.grid-item:nth-child(2),
+.grid-item:nth-child(3),
+.grid-item:nth-child(4) {
+    border-top: 1px solid #dddddd;
+}
+
+.pr-wrapper {
+    padding: 5px;
+    display: block;
+    color: #000000;
+}
+
+.pr-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-button {
+    position: absolute;
+    bottom: 15px;
+    right: 10px;
+    z-index: 9;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+}
+
+.pr-image img {
+    object-fit: cover;
+    object-position: center;
+    transition: .3s;
+    width: 100%;
+}
+
+.product-button > * {
+    margin-bottom: 5px;
+    -webkit-transition: all .3s ease;
+    transition: all .3s ease;
+    opacity: 1;
+    visibility: visible;
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+}
+
+.product-button .add-to-cart, .product-button .add-wishlist {
+    color: #000;
+    display: block;
+    text-align: center;
+    background: #fff;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #036134;
+    white-space: nowrap;
+    margin-bottom: 5px;
+    transition: .2s;
+}
+
+.pr-info {
+    padding: 10px;
+}
+
+.pr-info .model-name {
+    font-weight: 500;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
