@@ -14,9 +14,9 @@ const App = () => {
     const [isFetchingData, setIsFetchingData] = useState(true);
 
     useEffect(() => {
-        get(`/menu`).then(res => {
+        get(`menu/search?sort=menuOrder,desc`).then(res => {
             const menuListArr = [];
-            res.forEach(menu => {
+            res.content.forEach(menu => {
                 get(`http://bpaws10l:8082/api/files/resource?resourceId=${menu.id}&bucket=mobi-c&folder=menu-logo`).then(file => {
                     menuListArr.push({
                         ...menu,
@@ -28,8 +28,6 @@ const App = () => {
                     setMenuList(prevState => ([
                         ...menuListArr
                     ]))
-
-                    console.log(menuListArr);
                 })
             })
             setIsFetchingData(false)

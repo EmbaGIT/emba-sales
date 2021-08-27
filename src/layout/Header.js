@@ -73,20 +73,8 @@ const Header = (props) => {
 
                     <NavLink to="/wishlist"><i className="fas fa-heart me-3 text-body"/></NavLink>
 
-                    <div>
-                        <span
-                            className="dropdown-toggle d-flex align-items-center hidden-arrow"
-                            id="navbarDropdownProfile"
-                            role="button"
-                        >
-                            <img
-                                src="https://mdbootstrap.com/img/new/avatars/2.jpg"
-                                className="rounded-circle"
-                                height="25"
-                                alt=""
-                                loading="lazy"
-                            />
-                        </span>
+                    <div className="">
+                        <button type="button" className="btn btn-primary">Çıxış</button>
                     </div>
                 </div>
             </div>
