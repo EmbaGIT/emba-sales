@@ -1,3 +1,8 @@
+@font-face {
+    font-family: Poppins;
+    src: url('../fonts/Poppins-SemiBold.ttf');
+}
+
 .flex-1{
     flex:1;
 }
@@ -113,6 +118,20 @@
     font-weight: 500;
     margin-bottom: 5px;
     font-size: 1.1rem;
+}
+
+.product-name{
+    font-size: 22px;
+    font-family: Poppins;
+    display: flex;
+    align-items: center;
+}
+
+.product-price-box {
+    padding: 10px;
+    background: rgba(249, 249, 249, .6);
+    border: 1px solid #efefef;
+    max-width: 450px;
 }
 
 @media (max-width: 1440px) {

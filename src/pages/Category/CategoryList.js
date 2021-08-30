@@ -13,6 +13,7 @@ const Category = () => {
     let query = useQuery();
     const currentPage = query.get("page") || 0;
     const [page, setPage] = useState(currentPage);
+    const [pageInfo, setPageInfo] = useState();
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [productList, setProductList] = useState([]);
 
@@ -21,6 +22,7 @@ const Category = () => {
         setIsFetchingData(true);
         get(`http://bpaws10l:8083/api/parents/byAttributeId/${category_id}?page=${page}&size=15`).then((res) => {
             /*if(res.content.length){*/
+            setPageInfo(res);
             const productListArr = [];
             res.content.forEach(product => {
                 get(`http://bpaws10l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
@@ -118,7 +120,7 @@ const Category = () => {
                         nextLinkClassName={'page-link'}
                         breakLabel={'...'}
                         breakClassName={'break-me'}
-                        pageCount={productList?.totalPages}
+                        pageCount={pageInfo?.totalPages}
                         marginPagesDisplayed={2}
                         pageRangeDisplayed={3}
                         onPageChange={paginate}

@@ -8,6 +8,7 @@ import {get} from "./api/Api";
 import Loader from "react-loader-spinner";
 import Home from './pages/HomePage';
 import Category from './pages/Category/CategoryList';
+import Product from './pages/Product/ProductDetail';
 
 const App = () => {
     const [menuList, setMenuList] = useState([]);
@@ -51,6 +52,9 @@ const App = () => {
                     </Route>
                     <Route path='/category/:id'>
                         <Category/>
+                    </Route>
+                    <Route path='/product/:id'>
+                        <Product/>
                     </Route>
                 </Switch>
             </Layout>
