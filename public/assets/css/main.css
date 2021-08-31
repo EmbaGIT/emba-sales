@@ -11,6 +11,10 @@
     cursor: pointer;
 }
 
+.fm-poppins{
+    font-family: Poppins;
+}
+
 .category-box {
     background: #ededed;
     text-align: center;
@@ -132,6 +136,45 @@
     background: rgba(249, 249, 249, .6);
     border: 1px solid #efefef;
     max-width: 450px;
+}
+
+.sub-item-wrapper {
+    position: relative;
+    border: 1px solid #cdcdd0;
+    background-color: #fff;
+}
+
+.sub-item-info {
+    padding: 10px;
+    display: flex;
+}
+
+.sub-item-image {
+    text-align: center;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.sub-item-image img {
+    width: 100px;
+}
+
+.line {
+    height: 1px;
+    background-color: #dedede;
+}
+
+.sub-item-price-block {
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sub-product-price {
+    font-weight: 500;
+    font-size: 16px;
 }
 
 @media (max-width: 1440px) {

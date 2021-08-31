@@ -48,27 +48,11 @@ const Header = (props) => {
                 <div className="d-flex align-items-center">
                     <div className="position-relative">
                         <span
-                            className="text-reset me-3 dropdown-toggle hidden-arrow"
-                            id="navbarDropdownCart"
-                            role="button"
-                            data-mdb-toggle="dropdown"
-                            aria-expanded="false">
+                            className="text-reset me-3"
+                            role="button">
                             <i className="fas fa-shopping-cart"/>
                             <span className="badge rounded-pill badge-notification bg-danger">1</span>
                         </span>
-                        <ul
-                            className="dropdown-menu dropdown-menu-end"
-                            aria-labelledby="navbarDropdownCart">
-                            <li>
-                                <NavLink to='/product/250' className="dropdown-item">Mehsul</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to='/product/251' className="dropdown-item">Mehsul</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to='/product/252' className="dropdown-item">Mehsul</NavLink>
-                            </li>
-                        </ul>
                     </div>
 
                     <NavLink to="/wishlist"><i className="fas fa-heart me-3 text-body"/></NavLink>
