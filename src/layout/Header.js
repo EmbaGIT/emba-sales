@@ -1,8 +1,18 @@
-import React from "react";
+import React, {useContext} from "react";
 import logo from '../assets/images/logo.png';
+import CartContext from "../store/CartContext";
 import {Link, NavLink} from "react-router-dom";
 
 const Header = (props) => {
+
+    const cartCtx = useContext(CartContext);
+
+    const numberOfCartItem = cartCtx.items.reduce((cardNumber, item) => {
+        console.log("cardNumber", cardNumber);
+        console.log("item", item);
+        return cardNumber + item.amount
+    }, 0)
+
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container">
@@ -51,7 +61,7 @@ const Header = (props) => {
                             className="text-reset me-3"
                             role="button">
                             <i className="fas fa-shopping-cart"/>
-                            <span className="badge rounded-pill badge-notification bg-danger">1</span>
+                            <span className="badge rounded-pill badge-notification bg-danger">{numberOfCartItem}</span>
                         </span>
                     </div>
 

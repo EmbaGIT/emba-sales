@@ -9,6 +9,7 @@ import Loader from "react-loader-spinner";
 import Home from './pages/HomePage';
 import Category from './pages/Category/CategoryList';
 import Product from './pages/Product/ProductDetail';
+import CartProvider from "./store/CartProvider";
 
 const App = () => {
     const [menuList, setMenuList] = useState([]);
@@ -36,7 +37,7 @@ const App = () => {
     }, [])
 
     return (
-        <div>
+        <CartProvider>
             {isFetchingData &&
             <div className="d-flex align-items-center justify-content-center">
                 <Loader
@@ -59,7 +60,7 @@ const App = () => {
                 </Switch>
             </Layout>
             }
-        </div>
+        </CartProvider>
 
     );
 }

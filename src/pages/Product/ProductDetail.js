@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {useParams} from "react-router-dom";
 import {get} from "../../api/Api";
 import noImage from '../../assets/images/no-image.png';
 import Loader from "react-loader-spinner";
 import Slider from "react-slick";
+import Input from "../../UI/Input";
 
 const Product = () => {
     const params = useParams();
@@ -12,6 +13,8 @@ const Product = () => {
     const [productInfo, setProductInfo] = useState();
     const [productImages, setProductImages] = useState();
     const [subProducts, setSubProducts] = useState();
+
+    const amountInputRef = useRef();
 
     const settings = {
         dots: true,
@@ -41,6 +44,15 @@ const Product = () => {
             });
         });
     }, [parent_id]);
+
+    const addToCartHandler = () => {
+        const enteredAmount = amountInputRef.current.value; // always string value if input type number
+        const enteredAmountNumber = +enteredAmount;
+
+        if(enteredAmount.trim().length === 0 || enteredAmountNumber<1 || enteredAmountNumber > 12){
+            return;
+        }
+    }
 
     if (isFetchingData) {
         return (
@@ -77,7 +89,8 @@ const Product = () => {
                             <div className="d-flex align-items-center product-info-wrapper justify-content-between">
                                 <div className="price-block">
                                         <span className="product-price-current">
-                                            <span>311</span> AZN</span>
+                                            <span>311</span> AZN
+                                        </span>
                                 </div>
                             </div>
                         </div>
@@ -100,8 +113,23 @@ const Product = () => {
                                 </div>
                             </div>
                             <div className="line"></div>
-                            <div className="sub-item-price-block">
-                                {item.item.price ? item.item.price : 0} AZN
+                            <div className="d-flex justify-content-between">
+                                <div className="sub-item-price-block">
+                                    {item.item.price ? item.item.price : 0} AZN
+                                </div>
+                                <Input
+                                    ref={amountInputRef}
+                                    input = {{
+                                        type: 'number',
+                                        id: item.item.id,
+                                        min: '1',
+                                        max: '12',
+                                        step: '1'
+                                    }}
+                                />
+                            </div>
+                            <div className="text-end">
+                                <button type="button" className="btn btn-success" onClick={addToCartHandler}>Səbətə at</button>
                             </div>
                         </div>
                     </div>
