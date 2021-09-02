@@ -1,10 +1,10 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import {get} from "../../api/Api";
 import noImage from '../../assets/images/no-image.png';
 import Loader from "react-loader-spinner";
 import Slider from "react-slick";
-import Input from "../../UI/Input";
+import SubProductItem from "./SubProductItem";
 
 const Product = () => {
     const params = useParams();
@@ -13,9 +13,6 @@ const Product = () => {
     const [productInfo, setProductInfo] = useState();
     const [productImages, setProductImages] = useState();
     const [subProducts, setSubProducts] = useState();
-
-    const amountInputRef = useRef();
-
     const settings = {
         dots: true,
         infinite: true,
@@ -45,14 +42,6 @@ const Product = () => {
         });
     }, [parent_id]);
 
-    const addToCartHandler = () => {
-        const enteredAmount = amountInputRef.current.value; // always string value if input type number
-        const enteredAmountNumber = +enteredAmount;
-
-        if(enteredAmount.trim().length === 0 || enteredAmountNumber<1 || enteredAmountNumber > 12){
-            return;
-        }
-    }
 
     if (isFetchingData) {
         return (
@@ -71,11 +60,11 @@ const Product = () => {
             <div className="row">
                 <div className="col-lg-7">
                     <Slider {...settings}>
-                        {productImages && productImages.map((file, index) => (
+                        {productImages.length ? productImages.map((file, index) => (
                             <div key={index}>
                                 <img src={file.objectUrl} alt=""/>
                             </div>
-                        ))}
+                        )) : <div><img src={noImage} alt=""/></div>}
                     </Slider>
                 </div>
                 <div className="col-lg-5">
@@ -99,40 +88,14 @@ const Product = () => {
                 </div>
             </div>
             <div className="row mt-4">
-                {subProducts && subProducts.map(item => (
-                    <div className="col-xl-4 col-lg-6 col-md-12 mb-3" key={item.item.id}>
-                        <div className="sub-item-wrapper">
-                            <div className="sub-item-info">
-                                <div className="sub-item-image">
-                                    {item.files.length ? item.files.map(file => (
-                                        <img src={file.objectUrl} alt=""/>
-                                    )) : <img src={noImage} alt=""/>}
-                                </div>
-                                <div className="sub-item">
-                                    <p >{item.item.name}</p>
-                                </div>
-                            </div>
-                            <div className="line"></div>
-                            <div className="d-flex justify-content-between">
-                                <div className="sub-item-price-block">
-                                    {item.item.price ? item.item.price : 0} AZN
-                                </div>
-                                <Input
-                                    ref={amountInputRef}
-                                    input = {{
-                                        type: 'number',
-                                        id: item.item.id,
-                                        min: '1',
-                                        max: '12',
-                                        step: '1'
-                                    }}
-                                />
-                            </div>
-                            <div className="text-end">
-                                <button type="button" className="btn btn-success" onClick={addToCartHandler}>Səbətə at</button>
-                            </div>
-                        </div>
-                    </div>
+                {subProducts && subProducts.map((item) => (
+                    <SubProductItem
+                        key_id={item.item.id}
+                        id={item.item.id}
+                        name={item.item.name}
+                        price={item.item.price}
+                        files={item.files}
+                    />
                 ))}
             </div>
         </div>
