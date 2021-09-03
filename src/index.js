@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import {ToastContainer, Flip} from 'react-toastify';
+import {ToastContainer} from 'react-toastify';
 import {BrowserRouter as Router} from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 ReactDOM.render(
     <Router>
-        <ToastContainer transition={Flip}/>
+        <ToastContainer/>
         <React.StrictMode>
             <App/>
         </React.StrictMode>

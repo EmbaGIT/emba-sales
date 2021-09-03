@@ -10,6 +10,7 @@ import Home from './pages/HomePage';
 import Category from './pages/Category/CategoryList';
 import Product from './pages/Product/ProductDetail';
 import CartProvider from "./store/CartProvider";
+import Cart from "./pages/Cart/Cart";
 
 const App = () => {
     const [menuList, setMenuList] = useState([]);
@@ -51,12 +52,9 @@ const App = () => {
                     <Route path='/' exact>
                         <Home menuData={menuList}/>
                     </Route>
-                    <Route path='/category/:id'>
-                        <Category/>
-                    </Route>
-                    <Route path='/product/:id'>
-                        <Product/>
-                    </Route>
+                    <Route path='/category/:id' component={Category}/>
+                    <Route path='/product/:id' component={Product}/>
+                    <Route path='/cart' exact component={Cart}/>
                 </Switch>
             </Layout>
             }

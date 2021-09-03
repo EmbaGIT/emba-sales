@@ -57,12 +57,14 @@ const Header = (props) => {
 
                 <div className="d-flex align-items-center">
                     <div className="position-relative">
-                        <span
-                            className="text-reset me-3"
-                            role="button">
-                            <i className="fas fa-shopping-cart"/>
-                            <span className="badge rounded-pill badge-notification bg-danger">{numberOfCartItem}</span>
-                        </span>
+                        <Link to="/cart">
+                            <span
+                                className="text-reset me-3"
+                                role="button">
+                                <i className="fas fa-shopping-cart text-body"/>
+                                <span className="badge rounded-pill badge-notification bg-danger">{numberOfCartItem}</span>
+                            </span>
+                        </Link>
                     </div>
 
                     <NavLink to="/wishlist"><i className="fas fa-heart me-3 text-body"/></NavLink>

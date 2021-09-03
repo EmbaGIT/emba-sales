@@ -9,8 +9,6 @@ const SubProductItem = (props) => {
     const cartCtx=useContext(CartContext);
     const [isAmountValid, setIsAmountValid] = useState(true);
 
-    console.log(props);
-
     const addToCartHandler = () => {
         const enteredAmount = amountInputRef.current.value; // always string value also input type number
         const enteredAmountNumber = +enteredAmount;
@@ -23,7 +21,8 @@ const SubProductItem = (props) => {
                 id: props.id,
                 name: props.name,
                 amount: enteredAmountNumber,
-                price: props.price
+                price: props.price,
+                files: props.files
             });
         }
 
