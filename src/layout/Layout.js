@@ -8,7 +8,7 @@ const Layout = (props) => {
             <Header menuData={props.menuData}/>
             <section className='content d-flex flex-column flex-column-fluid py-3'
                      style={{minHeight: 'calc(100vh - 120px)'}}>
-                <div className='container'>
+                <div className='container-fluid'>
                     {props.children}
                 </div>
             </section>

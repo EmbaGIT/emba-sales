@@ -1,10 +1,13 @@
-import React, {useContext} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import {Link} from 'react-router-dom'
 import CartContext from "../../store/CartContext";
 import noImage from "../../assets/images/no-image.png";
+import CountInput from "../../UI/countInput";
 
 const Cart = () => {
     const cartCtx=useContext(CartContext);
+    const amountInputRef = useRef();
+    const [hasItem, setHasItem] = useState(cartCtx.items.length > 0)
     console.log(cartCtx);
 
     return (
@@ -34,15 +37,7 @@ const Cart = () => {
                                         <p className="fm-poppins_bold mb-0"><Link
                                             to={`/product/${item.id}`}>{item.name}</Link></p>
                                     </div>
-                                    <div className="basket-product-count-row pr-count">
-                                        <div className="count-input-wrapper">
-                                            <button type="button" className="count_down"><i className="fas fa-minus"/>
-                                            </button>
-                                            <input type="number" className="count-input" value="1" readOnly/>
-                                            <button type="button" className="count_up"><i className="fas fa-plus"/>
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <CountInput ref={amountInputRef}/>
                                     <div className="basket-product-price-row">
                                         <div className="basket-product-price"><span>{item.price}</span> ₼</div>
                                     </div>
@@ -88,8 +83,10 @@ const Cart = () => {
                             </div>
                         </div>
                     </div>
+                    {hasItem &&
                     <button type="submit" className="btn btn-success py-2 fm-poppins w-100">Səbəti təsdiq et<i
                         className="fas fa-chevron-right ms-1"/></button>
+                    }
                 </div>
             </div>
         </>

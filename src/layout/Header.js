@@ -15,21 +15,9 @@ const Header = (props) => {
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
-            <div className="container">
-                <button
-                    className="navbar-toggler"
-                    type="button"
-                    data-mdb-toggle="collapse"
-                    data-mdb-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                >
-                    <i className="fas fa-bars"/>
-                </button>
-
-                <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                    <Link className="navbar-brand mt-2 mt-lg-0" to="/">
+            <div className="container-fluid">
+                <div className="d-flex flex-grow-1 align-items-center" id="navbarSupportedContent">
+                    <Link className="navbar-brand mt-lg-0" to="/">
                         <img
                             src={logo}
                             style={window.innerWidth > 586 ? {maxWidth: '200px'} : {maxWidth: '160px'}}
