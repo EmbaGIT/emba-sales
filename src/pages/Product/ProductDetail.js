@@ -18,17 +18,17 @@ const Product = () => {
     useEffect(() => {
         setProductInfo([]);
         setIsFetchingData(true);
-        get(`http://bpaws10l.embawood.dm:8083/api/products/search?parentId.equals=${parent_id}&size=20`).then((res) => {
+        get(`http://bpaws01l:8083/api/products/search?parentId.equals=${parent_id}&size=20`).then((res) => {
             const subProductArr = [];
             res.content.map(item => (
-                get(`http://bpaws10l.embawood.dm:8082/api/files/resource?resourceId=${item.id}&bucket=mobi-c-test&folder=module-banner`).then(files => {
+                get(`http://bpaws01l:8082/api/files/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
                     subProductArr.push({item, files});
                     setSubProducts(prevState => ([
                         ...subProductArr
                     ]));
                 })
             ))
-            get(`http://bpaws10l.embawood.dm:8082/api/files/resource?resourceId=${parent_id}&bucket=mobi-c-test&folder=parent-products`).then(files => {
+            get(`http://bpaws01l:8082/api/files/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
                 setProductInfo(res);
                 const images = [];
                 files.map(file => (

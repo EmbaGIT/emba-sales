@@ -20,12 +20,12 @@ const Category = () => {
     useEffect(() => {
         setProductList([]);
         setIsFetchingData(true);
-        get(`http://bpaws10l.embawood.dm:8083/api/parents/byAttributeId/${category_id}?page=${page}&size=15`).then((res) => {
+        get(`http://bpaws01l:8083/api/parents/byAttributeId/${category_id}?page=${page}&size=15`).then((res) => {
             /*if(res.content.length){*/
             setPageInfo(res);
             const productListArr = [];
             res.content.forEach(product => {
-                get(`http://bpaws10l.embawood.dm:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c-test&folder=parent-banner`).then(file => {
+                get(`http://bpaws01l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
                     productListArr.push({
                         ...product,
                         file
@@ -40,11 +40,11 @@ const Category = () => {
             })
             setIsFetchingData(false);
             /*}else{
-                get(`http://bpaws10l:8083/api/products/search?attributeId.equals=${category_id}`).then(response => {
+                get(`http://bpaws01l:8083/api/products/search?attributeId.equals=${category_id}`).then(response => {
                     console.log("response", response)
                     const productListArr = [];
                     response.content.forEach(product => {
-                        get(`http://bpaws10l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
+                        get(`http://bpaws01l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
                             productListArr.push({
                                 ...product,
                                 file

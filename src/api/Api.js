@@ -2,7 +2,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const axiosInstance = axios.create({
-    baseURL: 'http://bpaws10l.embawood.dm:8083/api',
+    baseURL: 'http://bpaws01l:8083/api',
 });
 
 export const get = (url) => axiosInstance.get(url).then((res) => res.data);
@@ -33,7 +33,7 @@ axiosInstance.interceptors.request.use((config) => {
             Authorization: `Bearer ${jwt}`,
         };
     }
-    if (config.url.includes('http://bpaws10l.embawood.dm:8082/api/files')) {
+    if (config.url.includes('http://bpaws01l:8082/api/files')) {
         config.headers = {
             ...config.headers,
             'Content-Type': 'multipart/form-data;',
