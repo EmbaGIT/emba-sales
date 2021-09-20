@@ -47,7 +47,7 @@ const App = () => {
                     height={60}
                     width={60}/>
             </div>}
-            {!isFetchingData && menuList.length > 0 && <Layout menuData={menuList}>
+            {!isFetchingData && <Layout menuData={menuList}>
                 <Switch>
                     <Route path='/' exact>
                         <Home menuData={menuList}/>
