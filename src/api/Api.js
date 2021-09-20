@@ -33,7 +33,7 @@ axiosInstance.interceptors.request.use((config) => {
             Authorization: `Bearer ${jwt}`,
         };
     }
-    if (config.url.includes('http://bpaws01l:8082/api/files')) {
+    if (config.url.includes('http://bpaws01l.embawood.dm:8082/api/files')) {
         config.headers = {
             ...config.headers,
             'Content-Type': 'multipart/form-data;',
