@@ -20,7 +20,7 @@ const App = () => {
         get(`menu/search?sort=menuOrder,desc`).then(res => {
             const menuListArr = [];
             res.content.forEach(menu => {
-                get(`http://bpaws10l:8082/api/files/resource?resourceId=${menu.id}&bucket=mobi-c&folder=menu-logo`).then(file => {
+                get(`http://bpaws01l:8082/api/files/resource?resourceId=${menu.id}&bucket=mobi-c&folder=menu-logo`).then(file => {
                     menuListArr.push({
                         ...menu,
                         file
