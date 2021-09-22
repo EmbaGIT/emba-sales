@@ -2,7 +2,14 @@ import React, {useContext, useRef, useState} from 'react';
 import noImage from "../../assets/images/no-image.png";
 import CountInput from "../../UI/countInput";
 import CartContext from "../../store/CartContext";
+import LightGallery from 'lightgallery/react';
+import 'lightgallery/css/lightgallery.css';
 
+const img = {
+    width: '100%',
+    maxWidth: 100,
+    marginRight: 10
+};
 
 const SubProductItem = (props) => {
     const amountInputRef = useRef();
@@ -33,7 +40,11 @@ const SubProductItem = (props) => {
                 <div className="sub-item-info">
                     <div className="sub-item-image">
                         {props.files?.length ? props.files.map(file => (
-                            <img src={file.objectUrl} alt=""/>
+                            <LightGallery speed={500}>
+                                <a href={file.objectUrl}>
+                                    <img alt="" style={img} src={file.objectUrl} />
+                                </a>
+                            </LightGallery>
                         )) : <img src={noImage} alt=""/>}
                     </div>
                     <div className="sub-item">
