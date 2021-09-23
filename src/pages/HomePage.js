@@ -6,7 +6,6 @@ const Home = (props) => {
         <div className="row py-5">
             {props.menuData && props.menuData.map((menu, index) => (
                 <div key={index} className="col-md-3 mb-3">
-                    {console.log(index)}
                     <Link to={`category/${menu.attributes.id}`}>
                         <div className="category-box">
                             <div className="category-hover-box">

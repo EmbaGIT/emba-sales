@@ -20,12 +20,12 @@ const Category = () => {
     useEffect(() => {
         setProductList([]);
         setIsFetchingData(true);
-        get(`http://bpaws01l:8083/api/parents/byAttributeId/${category_id}?page=${page}&size=15`).then((res) => {
+        get(`parents/byAttributeId/${category_id}?page=${page}&size=15`).then((res) => {
             /*if(res.content.length){*/
             setPageInfo(res);
             const productListArr = [];
             res.content.forEach(product => {
-                get(`http://bpaws01l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
+                get(`http://bpaws10l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c-test&folder=parent-banner`).then(file => {
                     productListArr.push({
                         ...product,
                         file
@@ -88,7 +88,7 @@ const Category = () => {
             <div className="grid-wrapper">
                 {productList && productList.map((product, index) => (
                     <div className="grid-item" key={index}>
-                        <Link to={`/product/${product.id}`} className="pr-wrapper product-add">
+                        <Link to={`/product/${product.id}?parentName=${product.name}`} className="pr-wrapper product-add">
                             <div className="pr-image">
                                 <div className="product-button">
                                     <div className="add-to-cart btn-cart">

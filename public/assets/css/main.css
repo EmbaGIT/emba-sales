@@ -316,6 +316,21 @@ input[type=number] {
     font-size: 16px;
 }
 
+.panel-heading{
+    color: #444;
+    font-size: 16px;
+    font-weight: 500;
+    border-bottom: 2px solid #7bb80b;
+    background: rgba(0, 0, 0, 0.03);
+    line-height: 1;
+    padding: 15px;
+    margin-bottom: -1px;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    font-family: Poppins;
+}
+
 @media (max-width: 1440px) {
     .grid-wrapper {
         grid-template-columns: repeat(3, 1fr);
