@@ -25,7 +25,7 @@ const Category = () => {
             setPageInfo(res);
             const productListArr = [];
             res.content.forEach(product => {
-                get(`http://bpaws10l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c-test&folder=parent-banner`).then(file => {
+                get(`http://bpaws01l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
                     productListArr.push({
                         ...product,
                         file

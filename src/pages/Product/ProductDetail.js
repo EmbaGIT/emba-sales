@@ -24,7 +24,7 @@ const Product = () => {
         get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1`).then((res) => {
             const subProductIsIncludedArr = [];
             res.content.map(item => (
-                get(`http://bpaws10l:8082/api/files/resource?resourceId=${item.id}&bucket=mobi-c-test&folder=module-banner`).then(files => {
+                get(`http://bpaws01l:8082/api/files/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
                     subProductIsIncludedArr.push({item, files});
                     setSubProductsIsIncluded(prevState => ([
                         ...subProductIsIncludedArr
@@ -36,7 +36,7 @@ const Product = () => {
         get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=4`).then((res) => {
             const subProductArr = [];
             res.content.map(item => (
-                get(`http://bpaws10l:8082/api/files/resource?resourceId=${item.id}&bucket=mobi-c-test&folder=module-banner`).then(files => {
+                get(`http://bpaws01l:8082/api/files/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
                     subProductArr.push({item, files});
                     setSubProductsNotIncluded(prevState => ([
                         ...subProductArr
@@ -45,7 +45,7 @@ const Product = () => {
             ))
             setIsFetchingData(false);
         });
-        get(`http://bpaws10l:8082/api/files/resource?resourceId=${parent_id}&bucket=mobi-c-test&folder=parent-products`).then(files => {
+        get(`http://bpaws01l:8082/api/files/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
             const images = [];
             files.map(file => (
                 images.push({
