@@ -28,7 +28,7 @@ const Cart = () => {
                                 <div className="cart-product-table pr-wrapper">
                                     <div className="basket-product-image-row">
                                         {item.files.length ? item.files.map(file => (
-                                                <img src={file.objectUrl} alt="" className="basket-product-image"/>
+                                                <img src={file.originalImageUrl} alt="" className="basket-product-image"/>
                                             )) :
                                             <img src={noImage} alt="" className="basket-product-image"/>
                                         }

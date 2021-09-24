@@ -6,51 +6,61 @@ import Loader from "react-loader-spinner";
 import ImageGallery from 'react-image-gallery';
 import "react-image-gallery/styles/css/image-gallery.css";
 import SubProductItem from "./SubProductItem";
-import {useQuery} from "../../hooks/useQuery";
 
 const Product = () => {
     const params = useParams();
-    let query = useQuery();
     const parent_id = params.id;
-    const parent_name = query.get("parentName");
     const [isFetchingData, setIsFetchingData] = useState(true);
-    const [productName, setProductName] = useState(parent_name);
+    const [productInfo, setProductInfo] = useState('');
+    const [totalPrice, setSetPrice] = useState(0);
     const [productImages, setProductImages] = useState();
     const [subProductsIsIncluded, setSubProductsIsIncluded] = useState();
     const [subProductsNotIncluded, setSubProductsNotIncluded] = useState();
 
     useEffect(() => {
         setIsFetchingData(true);
+        let setPrice=0;
+        get(`parents/${parent_id}`).then(res => {
+            setProductInfo(res);
+        })
         get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1`).then((res) => {
             const subProductIsIncludedArr = [];
-            res.content.map(item => (
-                get(`http://bpaws01l:8082/api/files/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
+            res.content.map(item => {
+                setPrice += item.price;
+                get(`http://bpaws01l:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
                     subProductIsIncludedArr.push({item, files});
+                    subProductIsIncludedArr.sort(
+                        (a, b) => parseInt(a.item.id) - parseInt(b.item.id)
+                    );
                     setSubProductsIsIncluded(prevState => ([
                         ...subProductIsIncludedArr
                     ]));
                 })
-            ))
+            })
             setIsFetchingData(false);
+            setSetPrice(setPrice);
         });
         get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=4`).then((res) => {
-            const subProductArr = [];
+            const subProductNotIncludedArr = [];
             res.content.map(item => (
-                get(`http://bpaws01l:8082/api/files/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
-                    subProductArr.push({item, files});
+                get(`http://bpaws01l:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
+                    subProductNotIncludedArr.push({item, files});
+                    subProductNotIncludedArr.sort(
+                        (a, b) => parseInt(a.item.id) - parseInt(b.item.id)
+                    );
                     setSubProductsNotIncluded(prevState => ([
-                        ...subProductArr
+                        ...subProductNotIncludedArr
                     ]));
                 })
             ))
             setIsFetchingData(false);
         });
-        get(`http://bpaws01l:8082/api/files/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
+        get(`http://bpaws01l:8082/api/image/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
             const images = [];
             files.map(file => (
                 images.push({
-                    original: file.objectUrl,
-                    thumbnail: file.objectUrl,
+                    original: file.originalImageUrl,
+                    thumbnail: file.lowQualityImageUrl,
                 })
             ))
             setProductImages(images);
@@ -80,17 +90,17 @@ const Product = () => {
                     }
                 </div>
                 <div className="col-lg-5">
-                    {productName &&
+                    {productInfo &&
                     <>
                         <div className="d-flex">
-                            <h1 className="product-name">{productName}</h1>
+                            <h1 className="product-name">{productInfo.name}</h1>
                             <div className="ms-3"><i className="far fa-heart"/></div>
                         </div>
                         <div className="product-price-box mt-2">
                             <div className="d-flex align-items-center product-info-wrapper justify-content-between">
                                 <div className="price-block">
                                         <span className="product-price-current">
-                                            <span>311</span> AZN
+                                            <span className="price">{totalPrice ? totalPrice : 0}</span> AZN
                                         </span>
                                 </div>
                             </div>
@@ -110,6 +120,7 @@ const Product = () => {
                         name={item.item.name}
                         price={item.item.price}
                         files={item.files}
+                        defaultValue={1}
                     />
                 ))}
             </div>
@@ -124,6 +135,7 @@ const Product = () => {
                         name={item.item.name}
                         price={item.item.price}
                         files={item.files}
+                        defaultValue={0}
                     />
                 ))}
             </div>

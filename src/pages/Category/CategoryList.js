@@ -25,7 +25,7 @@ const Category = () => {
             setPageInfo(res);
             const productListArr = [];
             res.content.forEach(product => {
-                get(`http://bpaws01l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
+                get(`http://bpaws01l:8082/api/image/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
                     productListArr.push({
                         ...product,
                         file
@@ -44,7 +44,7 @@ const Category = () => {
                     console.log("response", response)
                     const productListArr = [];
                     response.content.forEach(product => {
-                        get(`http://bpaws01l:8082/api/files/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
+                        get(`http://bpaws01l:8082/api/image/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
                             productListArr.push({
                                 ...product,
                                 file
@@ -88,7 +88,7 @@ const Category = () => {
             <div className="grid-wrapper">
                 {productList && productList.map((product, index) => (
                     <div className="grid-item" key={index}>
-                        <Link to={`/product/${product.id}?parentName=${product.name}`} className="pr-wrapper product-add">
+                        <Link to={`/product/${product.id}`} className="pr-wrapper product-add">
                             <div className="pr-image">
                                 <div className="product-button">
                                     <div className="add-to-cart btn-cart">
@@ -99,7 +99,7 @@ const Category = () => {
                                     </div>
                                 </div>
                                 {product.file.length ? product.file.map(file => (
-                                    <img src={file.objectUrl} alt=""/>
+                                    <img src={file.lowQualityImageUrl} alt=""/>
                                 )) : <img src={noImage} alt=""/>}
                             </div>
                             <div className="pr-info">

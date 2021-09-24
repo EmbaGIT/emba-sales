@@ -29,7 +29,8 @@ const SubProductItem = (props) => {
                 name: props.name,
                 amount: enteredAmountNumber,
                 price: props.price,
-                files: props.files
+                files: props.files,
+                discount: 0
             });
         }
     }
@@ -41,8 +42,8 @@ const SubProductItem = (props) => {
                     <div className="sub-item-image">
                         {props.files?.length ? props.files.map(file => (
                             <LightGallery speed={500}>
-                                <a href={file.objectUrl}>
-                                    <img alt="" style={img} src={file.objectUrl} />
+                                <a href={file.originalImageUrl}>
+                                    <img alt="" style={img} src={file.lowQualityImageUrl} />
                                 </a>
                             </LightGallery>
                         )) : <img src={noImage} alt=""/>}
@@ -56,7 +57,7 @@ const SubProductItem = (props) => {
                     <div className="sub-item-price-block">
                         {props.price ? props.price : 0} AZN
                     </div>
-                    <CountInput ref={amountInputRef}/>
+                    <CountInput defaultValue={props.defaultValue} ref={amountInputRef}/>
                     <div className="text-end">
                         <button type="button" className="btn btn-success" onClick={addToCartHandler}>
                             <i className="fas fa-cart-plus"/>
@@ -64,8 +65,8 @@ const SubProductItem = (props) => {
                     </div>
                 </div>
                 {!isAmountValid &&
-                <small className="text-danger">Zəhmət olmasa düzgün miqdar daxil edin (1-12).</small>}
-
+                <small className="text-danger">Zəhmət olmasa düzgün miqdar daxil edin (1-12).</small>
+                }
             </div>
         </div>
     )

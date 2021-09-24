@@ -10,7 +10,7 @@ const Home = (props) => {
                         <div className="category-box">
                             <div className="category-hover-box">
                                 {menu.file.map(file => (
-                                    <img src={file.objectUrl} className="category-box-image" alt=""/>
+                                    <img src={file.originalImageUrl} className="category-box-image" alt=""/>
                                 ))}
                                 <div className="category-name">{menu.nameAz}</div>
                             </div>

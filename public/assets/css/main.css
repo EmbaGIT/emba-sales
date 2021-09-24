@@ -143,6 +143,11 @@
     max-width: 450px;
 }
 
+.price{
+    font-family: Poppins;
+    font-size: 1.2rem;
+}
+
 .sub-item-wrapper {
     position: relative;
     border: 1px solid #cdcdd0;
