@@ -169,6 +169,14 @@
     width: 100px;
 }
 
+.sub-item-name{
+    cursor: pointer;
+}
+
+.sub-product-info-table.table>:not(caption)>*>* {
+    padding: 0.5rem 0.7rem;
+}
+
 .line {
     height: 1px;
     background-color: #dedede;

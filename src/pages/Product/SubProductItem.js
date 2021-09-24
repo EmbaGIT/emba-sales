@@ -35,6 +35,7 @@ const SubProductItem = (props) => {
         }
     }
 
+
     return (
         <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-3" key={props.id}>
             <div className="sub-item-wrapper">
@@ -49,7 +50,7 @@ const SubProductItem = (props) => {
                         )) : <img src={noImage} alt=""/>}
                     </div>
                     <div className="sub-item">
-                        <p>{props.name}</p>
+                        <p className="sub-item-name" onClick={props.onClickHandle.bind(null, props.id)}>{props.name}</p>
                     </div>
                 </div>
                 <div className="line"></div>

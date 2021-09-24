@@ -6,6 +6,7 @@ import Loader from "react-loader-spinner";
 import ImageGallery from 'react-image-gallery';
 import "react-image-gallery/styles/css/image-gallery.css";
 import SubProductItem from "./SubProductItem";
+import SubProductInfo from "./SubProductİnfo";
 
 const Product = () => {
     const params = useParams();
@@ -14,8 +15,19 @@ const Product = () => {
     const [productInfo, setProductInfo] = useState('');
     const [totalPrice, setSetPrice] = useState(0);
     const [productImages, setProductImages] = useState();
+    const [subProductImages, setSubProductImages] = useState();
     const [subProductsIsIncluded, setSubProductsIsIncluded] = useState();
     const [subProductsNotIncluded, setSubProductsNotIncluded] = useState();
+    const [subProductInfo, setSubProductInfo] = useState([]);
+    const [cartIsShown, setCartIsShown] = useState(false);
+
+    const showCartHandler = () => {
+        setCartIsShown(true);
+    };
+
+    const hideCartHandler = () => {
+        setCartIsShown(false);
+    };
 
     useEffect(() => {
         setIsFetchingData(true);
@@ -67,6 +79,23 @@ const Product = () => {
         });
     }, [parent_id]);
 
+    const handleModuleInfo = (id) => {
+        get(`http://bpaws01l:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-images`).then(files => {
+            console.log(files);
+            const images = [];
+            files.map(file => (
+                images.push({
+                    original: file.originalImageUrl,
+                    thumbnail: file.lowQualityImageUrl,
+                })
+            ))
+            setSubProductImages(images);
+            showCartHandler();
+        });
+        get(`products/${id}`).then(res => {
+            setSubProductInfo(res);
+        })
+    }
 
     if (isFetchingData) {
         return (
@@ -109,6 +138,7 @@ const Product = () => {
                     }
                 </div>
             </div>
+            {cartIsShown && <SubProductInfo onClose={hideCartHandler} info={subProductInfo} images={subProductImages}/>}
             <div className="row mt-4">
                 <div className="col-12 mb-3">
                     <p className="panel-heading">Dəst Tərkibi</p>
@@ -121,6 +151,7 @@ const Product = () => {
                         price={item.item.price}
                         files={item.files}
                         defaultValue={1}
+                        onClickHandle = {handleModuleInfo}
                     />
                 ))}
             </div>
@@ -136,6 +167,7 @@ const Product = () => {
                         price={item.item.price}
                         files={item.files}
                         defaultValue={0}
+                        onClickHandle = {handleModuleInfo}
                     />
                 ))}
             </div>
