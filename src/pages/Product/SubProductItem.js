@@ -30,7 +30,8 @@ const SubProductItem = (props) => {
                 amount: enteredAmountNumber,
                 price: props.price,
                 files: props.files,
-                discount: 0
+                discount: 0,
+                parent : props.parent
             });
         }
     }

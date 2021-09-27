@@ -24,14 +24,6 @@ const SubProductInfo = (props) => {
                                 <td></td>
                             </tr>
                         ))}
-                        {props.info?.categories && props.info?.categories.map((info, index) => (
-                            <tr key={info.id}>
-                                <td><strong>{info.name}</strong></td>
-                                <td>{info.value ? <span className='text-success p-1'>Daxildir</span> :
-                                    <span className='text-danger p-1'>Daxil deyil</span>}</td>
-                                <td></td>
-                            </tr>
-                        ))}
                         {props.info?.characteristics && props.info?.characteristics.map((info, index) => (
                             <tr key={info.id}>
                                 <td><strong>{info.name}</strong></td>

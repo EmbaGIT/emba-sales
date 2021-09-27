@@ -10,7 +10,7 @@ const Header = (props) => {
     const numberOfCartItem = cartCtx.items.reduce((cardNumber, item) => {
         console.log("cardNumber", cardNumber);
         console.log("item", item);
-        return cardNumber + item.amount
+        return cardNumber + item.products[0].amount
     }, 0)
 
     return (
@@ -47,15 +47,15 @@ const Header = (props) => {
                     <div className="position-relative">
                         <Link to="/cart">
                             <span
-                                className="text-reset me-3"
+                                className="text-reset me-5"
                                 role="button">
-                                <i className="fas fa-shopping-cart text-body"/>
+                                <i className="fas fa-shopping-cart text-body" style={{fontSize: '20px'}}/>
                                 <span className="badge rounded-pill badge-notification bg-danger">{numberOfCartItem}</span>
                             </span>
                         </Link>
                     </div>
 
-                    <NavLink to="/wishlist"><i className="fas fa-heart me-3 text-body"/></NavLink>
+                    <NavLink to="/wishlist"><i className="fas fa-heart me-5 text-body" style={{fontSize: '20px'}}/></NavLink>
 
                     <div className="">
                         <button type="button" className="btn btn-primary">Çıxış</button>

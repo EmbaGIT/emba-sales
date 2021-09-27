@@ -57,6 +57,7 @@ const Product = () => {
             res.content.map(item => (
                 get(`http://bpaws01l:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
                     subProductNotIncludedArr.push({item, files});
+
                     subProductNotIncludedArr.sort(
                         (a, b) => parseInt(a.item.id) - parseInt(b.item.id)
                     );
@@ -80,8 +81,7 @@ const Product = () => {
     }, [parent_id]);
 
     const handleModuleInfo = (id) => {
-        get(`http://bpaws01l:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-images`).then(files => {
-            console.log(files);
+        get(`http://bpaws01l.embawood.dm:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-images`).then(files => {
             const images = [];
             files.map(file => (
                 images.push({
@@ -94,6 +94,7 @@ const Product = () => {
         });
         get(`products/${id}`).then(res => {
             setSubProductInfo(res);
+            console.log("product info", res);
         })
     }
 
@@ -151,13 +152,14 @@ const Product = () => {
                         price={item.item.price}
                         files={item.files}
                         defaultValue={1}
+                        parent={item.item.parent.name}
                         onClickHandle = {handleModuleInfo}
                     />
                 ))}
             </div>
             <div className="row mt-4">
                 <div className="col-12 mb-3">
-                    <p className="panel-heading">Dəst Daxil Olmayan Modullar</p>
+                    <p className="panel-heading">Dəstə Daxil Olmayan Modullar</p>
                 </div>
                 {subProductsNotIncluded && subProductsNotIncluded.map((item) => (
                     <SubProductItem
