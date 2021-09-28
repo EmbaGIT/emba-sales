@@ -25,26 +25,30 @@ const Cart = () => {
                     {cartCtx.items.length ?
                         <div className="basket-product-wrapper card card-table">
                             {cartCtx.items.map(item => (
-                                <div className="cart-product-table pr-wrapper">
-                                    <div className="basket-product-image-row">
-                                        {item.files.length ? item.files.map(file => (
-                                                <img src={file.originalImageUrl} alt="" className="basket-product-image"/>
-                                            )) :
-                                            <img src={noImage} alt="" className="basket-product-image"/>
-                                        }
-                                    </div>
-                                    <div className="basket-product-name-row">
-                                        <p className="fm-poppins_bold mb-0"><Link
-                                            to={`/product/${item.id}`}>{item.name}</Link></p>
-                                    </div>
-                                    <CountInput ref={amountInputRef}/>
-                                    <div className="basket-product-price-row">
-                                        <div className="basket-product-price"><span>{item.price}</span> ₼</div>
-                                    </div>
-                                    <div className="basket-product-delete-row">
-                                        <div className="delete-cart-item"><i className="text-danger fas fa-trash-alt"/>
+                                <div>
+                                    <div className="bg-llight">{item.parent}</div>
+                                    {item.products && item.products.map(product => (
+                                        <div className="cart-product-table pr-wrapper">
+                                            <div className="basket-product-image-row">
+                                                {product.files.length ? product.files.map(file => (
+                                                        <img src={file.originalImageUrl} alt="" className="basket-product-image"/>
+                                                    )) :
+                                                    <img src={noImage} alt="" className="basket-product-image"/>
+                                                }
+                                            </div>
+                                            <div className="basket-product-name-row">
+                                                <p className="fm-poppins_bold mb-0">{product.name}</p>
+                                            </div>
+                                            <CountInput ref={amountInputRef} defaultValue={product.amount}/>
+                                            <div className="basket-product-price-row">
+                                                <div className="basket-product-price"><span>{product.price}</span> ₼</div>
+                                            </div>
+                                            <div className="basket-product-delete-row">
+                                                <div className="delete-cart-item"><i className="text-danger fas fa-trash-alt"/>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ))}
                                 </div>
                             ))}
                         </div>

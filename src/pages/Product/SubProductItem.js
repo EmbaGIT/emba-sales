@@ -25,12 +25,12 @@ const SubProductItem = (props) => {
             return;
         } else {
             cartCtx.addItem({
+                amount: enteredAmountNumber,
+                discount: 0,
+                files: props.files,
                 id: props.id,
                 name: props.name,
-                amount: enteredAmountNumber,
                 price: props.price,
-                files: props.files,
-                discount: 0,
                 parent : props.parent
             });
         }

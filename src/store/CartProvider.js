@@ -3,31 +3,11 @@ import CartContext from "./CartContext";
 import {toast} from 'react-toastify'
 
 const defaultCartState = {
-    items: [{
-        parent: 'Alyans yataq dəsti',
-        products: [{
-            amount: 2,
-            discount: 0,
-            files: [],
-            id: 733,
-            name: "Alyans - Yataq - Tumba - Ceviz hareli / Magic blue - 650 x 420 x 520 - MFF",
-            price: 125
-        }],
-    }, {
-        parent: 'Nevis yataq dəsti',
-        products: [{
-            amount: 3,
-            discount: 0,
-            files: [],
-            id: 733,
-            name: "Alyans - Yataq - Tumba - Ceviz hareli / Magic blue - 650 x 420 x 520 - MFF",
-            price: 125
-        }]
-    }],
+    items: [],
     totalAmount: 0
 }
 
-console.log(defaultCartState);
+console.log("defaultCartState", defaultCartState);
 
 const MessageComponent = ({text}) => (
     <span style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center'}}>
@@ -47,35 +27,49 @@ const MessageComponent = ({text}) => (
 const cartReducer = (state, action) => {
     if (action.type === "ADD") {
         const updatedTotalAmount = state.totalAmount + action.item.price * action.item.amount;
-
-        const existingCartItemIndex = state.items.findIndex(
+        const existingParentItemIndex = state.items.findIndex(
             (item) => item.parent === action.item.parent
         );
 
-        const existingCartItem = state.items[existingCartItemIndex];
+        const existingParentItem = state.items[existingParentItemIndex];
 
-        console.log("item already part", state.items[existingCartItemIndex].products);
-
+        let updatedState;
         let updatedItems;
 
-        if (existingCartItem) {
-            const updatedItem = {
-                ...existingCartItem,
-                amount: existingCartItem.amount + action.item.amount,
-            };
-            updatedItems = [...state.items];
-            updatedItems[existingCartItemIndex] = updatedItem;
-        } else {
-            updatedItems = state.items.concat(action.item);
+        if(existingParentItem){
+            const existingItemIndex = existingParentItem.products.findIndex(item => item.id === action.item.id);
+            const existingItem = existingParentItem.products[existingItemIndex];
+
+            if(existingItem){
+                const updatedItem={
+                    ...existingParentItem.products[existingItemIndex],
+                    amount: existingItem.amount + action.item.amount
+                }
+                updatedItems = {...existingParentItem};
+                updatedItems.products[existingItemIndex] = updatedItem;
+            }else{
+                updatedItems = {...existingParentItem};
+                updatedItems.products.push(action.item);
+            }
+            updatedState = [...state.items];
+            updatedState[existingParentItemIndex] = updatedItems;
+        }else{
+            updatedState = [...state.items];
+            updatedState.push({
+                parent: action.item.parent,
+                products: [action.item]
+            })
         }
-        toast.success(<MessageComponent text={`${action.item.name} səbətə əlavə edildi.`}/>, {
+
+        /*toast.success(<MessageComponent text={`${action.item.name} səbətə əlavə edildi.`}/>, {
             position: toast.POSITION.TOP_RIGHT,
             toastId: 'success-toast-message',
             autoClose: 1500,
             closeOnClick: true,
-        });
+        });*/
+
         return {
-            items: updatedItems,
+            items: updatedState,
             totalAmount: updatedTotalAmount
         }
     }

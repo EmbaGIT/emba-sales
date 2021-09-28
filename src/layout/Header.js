@@ -6,11 +6,15 @@ import {Link, NavLink} from "react-router-dom";
 const Header = (props) => {
 
     const cartCtx = useContext(CartContext);
+    let cartTotalElement =0;
 
     const numberOfCartItem = cartCtx.items.reduce((cardNumber, item) => {
         console.log("cardNumber", cardNumber);
         console.log("item", item);
-        return cardNumber + item.products[0].amount
+        item.products.map(item => {
+            cartTotalElement += item.amount;
+        })
+        return cartTotalElement;
     }, 0)
 
     return (
