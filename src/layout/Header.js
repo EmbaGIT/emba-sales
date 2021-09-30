@@ -5,17 +5,24 @@ import {Link, NavLink} from "react-router-dom";
 
 const Header = (props) => {
 
-    const cartCtx = useContext(CartContext);
     let cartTotalElement =0;
+    const cartCtx = useContext(CartContext);
 
-    const numberOfCartItem = cartCtx.items.reduce((cardNumber, item) => {
+    const { items } = cartCtx;
+    const numberOfCartItem = items.reduce((curNumber, item) => {
+        return curNumber + item.amount;
+    }, 0);
+
+/*    const numberOfCartItem = cartCtx.items.reduce((cardNumber, item) => {
         console.log("cardNumber", cardNumber);
         console.log("item", item);
         item.products.map(item => {
             cartTotalElement += item.amount;
         })
         return cartTotalElement;
-    }, 0)
+    }, 0)*/
+
+    // const numberOfCartItem = 0;
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">

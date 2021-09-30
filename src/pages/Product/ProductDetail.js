@@ -39,7 +39,7 @@ const Product = () => {
             const subProductIsIncludedArr = [];
             res.content.map(item => {
                 setPrice += item.price;
-                get(`http://bpaws01l:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
+                get(`http://bpaws01l.embawood.dm:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
                     subProductIsIncludedArr.push({item, files});
                     subProductIsIncludedArr.sort(
                         (a, b) => parseInt(a.item.id) - parseInt(b.item.id)
@@ -55,7 +55,7 @@ const Product = () => {
         get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=4`).then((res) => {
             const subProductNotIncludedArr = [];
             res.content.map(item => (
-                get(`http://bpaws01l:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
+                get(`http://bpaws01l.embawood.dm:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
                     subProductNotIncludedArr.push({item, files});
 
                     subProductNotIncludedArr.sort(
@@ -68,7 +68,7 @@ const Product = () => {
             ))
             setIsFetchingData(false);
         });
-        get(`http://bpaws01l:8082/api/image/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
+        get(`http://bpaws01l.embawood.dm:8082/api/image/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
             const images = [];
             files.map(file => (
                 images.push({
@@ -81,7 +81,7 @@ const Product = () => {
     }, [parent_id]);
 
     const handleModuleInfo = (id) => {
-        get(`http://bpaws01l.embawood.dm:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-images`).then(files => {
+        get(`http://bpaws01l.embawood.dm.embawood.dm:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-images`).then(files => {
             const images = [];
             files.map(file => (
                 images.push({

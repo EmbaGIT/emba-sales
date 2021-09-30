@@ -1,13 +1,12 @@
-import {useReducer} from "react";
+/*
+import {useReducer, useEffect, useState} from "react";
 import CartContext from "./CartContext";
 import {toast} from 'react-toastify'
 
-const defaultCartState = {
+const defaultCartState = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : {
     items: [],
     totalAmount: 0
-}
-
-console.log("defaultCartState", defaultCartState);
+};
 
 const MessageComponent = ({text}) => (
     <span style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center'}}>
@@ -25,58 +24,84 @@ const MessageComponent = ({text}) => (
 );
 
 const cartReducer = (state, action) => {
-    if (action.type === "ADD") {
+
+/!*    const previousStateItems=state.items;
+
+    if (action.type === 'ADD') {
         const updatedTotalAmount = state.totalAmount + action.item.price * action.item.amount;
-        const existingParentItemIndex = state.items.findIndex(
+
+        const existingParentItemIndex = previousStateItems.findIndex(
             (item) => item.parent === action.item.parent
         );
-
-        const existingParentItem = state.items[existingParentItemIndex];
-
+        const existingParentItem = previousStateItems[existingParentItemIndex];
         let updatedState;
-        let updatedItems;
 
         if(existingParentItem){
-            const existingItemIndex = existingParentItem.products.findIndex(item => item.id === action.item.id);
-            const existingItem = existingParentItem.products[existingItemIndex];
+            const existingCartItemIndex = existingParentItem.products.findIndex(
+                (item) => item.id === action.item.id
+            );
+            const existingCartItem = existingParentItem.products[existingCartItemIndex];
+            let updatedItems;
 
-            if(existingItem){
-                const updatedItem={
-                    ...existingParentItem.products[existingItemIndex],
-                    amount: existingItem.amount + action.item.amount
-                }
+            if (existingCartItem) {
+                const updatedItem = {
+                    ...existingCartItem,
+                    amount: existingCartItem.amount + action.item.amount,
+                };
                 updatedItems = {...existingParentItem};
-                updatedItems.products[existingItemIndex] = updatedItem;
-            }else{
+                updatedItems.products[existingCartItemIndex] = updatedItem;
+            } else {
                 updatedItems = {...existingParentItem};
                 updatedItems.products.push(action.item);
             }
-            updatedState = [...state.items];
+
+            updatedState = [...previousStateItems];
             updatedState[existingParentItemIndex] = updatedItems;
         }else{
-            updatedState = [...state.items];
+            updatedState = [...previousStateItems];
             updatedState.push({
                 parent: action.item.parent,
                 products: [action.item]
             })
         }
 
-        /*toast.success(<MessageComponent text={`${action.item.name} səbətə əlavə edildi.`}/>, {
-            position: toast.POSITION.TOP_RIGHT,
-            toastId: 'success-toast-message',
-            autoClose: 1500,
-            closeOnClick: true,
-        });*/
-
         return {
             items: updatedState,
-            totalAmount: updatedTotalAmount
+            totalAmount: updatedTotalAmount,
+        };
+    }*!/
+    if (action.type === 'ADD') {
+        const updatedTotalAmount =
+            state.totalAmount + action.item.price * action.item.amount;
+
+        const existingCartItemIndex = state.items.findIndex(
+            (item) => item.id === action.item.id
+        );
+        const existingCartItem = state.items[existingCartItemIndex];
+        let updatedItems;
+
+        if (existingCartItem) {
+            const updatedItem = {
+                ...existingCartItem,
+                amount: existingCartItem.amount + action.item.amount,
+            };
+            updatedItems = [...state.items];
+            updatedItems[existingCartItemIndex] = updatedItem;
+        } else {
+            updatedItems = state.items.concat(action.item);
         }
+
+        return {
+            items: updatedItems,
+            totalAmount: updatedTotalAmount,
+        };
     }
     return defaultCartState;
 }
 
+
 const CartProvider = (props) => {
+
     const [cartState, dispatchCartAction] = useReducer(
         cartReducer,
         defaultCartState
@@ -103,6 +128,62 @@ const CartProvider = (props) => {
         </CartContext.Provider>
     )
 
+}
+
+export default CartProvider;*/
+
+import React, { createContext, useReducer } from 'react';
+import { CartReducer, sumItems } from './CartReducer';
+
+export const CartContext = createContext()
+
+const storage = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : [];
+const initialState = { cartItems: storage, ...sumItems(storage), checkout: false };
+
+const CartProvider = ({children}) => {
+
+    const [state, dispatch] = useReducer(CartReducer, initialState)
+
+    const increase = payload => {
+        dispatch({type: 'INCREASE', payload})
+    }
+
+    const decrease = payload => {
+        dispatch({type: 'DECREASE', payload})
+    }
+
+    const addProduct = payload => {
+        dispatch({type: 'ADD_ITEM', payload})
+    }
+
+    const removeProduct = payload => {
+        dispatch({type: 'REMOVE_ITEM', payload})
+    }
+
+    const clearCart = () => {
+        dispatch({type: 'CLEAR'})
+    }
+
+    const handleCheckout = () => {
+        console.log('CHECKOUT', state);
+        dispatch({type: 'CHECKOUT'})
+    }
+
+    const contextValues = {
+        removeProduct,
+        addProduct,
+        increase,
+        decrease,
+        clearCart,
+        handleCheckout,
+        ...state
+    }
+
+    return (
+        <CartContext.Provider value={contextValues} >
+            { children }
+        </CartContext.Provider>
+    );
 }
 
 export default CartProvider;

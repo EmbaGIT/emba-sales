@@ -17,7 +17,7 @@ const SubProductItem = (props) => {
     const [isAmountValid, setIsAmountValid] = useState(true);
 
     const addToCartHandler = () => {
-        const enteredAmount = amountInputRef.current.value; // always string value also input type number
+        const enteredAmount = amountInputRef.current.value;
         const enteredAmountNumber = +enteredAmount;
 
         if (enteredAmount.trim().length === 0 || enteredAmountNumber < 1 || enteredAmountNumber > 12) {
