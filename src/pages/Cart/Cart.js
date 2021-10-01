@@ -1,14 +1,54 @@
-import React, {useContext, useRef, useState} from 'react';
+import React, {useContext, useRef, useState, useEffect} from 'react';
 import {Link} from 'react-router-dom'
 import CartContext from "../../store/CartContext";
 import noImage from "../../assets/images/no-image.png";
 import CountInput from "../../UI/countInput";
 
 const Cart = () => {
-    const cartCtx=useContext(CartContext);
+    const cartCtx = useContext(CartContext);
     const amountInputRef = useRef();
-    const [hasItem, setHasItem] = useState(cartCtx.items.length > 0)
-    console.log(cartCtx);
+    const [hasItem, setHasItem] = useState(cartCtx.items.length > 0);
+    const [cartState, setCartState] = useState([]);
+
+    useEffect(() => {
+        const newCartArr = [];
+        newCartArr.push({
+            parent: cartCtx.items[0].parent,
+            products: [{
+                amount: cartCtx.items[0].amount,
+                discount: cartCtx.items[0].discount,
+                files: cartCtx.items[0].files,
+                id: cartCtx.items[0].id,
+                name: cartCtx.items[0].name,
+                price: cartCtx.items[0].price
+            }],
+        });
+        cartCtx.items.forEach((item, index) => {
+            if (index > 0) {
+                const existingParentItemIndex = newCartArr.findIndex(
+                    (product) => product.parent === item.parent
+                );
+                if (existingParentItemIndex) {
+                    console.log(newCartArr[existingParentItemIndex]);
+                    // newCartArr[existingParentItemIndex].products.push(item);
+                } else {
+                    newCartArr.push({
+                        parent: item.parent,
+                        products: [{
+                            amount: item.amount,
+                            discount: item.discount,
+                            files: item.files,
+                            id: item.id,
+                            name: item.name,
+                            price: item.price
+                        }],
+                    })
+                }
+            }
+        })
+        console.log(newCartArr);
+        setCartState(newCartArr);
+    }, []);
 
     return (
         <>
@@ -22,16 +62,17 @@ const Cart = () => {
             </div>
             <div className="row mb-3">
                 <div className="col-lg-9">
-                    {cartCtx.items.length ?
+                    {cartState.length ?
                         <div className="basket-product-wrapper card card-table">
-                            {cartCtx.items.map(item => (
+                            {cartState.map(item => (
                                 <div>
                                     <div className="bg-llight">{item.parent}</div>
                                     {item.products && item.products.map(product => (
                                         <div className="cart-product-table pr-wrapper">
                                             <div className="basket-product-image-row">
                                                 {product.files.length ? product.files.map(file => (
-                                                        <img src={file.originalImageUrl} alt="" className="basket-product-image"/>
+                                                        <img src={file.originalImageUrl} alt=""
+                                                             className="basket-product-image"/>
                                                     )) :
                                                     <img src={noImage} alt="" className="basket-product-image"/>
                                                 }
@@ -41,10 +82,12 @@ const Cart = () => {
                                             </div>
                                             <CountInput ref={amountInputRef} defaultValue={product.amount}/>
                                             <div className="basket-product-price-row">
-                                                <div className="basket-product-price"><span>{product.price}</span> ₼</div>
+                                                <div className="basket-product-price"><span>{product.price}</span> ₼
+                                                </div>
                                             </div>
                                             <div className="basket-product-delete-row">
-                                                <div className="delete-cart-item"><i className="text-danger fas fa-trash-alt"/>
+                                                <div className="delete-cart-item"><i
+                                                    className="text-danger fas fa-trash-alt"/>
                                                 </div>
                                             </div>
                                         </div>

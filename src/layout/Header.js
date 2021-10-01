@@ -22,7 +22,7 @@ const Header = (props) => {
         return cartTotalElement;
     }, 0)*/
 
-    // const numberOfCartItem = 0;
+// const numberOfCartItem = 0;
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">

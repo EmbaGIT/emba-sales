@@ -169,6 +169,7 @@ const Product = () => {
                         price={item.item.price}
                         files={item.files}
                         defaultValue={0}
+                        parent={item.item.parent.name}
                         onClickHandle = {handleModuleInfo}
                     />
                 ))}

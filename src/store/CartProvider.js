@@ -1,7 +1,6 @@
-/*
-import {useReducer, useEffect, useState} from "react";
+import {useReducer} from "react";
 import CartContext from "./CartContext";
-import {toast} from 'react-toastify'
+import {toast} from 'react-toastify';
 
 const defaultCartState = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : {
     items: [],
@@ -24,8 +23,7 @@ const MessageComponent = ({text}) => (
 );
 
 const cartReducer = (state, action) => {
-
-/!*    const previousStateItems=state.items;
+/*    const previousStateItems=state.items;
 
     if (action.type === 'ADD') {
         const updatedTotalAmount = state.totalAmount + action.item.price * action.item.amount;
@@ -69,10 +67,9 @@ const cartReducer = (state, action) => {
             items: updatedState,
             totalAmount: updatedTotalAmount,
         };
-    }*!/
+    }*/
     if (action.type === 'ADD') {
-        const updatedTotalAmount =
-            state.totalAmount + action.item.price * action.item.amount;
+        const updatedTotalAmount = state.totalAmount + action.item.price * action.item.amount;
 
         const existingCartItemIndex = state.items.findIndex(
             (item) => item.id === action.item.id
@@ -90,6 +87,11 @@ const cartReducer = (state, action) => {
         } else {
             updatedItems = state.items.concat(action.item);
         }
+
+        localStorage.setItem('cart', JSON.stringify({
+            items: updatedItems,
+            totalAmount: updatedTotalAmount,
+        }));
 
         return {
             items: updatedItems,
@@ -130,12 +132,13 @@ const CartProvider = (props) => {
 
 }
 
-export default CartProvider;*/
+/*
+export default CartProvider;
 
 import React, { createContext, useReducer } from 'react';
 import { CartReducer, sumItems } from './CartReducer';
 
-export const CartContext = createContext()
+export const CartContext = createContext();
 
 const storage = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : [];
 const initialState = { cartItems: storage, ...sumItems(storage), checkout: false };
@@ -184,6 +187,7 @@ const CartProvider = ({children}) => {
             { children }
         </CartContext.Provider>
     );
-}
+}*/
 
 export default CartProvider;
+
