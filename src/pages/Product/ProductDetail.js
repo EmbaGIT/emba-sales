@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
-import {get} from "../../api/Api";
+import {gett, postt, get, post} from "../../api/Api";
 import noImage from '../../assets/images/no-image.png';
 import Loader from "react-loader-spinner";
 import ImageGallery from 'react-image-gallery';
@@ -29,46 +29,113 @@ const Product = () => {
         setCartIsShown(false);
     };
 
+    function getProductStock(uid) {
+        return postt(`http://bpaws01l:8087/api/inventory`, {
+            "user_uid": "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
+            "goods": [
+                {
+                    "product_uid": uid,
+                    "characteristic_uid": ""
+                }
+            ]
+        });
+    }
+
+    function getProductFiles(id) {
+        return gett(`http://bpaws01l:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-banner`);
+    }
+
     useEffect(() => {
         setIsFetchingData(true);
         let setPrice=0;
+        const subProductIsIncludedArr = [];
+        const subProductNotIncludedArr = [];
         get(`parents/${parent_id}`).then(res => {
             setProductInfo(res);
-        })
+        });
         get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1`).then((res) => {
-            const subProductIsIncludedArr = [];
-            res.content.map(item => {
+            res.content.map(async item => {
                 setPrice += item.price;
-                get(`http://bpaws01l.embawood.dm:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
-                    subProductIsIncludedArr.push({item, files});
-                    subProductIsIncludedArr.sort(
-                        (a, b) => parseInt(a.item.id) - parseInt(b.item.id)
-                    );
-                    setSubProductsIsIncluded(prevState => ([
-                        ...subProductIsIncludedArr
-                    ]));
-                })
+                const items = [];
+                const stock = [];
+                const files = [];
+                await Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
+                    .then(function (results) {
+                        items.push(item);
+                        stock.push(...results[0].data[0].stock);
+                        files.push(...results[1].data);
+                        subProductIsIncludedArr.push({
+                            id: item.id,
+                            items,
+                            stock,
+                            files
+                        });
+                        subProductIsIncludedArr.sort(
+                            (a, b) => parseInt(a.id) - parseInt(b.id)
+                        );
+                        setSubProductsIsIncluded(prevState => ([
+                            ...subProductIsIncludedArr
+                        ]));
+                    });
             })
             setIsFetchingData(false);
             setSetPrice(setPrice);
         });
         get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=4`).then((res) => {
-            const subProductNotIncludedArr = [];
-            res.content.map(item => (
-                get(`http://bpaws01l.embawood.dm:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
-                    subProductNotIncludedArr.push({item, files});
-
-                    subProductNotIncludedArr.sort(
-                        (a, b) => parseInt(a.item.id) - parseInt(b.item.id)
-                    );
-                    setSubProductsNotIncluded(prevState => ([
-                        ...subProductNotIncludedArr
-                    ]));
-                })
-            ))
+            res.content.map(async item => {
+                const items = [];
+                const stock = [];
+                const files = [];
+                await Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
+                    .then(function (results) {
+                        items.push(item);
+                        stock.push(...results[0].data[0].stock);
+                        files.push(...results[1].data);
+                        subProductNotIncludedArr.push({
+                            id: item.id,
+                            items,
+                            stock,
+                            files
+                        });
+                        subProductNotIncludedArr.sort(
+                            (a, b) => parseInt(a.id) - parseInt(b.id)
+                        );
+                        setSubProductsNotIncluded(prevState => ([
+                            ...subProductNotIncludedArr
+                        ]));
+                    });
+            })
             setIsFetchingData(false);
+            /*const subProductNotIncludedArr = [];
+            res.content.map(item => {
+                const resItems = [];
+                const resStock = [];
+                const resFiles = [];
+                Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
+                    .then(function (results) {
+                        resItems.push(item);
+                        resStock.push(results[0].data[0].stock);
+                        resFiles.push(results[1].data[0]);
+
+                        subProductNotIncludedArr.push({
+                            id: item.id,
+                            items: resItems,
+                            stock: resStock,
+                            files: resFiles
+                        });
+
+                        console.log(subProductNotIncludedArr);
+                        subProductNotIncludedArr.sort(
+                            (a, b) => parseInt(b.id) - parseInt(a.id)
+                        );
+                    });
+                setSubProductsNotIncluded(prevState => ([
+                    ...subProductNotIncludedArr
+                ]));
+            })
+            setIsFetchingData(false);*/
         });
-        get(`http://bpaws01l.embawood.dm:8082/api/image/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
+        get(`http://bpaws01l:8082/api/image/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
             const images = [];
             files.map(file => (
                 images.push({
@@ -81,7 +148,7 @@ const Product = () => {
     }, [parent_id]);
 
     const handleModuleInfo = (id) => {
-        get(`http://bpaws01l.embawood.dm.embawood.dm:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-images`).then(files => {
+        get(`http://bpaws01l:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-images`).then(files => {
             const images = [];
             files.map(file => (
                 images.push({
@@ -146,13 +213,15 @@ const Product = () => {
                 </div>
                 {subProductsIsIncluded && subProductsIsIncluded.map((item) => (
                     <SubProductItem
-                        key_id={item.item.id}
-                        id={item.item.id}
-                        name={item.item.name}
-                        price={item.item.price}
+                        key_id={item.items[0].id}
+                        id={item.items[0].id}
+                        name={item.items[0].name}
+                        price={item.items[0].price}
                         files={item.files}
                         defaultValue={1}
-                        parent={item.item.parent.name}
+                        parent={item.items[0].parent.name}
+                        product_uid={item.items[0].uid}
+                        stock={item.stock}
                         onClickHandle = {handleModuleInfo}
                     />
                 ))}
@@ -163,13 +232,15 @@ const Product = () => {
                 </div>
                 {subProductsNotIncluded && subProductsNotIncluded.map((item) => (
                     <SubProductItem
-                        key_id={item.item.id}
-                        id={item.item.id}
-                        name={item.item.name}
-                        price={item.item.price}
+                        key_id={item.items[0].id}
+                        id={item.items[0].id}
+                        name={item.items[0].name}
+                        price={item.items[0].price}
                         files={item.files}
-                        defaultValue={0}
-                        parent={item.item.parent.name}
+                        defaultValue={1}
+                        parent={item.items[0].parent.name}
+                        product_uid={item.items[0].uid}
+                        stock={item.stock}
                         onClickHandle = {handleModuleInfo}
                     />
                 ))}

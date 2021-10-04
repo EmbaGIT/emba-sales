@@ -12,25 +12,26 @@ const Cart = () => {
 
     useEffect(() => {
         const newCartArr = [];
-        newCartArr.push({
-            parent: cartCtx.items[0].parent,
-            products: [{
-                amount: cartCtx.items[0].amount,
-                discount: cartCtx.items[0].discount,
-                files: cartCtx.items[0].files,
-                id: cartCtx.items[0].id,
-                name: cartCtx.items[0].name,
-                price: cartCtx.items[0].price
-            }],
-        });
+        if(cartCtx.items.length > 0){
+            newCartArr.push({
+                parent: cartCtx?.items[0].parent,
+                products: [{
+                    amount: cartCtx.items[0].amount,
+                    discount: cartCtx.items[0].discount,
+                    files: cartCtx.items[0].files,
+                    id: cartCtx.items[0].id,
+                    name: cartCtx.items[0].name,
+                    price: cartCtx.items[0].price
+                }],
+            });
+        }
         cartCtx.items.forEach((item, index) => {
             if (index > 0) {
                 const existingParentItemIndex = newCartArr.findIndex(
                     (product) => product.parent === item.parent
                 );
-                if (existingParentItemIndex) {
-                    console.log(newCartArr[existingParentItemIndex]);
-                    // newCartArr[existingParentItemIndex].products.push(item);
+                if (newCartArr[existingParentItemIndex]) {
+                    newCartArr[existingParentItemIndex].products.push(item);
                 } else {
                     newCartArr.push({
                         parent: item.parent,
@@ -66,7 +67,7 @@ const Cart = () => {
                         <div className="basket-product-wrapper card card-table">
                             {cartState.map(item => (
                                 <div>
-                                    <div className="bg-llight">{item.parent}</div>
+                                    <div className="list-group-item-primary p-3">{item.parent}</div>
                                     {item.products && item.products.map(product => (
                                         <div className="cart-product-table pr-wrapper">
                                             <div className="basket-product-image-row">
@@ -122,16 +123,19 @@ const Cart = () => {
                     </div>
                     <div className="card">
                         <div className="card-body">
-                            <p className="fm-poppins_bold">Endirim və ya hədiyyə kuponu</p>
-                            <div className="d-flex">
-                                <input type="text" placeholder="Kodu daxil edin"
-                                       className="border-radius-0 form-control"/>
-                                <button className="btn btn-custom border-radius-0">Yoxla</button>
+                            <p className="fm-poppins_bold">Bütün səbətə endirim tətbiq et (%-lə)</p>
+                            <div className="input-group">
+                                <div>
+                                    <input type="search" id="form1" className="form-control"/>
+                                </div>
+                                <button type="button" className="btn btn-sm btn-primary">
+                                    Tətbiq et
+                                </button>
                             </div>
                         </div>
                     </div>
                     {hasItem &&
-                    <button type="submit" className="btn btn-success py-2 fm-poppins w-100">Səbəti təsdiq et<i
+                    <button type="submit" className="btn btn-success py-2 mt-2 fm-poppins w-100">Səbəti təsdiq et<i
                         className="fas fa-chevron-right ms-1"/></button>
                     }
                 </div>

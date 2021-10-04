@@ -23,53 +23,8 @@ const MessageComponent = ({text}) => (
 );
 
 const cartReducer = (state, action) => {
-/*    const previousStateItems=state.items;
-
     if (action.type === 'ADD') {
-        const updatedTotalAmount = state.totalAmount + action.item.price * action.item.amount;
-
-        const existingParentItemIndex = previousStateItems.findIndex(
-            (item) => item.parent === action.item.parent
-        );
-        const existingParentItem = previousStateItems[existingParentItemIndex];
-        let updatedState;
-
-        if(existingParentItem){
-            const existingCartItemIndex = existingParentItem.products.findIndex(
-                (item) => item.id === action.item.id
-            );
-            const existingCartItem = existingParentItem.products[existingCartItemIndex];
-            let updatedItems;
-
-            if (existingCartItem) {
-                const updatedItem = {
-                    ...existingCartItem,
-                    amount: existingCartItem.amount + action.item.amount,
-                };
-                updatedItems = {...existingParentItem};
-                updatedItems.products[existingCartItemIndex] = updatedItem;
-            } else {
-                updatedItems = {...existingParentItem};
-                updatedItems.products.push(action.item);
-            }
-
-            updatedState = [...previousStateItems];
-            updatedState[existingParentItemIndex] = updatedItems;
-        }else{
-            updatedState = [...previousStateItems];
-            updatedState.push({
-                parent: action.item.parent,
-                products: [action.item]
-            })
-        }
-
-        return {
-            items: updatedState,
-            totalAmount: updatedTotalAmount,
-        };
-    }*/
-    if (action.type === 'ADD') {
-        const updatedTotalAmount = state.totalAmount + action.item.price * action.item.amount;
+        const updatedTotalAmount = state.totalAmount + (action.item.price * action.item.amount - action.item.discount * action.item.price * action.item.amount/100);
 
         const existingCartItemIndex = state.items.findIndex(
             (item) => item.id === action.item.id

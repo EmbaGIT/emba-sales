@@ -54,6 +54,14 @@ const SubProductItem = (props) => {
                         <p className="sub-item-name" onClick={props.onClickHandle.bind(null, props.id)}>{props.name}</p>
                     </div>
                 </div>
+                <div className="p-2">
+                    {props.stock.length ?
+                        <select className="form-control">
+                            {props.stock.map(info  => (<option value="1">{info.warehouse} - {info.quantity}</option>))}
+                        </select>
+                        : <div>Anbar məlumatı yoxdur</div>
+                    }
+                </div>
                 <div className="line"></div>
                 <div className="d-flex justify-content-between p-2 align-items-center">
                     <div className="sub-item-price-block">
