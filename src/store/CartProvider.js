@@ -2,6 +2,8 @@ import {useReducer} from "react";
 import CartContext from "./CartContext";
 import {toast} from 'react-toastify';
 
+console.log(localStorage.getItem('cart'));
+
 const defaultCartState = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : {
     items: [],
     totalAmount: 0,
@@ -69,36 +71,26 @@ const cartReducer = (state, action) => {
     if (action.type === 'DISCOUNT') {
         let updatedTotalAmount = 0;
         let updatedDiscountAmount = 0;
-        const updatedItems = [];
-        console.log(action);
-        console.log(state);
 
         action.discount.items.forEach(item => {
-            state.items.findIndex(stateItem => {
-                if(item.id===stateItem.id){
-
-                }
-            })
-            /*const updatedItem = {
-                ...item,
-                discount: parseInt(action.discount.discount),
-            };
-            updatedItems.push(updatedItem);*/
-        });
-
-        /*action.discount.items.forEach(item => {
             updatedTotalAmount += item.amount * item.price;
         })
 
-        updatedItems.forEach(item => {
-            updatedDiscountAmount += item.amount * item.price - (item.amount * item.price * action.discount.discount / 100);
+        action.discount.items.forEach(item => {
+            updatedDiscountAmount += item.amount * item.price - (item.amount * item.price * item.discount / 100);
         });
 
-        return {
-            items: updatedItems,
+        localStorage.setItem('cart', JSON.stringify({
+            items: action.discount.items,
             totalAmount: updatedTotalAmount,
             discountAmount: updatedDiscountAmount
-        };*/
+        }));
+
+        return {
+            items: action.discount.items,
+            totalAmount: updatedTotalAmount,
+            discountAmount: updatedDiscountAmount
+        };
 
     }
     return defaultCartState;

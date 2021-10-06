@@ -22,7 +22,8 @@ const Cart = () => {
                     files: cartCtx.items[0].files,
                     id: cartCtx.items[0].id,
                     name: cartCtx.items[0].name,
-                    price: cartCtx.items[0].price
+                    price: cartCtx.items[0].price,
+                    parent: cartCtx.items[0].parent
                 }],
             });
         }
@@ -42,7 +43,8 @@ const Cart = () => {
                             files: item.files,
                             id: item.id,
                             name: item.name,
-                            price: item.price
+                            price: item.price,
+                            parent: item.parent
                         }],
                     })
                 }
@@ -52,9 +54,21 @@ const Cart = () => {
     }, [cartCtx]);
 
     const clearDiscount = () => {
+        const cartItems = [];
+        cartCtx.items.forEach(item => {
+            cartItems.push({
+                id: item.id,
+                discount: 0,
+                amount: item.amount,
+                price: item.price,
+                name: item.name,
+                parent: item.parent,
+                files: item.files
+            })
+        })
         cartCtx.discountHandler({
             discount: 0,
-            items: cartCtx.items
+            items: cartItems
         });
     }
 
@@ -62,18 +76,43 @@ const Cart = () => {
         if (type === "all") {
             const cartItems = [];
             cartCtx.items.forEach(item => {
-                cartItems.push({id: item.id, discount: param, amount: item.amount, price: item.price})
+                cartItems.push({
+                    id: item.id,
+                    discount: param,
+                    amount: item.amount,
+                    price: item.price,
+                    name: item.name,
+                    parent: item.parent,
+                    files: item.files
+                })
             })
             cartCtx.discountHandler({
                 type: "all",
                 items: cartItems
             });
         } else {
+            const cartItems = [];
+            cartCtx.items.forEach(item => {
+                if(item.id === param[0].id){
+                    cartItems.push(param[0])
+                }else{
+                    cartItems.push({
+                        id: item.id,
+                        discount: item.discount,
+                        amount: item.amount,
+                        price: item.price,
+                        name: item.name,
+                        parent: item.parent,
+                        files: item.files
+                    })
+                }
+            })
             cartCtx.discountHandler({
                 type: "single",
-                items: param
+                items: cartItems
             })
         }
+        console.log("cartCtx", cartCtx);
     }
 
     const handleInputChange = (value) => {
@@ -84,10 +123,10 @@ const Cart = () => {
     return (
         <>
             <div className="row mb-2">
-                <div className="col-lg-9">
+                <div className="col-lg-9 col-md-7">
                     <h3 className="fm-poppins">Səbət</h3>
                 </div>
-                <div className="col-lg-3">
+                <div className="col-lg-3 col-md-5">
                     <Link to='/' className="w-100 btn btn-dark">Alış verişə davam et</Link>
                 </div>
             </div>
@@ -125,11 +164,14 @@ const Cart = () => {
                                             </div>
                                             <div className="basket-product-price-row">
                                                 <input type="text" disabled={isDisabled} className="form-control"
-                                                       onBlur={event => applyDiscountProduct("single", [{
+                                                       onBlur={event => event.target.value.trim() && applyDiscountProduct("single", [{
                                                            id: product.id,
-                                                           discount: event.target.value,
+                                                           discount: parseInt(event.target.value),
                                                            amount: product.amount,
-                                                           price: product.price
+                                                           price: product.price,
+                                                           name: product.name,
+                                                           parent: product.parent,
+                                                           files: product.files
                                                        }])}
                                                        style={{width: '80px'}} placeholder="%"/>
                                             </div>
@@ -192,7 +234,7 @@ const Cart = () => {
                                 <div>
                                     <input type="text" id="isDisabled" disabled={!isDisabled} autoComplete="off"
                                         // onChange={(e) => handleInputChange('fullDiscount', e.target.value)}
-                                           onBlur={event => applyDiscountProduct("all", event.target.value)}
+                                           onBlur={event => event.target.value.trim() && applyDiscountProduct("all", event.target.value)}
                                            className="form-control"/>
                                 </div>
                             </div>

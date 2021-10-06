@@ -4,8 +4,6 @@ import CartContext from "../store/CartContext";
 import {Link, NavLink} from "react-router-dom";
 
 const Header = (props) => {
-
-    let cartTotalElement =0;
     const cartCtx = useContext(CartContext);
 
     const { items } = cartCtx;
