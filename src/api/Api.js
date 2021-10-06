@@ -50,7 +50,7 @@ axiosInstance.interceptors.request.use((config) => {
 }, (error) => Promise.reject(error));
 
 axiosInstance.interceptors.response.use((res) => {
-    if ((res.status === 201 || res.status === 200) && (res.config.method === 'post' || res.config.method === 'put')) {
+    if ((res.status === 201 || res.status === 200) && (res.config.method === 'post' && res.config.url!=='http://bpaws01l:8087/api/inventory') && res.config.method === 'put') {
         toast.success(<MessageComponent text='Uğurlu Əməliyyat!' />, {
             position: toast.POSITION.TOP_LEFT,
             toastId: 'success-toast-message',

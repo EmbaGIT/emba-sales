@@ -9,10 +9,11 @@ const Cart = () => {
     const amountInputRef = useRef();
     const [hasItem, setHasItem] = useState(cartCtx.items.length > 0);
     const [cartState, setCartState] = useState([]);
+    const [isDisabled, setIsDisabled] = useState(false);
 
     useEffect(() => {
         const newCartArr = [];
-        if(cartCtx.items.length > 0){
+        if (cartCtx.items.length > 0) {
             newCartArr.push({
                 parent: cartCtx?.items[0].parent,
                 products: [{
@@ -47,9 +48,38 @@ const Cart = () => {
                 }
             }
         })
-        console.log(newCartArr);
         setCartState(newCartArr);
-    }, []);
+    }, [cartCtx]);
+
+    const clearDiscount = () => {
+        cartCtx.discountHandler({
+            discount: 0,
+            items: cartCtx.items
+        });
+    }
+
+    const applyDiscountProduct = (type, param) => {
+        if (type === "all") {
+            const cartItems = [];
+            cartCtx.items.forEach(item => {
+                cartItems.push({id: item.id, discount: param, amount: item.amount, price: item.price})
+            })
+            cartCtx.discountHandler({
+                type: "all",
+                items: cartItems
+            });
+        } else {
+            cartCtx.discountHandler({
+                type: "single",
+                items: param
+            })
+        }
+    }
+
+    const handleInputChange = (value) => {
+        setIsDisabled(value);
+        clearDiscount();
+    }
 
     return (
         <>
@@ -67,7 +97,10 @@ const Cart = () => {
                         <div className="basket-product-wrapper card card-table">
                             {cartState.map(item => (
                                 <div>
-                                    <div className="list-group-item-primary p-3">{item.parent}</div>
+                                    <div
+                                        className="list-group-item-primary p-3 d-flex justify-content-between align-content-center">
+                                        <span>{item.parent}</span>
+                                    </div>
                                     {item.products && item.products.map(product => (
                                         <div className="cart-product-table pr-wrapper">
                                             <div className="basket-product-image-row">
@@ -80,11 +113,25 @@ const Cart = () => {
                                             </div>
                                             <div className="basket-product-name-row">
                                                 <p className="fm-poppins_bold mb-0">{product.name}</p>
+                                                <span className="text-success">Qiymət: {product.price} ₼</span>
                                             </div>
                                             <CountInput ref={amountInputRef} defaultValue={product.amount}/>
                                             <div className="basket-product-price-row">
-                                                <div className="basket-product-price"><span>{product.price}</span> ₼
+                                                <div className="basket-product-old-price">
+                                                    <span>{product.price * product.amount} ₼</span></div>
+                                                <div className="basket-product-price">
+                                                    <span>{product.price * product.amount - (product.price * product.amount * product.discount / 100)} ₼</span>
                                                 </div>
+                                            </div>
+                                            <div className="basket-product-price-row">
+                                                <input type="text" disabled={isDisabled} className="form-control"
+                                                       onBlur={event => applyDiscountProduct("single", [{
+                                                           id: product.id,
+                                                           discount: event.target.value,
+                                                           amount: product.amount,
+                                                           price: product.price
+                                                       }])}
+                                                       style={{width: '80px'}} placeholder="%"/>
                                             </div>
                                             <div className="basket-product-delete-row">
                                                 <div className="delete-cart-item"><i
@@ -113,8 +160,14 @@ const Cart = () => {
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Çatdırılma:</td>
-                                        <td className="text-right">Pulsuz</td>
+                                        <td>Səbətin endirimli dəyəri</td>
+                                        <td className="text-right"><span
+                                            className="cart-total-old-price fm-poppins_bold">{cartCtx.discountAmount}</span> ₼
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ümumi endirim faizi:</td>
+                                        <td className="text-right">0%</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -123,14 +176,25 @@ const Cart = () => {
                     </div>
                     <div className="card">
                         <div className="card-body">
-                            <p className="fm-poppins_bold">Bütün səbətə endirim tətbiq et (%-lə)</p>
+                            <div className="form-check">
+                                <input
+                                    checked={isDisabled}
+                                    onChange={(e) => handleInputChange(e.target.checked)}
+                                    className='form-check-input'
+                                    value={isDisabled}
+                                    type='checkbox'
+                                />
+                                <label className="form-check-label" htmlFor="isDisabled">
+                                    Bütün səbətə endirim tətbiq et (%-lə)
+                                </label>
+                            </div>
                             <div className="input-group">
                                 <div>
-                                    <input type="search" id="form1" className="form-control"/>
+                                    <input type="text" id="isDisabled" disabled={!isDisabled} autoComplete="off"
+                                        // onChange={(e) => handleInputChange('fullDiscount', e.target.value)}
+                                           onBlur={event => applyDiscountProduct("all", event.target.value)}
+                                           className="form-control"/>
                                 </div>
-                                <button type="button" className="btn btn-sm btn-primary">
-                                    Tətbiq et
-                                </button>
                             </div>
                         </div>
                     </div>

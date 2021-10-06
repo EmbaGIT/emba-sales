@@ -106,34 +106,6 @@ const Product = () => {
                     });
             })
             setIsFetchingData(false);
-            /*const subProductNotIncludedArr = [];
-            res.content.map(item => {
-                const resItems = [];
-                const resStock = [];
-                const resFiles = [];
-                Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
-                    .then(function (results) {
-                        resItems.push(item);
-                        resStock.push(results[0].data[0].stock);
-                        resFiles.push(results[1].data[0]);
-
-                        subProductNotIncludedArr.push({
-                            id: item.id,
-                            items: resItems,
-                            stock: resStock,
-                            files: resFiles
-                        });
-
-                        console.log(subProductNotIncludedArr);
-                        subProductNotIncludedArr.sort(
-                            (a, b) => parseInt(b.id) - parseInt(a.id)
-                        );
-                    });
-                setSubProductsNotIncluded(prevState => ([
-                    ...subProductNotIncludedArr
-                ]));
-            })
-            setIsFetchingData(false);*/
         });
         get(`http://bpaws01l:8082/api/image/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
             const images = [];

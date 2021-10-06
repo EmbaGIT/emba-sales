@@ -210,6 +210,10 @@ input[type=number] {
     -moz-appearance: textfield;
 }
 
+.form-check-input[type=checkbox]{
+    margin-right: 0;
+}
+
 .count-input-wrapper {
     width: 75px;
     display: -webkit-flex;
@@ -277,7 +281,7 @@ input[type=number] {
 }
 
 .basket-product-name-row {
-    flex-basis: calc(100% - 480px);
+    flex-basis: calc(100% - 500px);
 }
 
 .basket-product-count-row {
@@ -285,7 +289,7 @@ input[type=number] {
 }
 
 .basket-product-price-row {
-    flex-basis: 120px;
+    flex-basis: 100px;
 }
 
 .basket-product-delete-row {
