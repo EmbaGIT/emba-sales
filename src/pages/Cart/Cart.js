@@ -67,7 +67,6 @@ const Cart = () => {
             })
         })
         cartCtx.discountHandler({
-            discount: 0,
             items: cartItems
         });
     }
@@ -112,7 +111,10 @@ const Cart = () => {
                 items: cartItems
             })
         }
-        console.log("cartCtx", cartCtx);
+    }
+
+    const handleDelete = (id) => {
+        cartCtx.removeItem(id);
     }
 
     const handleInputChange = (value) => {
@@ -173,10 +175,11 @@ const Cart = () => {
                                                            parent: product.parent,
                                                            files: product.files
                                                        }])}
+                                                       defaultValue={product.discount}
                                                        style={{width: '80px'}} placeholder="%"/>
                                             </div>
                                             <div className="basket-product-delete-row">
-                                                <div className="delete-cart-item"><i
+                                                <div className="delete-cart-item" onClick={handleDelete.bind(this, product.id)}><i
                                                     className="text-danger fas fa-trash-alt"/>
                                                 </div>
                                             </div>
@@ -209,7 +212,7 @@ const Cart = () => {
                                     </tr>
                                     <tr>
                                         <td>Ümumi endirim faizi:</td>
-                                        <td className="text-right">0%</td>
+                                        <td className="text-right">{cartCtx.totalDiscount}%</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -233,7 +236,6 @@ const Cart = () => {
                             <div className="input-group">
                                 <div>
                                     <input type="text" id="isDisabled" disabled={!isDisabled} autoComplete="off"
-                                        // onChange={(e) => handleInputChange('fullDiscount', e.target.value)}
                                            onBlur={event => event.target.value.trim() && applyDiscountProduct("all", event.target.value)}
                                            className="form-control"/>
                                 </div>

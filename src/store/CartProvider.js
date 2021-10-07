@@ -2,12 +2,11 @@ import {useReducer} from "react";
 import CartContext from "./CartContext";
 import {toast} from 'react-toastify';
 
-console.log(localStorage.getItem('cart'));
-
 const defaultCartState = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : {
     items: [],
     totalAmount: 0,
     discountAmount: 0,
+    totalDiscount: 0
 };
 
 const MessageComponent = ({text}) => (
@@ -30,13 +29,15 @@ const SumItem = (state, action) => {
 }
 
 const SumDiscountItem = (state, action) => {
-    return state.totalAmount + (action.item.price * action.item.amount - action.item.discount * action.item.price * action.item.amount / 100);
+    return parseFloat(state.discountAmount) + (action.item.price * action.item.amount - action.item.discount * action.item.price * action.item.amount / 100);
 }
 
 const cartReducer = (state, action) => {
     if (action.type === 'ADD') {
         const updatedTotalAmount = SumItem(state, action);
         const updatedDiscountAmount = SumDiscountItem(state, action);
+
+        console.log(state, action);
 
         const existingCartItemIndex = state.items.findIndex(
             (item) => item.id === action.item.id
@@ -55,18 +56,54 @@ const cartReducer = (state, action) => {
             updatedItems = state.items.concat(action.item);
         }
 
+        const totalDiscount = parseFloat(100-(updatedDiscountAmount*100/updatedTotalAmount)).toFixed(2);
+
         localStorage.setItem('cart', JSON.stringify({
             items: updatedItems,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount
+            discountAmount: updatedDiscountAmount,
+            totalDiscount: totalDiscount
         }));
 
         return {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount
+            discountAmount: updatedDiscountAmount,
+            totalDiscount: totalDiscount
         };
     }
+
+    if (action.type === 'REMOVE') {
+        const existingCartItemIndex = state.items.findIndex(
+            (item) => item.id === action.id
+        );
+        const existingItem = state.items[existingCartItemIndex];
+        const updatedTotalAmount = state.totalAmount - existingItem.price * existingItem.amount;
+        const updatedDiscountAmount = parseFloat(state.discountAmount - (existingItem.price * existingItem.amount - existingItem.discount * existingItem.price * existingItem.amount / 100)).toFixed(2);
+        const updatedItems = state.items.filter(item => item.id !== action.id);
+        const totalDiscount = parseFloat(100-(updatedDiscountAmount*100/updatedTotalAmount)).toFixed(2);
+
+        localStorage.setItem('cart', JSON.stringify({
+            items: updatedItems,
+            totalAmount: updatedTotalAmount,
+            discountAmount: updatedDiscountAmount,
+            totalDiscount: totalDiscount
+        }));
+
+        console.log({
+            items: updatedItems,
+            totalAmount: updatedTotalAmount,
+            discountAmount: updatedDiscountAmount,
+        })
+
+        return {
+            items: updatedItems,
+            totalAmount: updatedTotalAmount,
+            discountAmount: updatedDiscountAmount,
+            totalDiscount: totalDiscount
+        };
+    }
+
 
     if (action.type === 'DISCOUNT') {
         let updatedTotalAmount = 0;
@@ -79,17 +116,20 @@ const cartReducer = (state, action) => {
         action.discount.items.forEach(item => {
             updatedDiscountAmount += item.amount * item.price - (item.amount * item.price * item.discount / 100);
         });
+        const totalDiscount = parseFloat(100 - (updatedDiscountAmount*100/updatedTotalAmount)).toFixed(2);
 
         localStorage.setItem('cart', JSON.stringify({
             items: action.discount.items,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount
+            discountAmount: updatedDiscountAmount,
+            totalDiscount: totalDiscount
         }));
 
         return {
             items: action.discount.items,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount
+            discountAmount: updatedDiscountAmount,
+            totalDiscount: totalDiscount
         };
 
     }
@@ -119,10 +159,12 @@ const CartProvider = (props) => {
         items: cartState.items,
         totalAmount: cartState.totalAmount,
         discountAmount: cartState.discountAmount,
+        totalDiscount: cartState.totalDiscount,
         addItem: addItemToCartHandler,
         removeItem: removeItemFromCartHandler,
         discountHandler: discountCartHandler,
     };
+
 
     return (
         <CartContext.Provider value={cartContext}>

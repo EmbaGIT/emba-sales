@@ -107,33 +107,53 @@ const Product = () => {
             })
             setIsFetchingData(false);
         });
-        get(`http://bpaws01l:8082/api/image/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
+        get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1`).then(res => {
             const images = [];
-            files.map(file => (
-                images.push({
-                    original: file.originalImageUrl,
-                    thumbnail: file.lowQualityImageUrl,
+            get(`http://bpaws01l:8082/api/image/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
+                files.map(file => (
+                    images.push({
+                        original: file.originalImageUrl,
+                        thumbnail: file.lowQualityImageUrl,
+                    })
+                ))
+            });
+            res.content.map(item => (
+                get(`http://bpaws01l:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
+                    files.map(file => (
+                        images.push({
+                            original: file.originalImageUrl,
+                            thumbnail: file.lowQualityImageUrl,
+                        })
+                    ))
                 })
             ))
             setProductImages(images);
-        });
+        })
+
     }, [parent_id]);
 
     const handleModuleInfo = (id) => {
+        const images = [];
         get(`http://bpaws01l:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-images`).then(files => {
-            const images = [];
             files.map(file => (
                 images.push({
                     original: file.originalImageUrl,
                     thumbnail: file.lowQualityImageUrl,
                 })
-            ))
-            setSubProductImages(images);
-            showCartHandler();
+            ));
+            get(`http://bpaws01l:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-banner`).then(banner => {
+                banner.map(file => (
+                    images.push({
+                        original: file.originalImageUrl,
+                        thumbnail: file.lowQualityImageUrl,
+                    })
+                ))
+                setSubProductImages(images);
+                showCartHandler();
+            });
         });
         get(`products/${id}`).then(res => {
             setSubProductInfo(res);
-            console.log("product info", res);
         })
     }
 

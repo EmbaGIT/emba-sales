@@ -348,6 +348,10 @@ input[type=number] {
     font-family: Poppins;
 }
 
+.delete-cart-item{
+    cursor: pointer;
+}
+
 @media (max-width: 1440px) {
     .grid-wrapper {
         grid-template-columns: repeat(3, 1fr);
