@@ -29,15 +29,13 @@ const SumItem = (state, action) => {
 }
 
 const SumDiscountItem = (state, action) => {
-    return parseFloat(state.discountAmount) + (action.item.price * action.item.amount - action.item.discount * action.item.price * action.item.amount / 100);
+    return state.discountAmount + (action.item.price * action.item.amount - action.item.discount * action.item.price * action.item.amount / 100);
 }
 
 const cartReducer = (state, action) => {
     if (action.type === 'ADD') {
         const updatedTotalAmount = SumItem(state, action);
         const updatedDiscountAmount = SumDiscountItem(state, action);
-
-        console.log(state, action);
 
         const existingCartItemIndex = state.items.findIndex(
             (item) => item.id === action.item.id
@@ -56,7 +54,7 @@ const cartReducer = (state, action) => {
             updatedItems = state.items.concat(action.item);
         }
 
-        const totalDiscount = parseFloat(100-(updatedDiscountAmount*100/updatedTotalAmount)).toFixed(2);
+        const totalDiscount = 100 - (updatedDiscountAmount*100/updatedTotalAmount);
 
         localStorage.setItem('cart', JSON.stringify({
             items: updatedItems,
@@ -79,9 +77,9 @@ const cartReducer = (state, action) => {
         );
         const existingItem = state.items[existingCartItemIndex];
         const updatedTotalAmount = state.totalAmount - existingItem.price * existingItem.amount;
-        const updatedDiscountAmount = parseFloat(state.discountAmount - (existingItem.price * existingItem.amount - existingItem.discount * existingItem.price * existingItem.amount / 100)).toFixed(2);
+        const updatedDiscountAmount = state.discountAmount - (existingItem.price * existingItem.amount - existingItem.discount * existingItem.price * existingItem.amount / 100);
         const updatedItems = state.items.filter(item => item.id !== action.id);
-        const totalDiscount = parseFloat(100-(updatedDiscountAmount*100/updatedTotalAmount)).toFixed(2);
+        const totalDiscount = updatedTotalAmount!==0 ? 100 - (updatedDiscountAmount*100/updatedTotalAmount) : 0;
 
         localStorage.setItem('cart', JSON.stringify({
             items: updatedItems,
@@ -94,6 +92,7 @@ const cartReducer = (state, action) => {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
             discountAmount: updatedDiscountAmount,
+            totalDiscount: totalDiscount
         })
 
         return {
@@ -116,7 +115,8 @@ const cartReducer = (state, action) => {
         action.discount.items.forEach(item => {
             updatedDiscountAmount += item.amount * item.price - (item.amount * item.price * item.discount / 100);
         });
-        const totalDiscount = parseFloat(100 - (updatedDiscountAmount*100/updatedTotalAmount)).toFixed(2);
+
+        const totalDiscount = 100 - (updatedDiscountAmount*100/updatedTotalAmount);
 
         localStorage.setItem('cart', JSON.stringify({
             items: action.discount.items,
@@ -175,4 +175,5 @@ const CartProvider = (props) => {
 }
 
 export default CartProvider;
+
 

@@ -143,7 +143,7 @@ const Cart = () => {
                                         <span>{item.parent}</span>
                                     </div>
                                     {item.products && item.products.map(product => (
-                                        <div className="cart-product-table pr-wrapper">
+                                        <div className="cart-product-table pr-wrapper" key={product.id}>
                                             <div className="basket-product-image-row">
                                                 {product.files.length ? product.files.map(file => (
                                                         <img src={file.originalImageUrl} alt=""
@@ -207,12 +207,12 @@ const Cart = () => {
                                     <tr>
                                         <td>Səbətin endirimli dəyəri</td>
                                         <td className="text-right"><span
-                                            className="cart-total-old-price fm-poppins_bold">{cartCtx.discountAmount}</span> ₼
+                                            className="cart-total-old-price fm-poppins_bold">{cartCtx.discountAmount.toFixed(2)}</span> ₼
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Ümumi endirim faizi:</td>
-                                        <td className="text-right">{cartCtx.totalDiscount}%</td>
+                                        <td className="text-right">{cartCtx.totalDiscount?.toFixed(2)}%</td>
                                     </tr>
                                     </tbody>
                                 </table>
