@@ -11,6 +11,7 @@ import Category from './pages/Category/CategoryList';
 import Product from './pages/Product/ProductDetail';
 import CartProvider from "./store/CartProvider";
 import Cart from "./pages/Cart/Cart";
+import Checkout from "./pages/Cart/Checkout";
 
 const App = () => {
     const [menuList, setMenuList] = useState([]);
@@ -55,6 +56,7 @@ const App = () => {
                     <Route path='/category/:id' component={Category}/>
                     <Route path='/product/:id' component={Product}/>
                     <Route path='/cart' exact component={Cart}/>
+                    <Route path='/checkout' exact component={Checkout}/>
                 </Switch>
             </Layout>
             }

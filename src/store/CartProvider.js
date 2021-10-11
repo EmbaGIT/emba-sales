@@ -47,6 +47,7 @@ const cartReducer = (state, action) => {
             const updatedItem = {
                 ...existingCartItem,
                 amount: existingCartItem.amount + action.item.amount,
+                discount: 0
             };
             updatedItems = [...state.items];
             updatedItems[existingCartItemIndex] = updatedItem;
@@ -59,15 +60,15 @@ const cartReducer = (state, action) => {
         localStorage.setItem('cart', JSON.stringify({
             items: updatedItems,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount,
-            totalDiscount: totalDiscount
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
         }));
 
         return {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount,
-            totalDiscount: totalDiscount
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100
         };
     }
 
@@ -77,29 +78,29 @@ const cartReducer = (state, action) => {
         );
         const existingItem = state.items[existingCartItemIndex];
         const updatedTotalAmount = state.totalAmount - existingItem.price * existingItem.amount;
-        const updatedDiscountAmount = state.discountAmount - (existingItem.price * existingItem.amount - existingItem.discount * existingItem.price * existingItem.amount / 100);
+        const updatedDiscountAmount = (state.discountAmount - (existingItem.price * existingItem.amount - existingItem.discount * existingItem.price * existingItem.amount / 100)).toFixed(2);
         const updatedItems = state.items.filter(item => item.id !== action.id);
         const totalDiscount = updatedTotalAmount!==0 ? 100 - (updatedDiscountAmount*100/updatedTotalAmount) : 0;
 
         localStorage.setItem('cart', JSON.stringify({
             items: updatedItems,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount,
-            totalDiscount: totalDiscount
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
         }));
 
         console.log({
             items: updatedItems,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount,
-            totalDiscount: totalDiscount
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
         })
 
         return {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount,
-            totalDiscount: totalDiscount
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100
         };
     }
 
@@ -121,15 +122,15 @@ const cartReducer = (state, action) => {
         localStorage.setItem('cart', JSON.stringify({
             items: action.discount.items,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount,
-            totalDiscount: totalDiscount
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
         }));
 
         return {
             items: action.discount.items,
             totalAmount: updatedTotalAmount,
-            discountAmount: updatedDiscountAmount,
-            totalDiscount: totalDiscount
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100
         };
 
     }
