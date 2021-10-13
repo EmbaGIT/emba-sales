@@ -29,6 +29,8 @@ const SumItem = (state, action) => {
 }
 
 const SumDiscountItem = (state, action) => {
+    console.log(state);
+    console.log(action);
     return state.discountAmount + (action.item.price * action.item.amount - action.item.discount * action.item.price * action.item.amount / 100);
 }
 
@@ -132,8 +134,12 @@ const cartReducer = (state, action) => {
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
             totalDiscount: Math.round(totalDiscount * 100) / 100
         };
-
     }
+
+    if(action.type==="PriceChange"){
+        console.log(action.value)
+    }
+
     return defaultCartState;
 }
 
@@ -156,6 +162,10 @@ const CartProvider = (props) => {
         dispatchCartAction({type: 'DISCOUNT', discount: discount});
     };
 
+    const priceChangeHandler = (value) => {
+        dispatchCartAction({type: 'PriceChange', value: value});
+    }
+
     const cartContext = {
         items: cartState.items,
         totalAmount: cartState.totalAmount,
@@ -164,6 +174,7 @@ const CartProvider = (props) => {
         addItem: addItemToCartHandler,
         removeItem: removeItemFromCartHandler,
         discountHandler: discountCartHandler,
+        checkoutPriceChange: priceChangeHandler,
     };
 
 

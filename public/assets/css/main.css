@@ -352,6 +352,14 @@ input[type=number] {
     cursor: pointer;
 }
 
+.table>:not(caption)>*>*{
+    padding: 0.5rem 0.7rem;
+}
+
+.table th{
+    font-weight: 600;
+}
+
 @media (max-width: 1440px) {
     .grid-wrapper {
         grid-template-columns: repeat(3, 1fr);
