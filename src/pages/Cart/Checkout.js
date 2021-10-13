@@ -41,7 +41,7 @@ const Checkout = () => {
     const [customerInfo, setCustomerInfo] = useState({
         name: '',
         surname: '',
-        patronomic: '',
+        patronymic: '',
         birthdate: '',
         city: '',
         mobile_phone: '',
@@ -76,6 +76,8 @@ const Checkout = () => {
 
     if (loading) return "Loading...";
     if (error) return <pre>{error.message}</pre>
+
+
 
     return (
         <div className="row">
