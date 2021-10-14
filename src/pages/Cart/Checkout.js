@@ -1,61 +1,30 @@
 import React, {useEffect, useContext, useState} from 'react';
 import CartContext from "../../store/CartContext";
-import {useQuery, gql} from "@apollo/client";
-
-const CUSTOMER_QUERY = gql`
-    query searchByName {
-      search(criteria: {name: {contains: "Fuad"}}) {
-        uid
-        name
-      }
-    }`;
-
-/*
-const EXCHANGE_RATES = gql`
-  query GetExchangeRates {
-    rates(currency: "USD") {
-      currency
-      rate
-    }
-  }
-`;
-*/
+import CustomerInfo from "./CustomerInfo";
 
 const Checkout = () => {
-
-    // const {loading, error, data} = useQuery(CUSTOMER_QUERY);
-
-    // if (loading) return <p>Loading...</p>;
-    // if (error) return <p>Error :(</p>;
-
-    // return data.rates.map(({currency, rate}) => (
-    //     <div key={currency}>
-    //         <p>
-    //             {currency}: {rate}
-    //         </p>
-    //     </div>
-    // ));
-
     const cartCtx = useContext(CartContext);
-    const [isRefactorDisabled, setIsRefactorDisabled] = useState(false);
-    const [customerInfo, setCustomerInfo] = useState({
-        name: '',
-        surname: '',
-        patronymic: '',
-        birthdate: '',
-        city: '',
-        mobile_phone: '',
-        city_phone: '',
-        address: '',
-        gender: '',
-        email: ''
-    })
     const [checkoutState, setCheckoutState] = useState({
         items: [],
         checkout: false
     });
 
-    const { data, loading, error } = useQuery(CUSTOMER_QUERY);
+    /*const years = range(1960, getYear(new Date()) + 1, 1);
+    const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];*/
+
 
     useEffect(() => {
         if (cartCtx.items.length > 0) {
@@ -74,15 +43,9 @@ const Checkout = () => {
         });
     }
 
-    if (loading) return "Loading...";
-    if (error) return <pre>{error.message}</pre>
-
-
-
     return (
         <div className="row">
             <div className="col-md-6">
-                {console.log(data)}
                 <div className="card">
                     <div className="list-group-item list-group-item-success">Sifarişin təsviri</div>
                     <div className="card-body">
@@ -159,44 +122,7 @@ const Checkout = () => {
                 </div>
             </div>
             <div className="col-md-6">
-                <div className="card">
-                    <div className="list-group-item list-group-item-success">Müştəri məlumatları</div>
-                    <div className="card-body">
-                        <h6>Müştəri haqqında məlumat</h6>
-                        <div className="input-group row mb-2">
-                            <div className="col-md-4">
-                                <label>Ad</label>
-                                <input type="text" className="form-control"/>
-                            </div>
-                            <div className="col-md-4">
-                                <label>Soyad</label>
-                                <input type="text" className="form-control"/>
-                            </div>
-                            <div className="col-md-4">
-                                <label>Ata adı</label>
-                                <input type="text" className="form-control"/>
-                            </div>
-                        </div>
-                        <div className="mb-2">
-                            <div className="form-check">
-                                <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id="refactorInfo"
-                                    disabled={isRefactorDisabled}
-                                />
-                                <label className="form-check-label" htmlFor="refactorInfo">
-                                    Məlumatları Yenilə
-                                </label>
-                            </div>
-                        </div>
-
-                        <div className="">
-
-                        </div>
-
-                    </div>
-                </div>
+                <CustomerInfo/>
             </div>
         </div>
     )

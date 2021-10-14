@@ -7,18 +7,8 @@ import {BrowserRouter as Router} from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 const client = new ApolloClient({
-    uri: "http://192.168.3.86:8088/graphql",
+    uri: "http://bpaws01l:8088/graphql",
     cache: new InMemoryCache(),
-    /*fetchOptions: {
-        mode: 'no-cors',
-    },
-    headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
-        "Access-Control-Allow-Headers":
-            "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
-    },
-    credentials: "omit",*/
 });
 
 ReactDOM.render(
