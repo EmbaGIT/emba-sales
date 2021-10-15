@@ -8,17 +8,49 @@ import "react-datepicker/dist/react-datepicker.css";
 import {get} from "../../api/Api";
 
 const CUSTOMER_QUERY = gql`
-    query searchByName($name: String!) {
-      search(criteria: {name: {contains: $name}}) {
+    query searchCustomer($name: String, $serial: String, $finCode: String) {
+      search(criteria: {
+        name: {contains: $name},
+        serial: {equals: $serial},
+        finCode: {equals: $finCode}}) {
         uid
         name
       }
     }`;
 
+const FULL_INFO_QUERY = gql`
+    query fullInfo($uid: String) {
+      search(criteria: {
+        uid: {equals: $uid}
+      }) {
+        id
+        uid
+        name
+        isActive
+        note
+        creationDate
+        modifiedDate
+        type {
+          type
+        }
+        group {
+          group
+        }
+        details {
+          infoTypeField {
+            field
+          }
+          fieldValue
+        }
+      }
+    }`
+
 const CustomerInfo = () => {
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [city, setCity] = useState([]);
     const [isRefactorDisabled, setIsRefactorDisabled] = useState(false);
+    const [nameInvalid, setNameInvalid] = useState(false);
+    const [surnameInvalid, setSurnameInvalid] = useState(false);
     const [birthDate, setBirthDate] = useState(new Date());
     const [customerInfo, setCustomerInfo] = useState({
         name: '',
@@ -38,9 +70,10 @@ const CustomerInfo = () => {
         email: ''
     });
 
-    const [getAvailableCustomer, { loading, data }] = useLazyQuery(CUSTOMER_QUERY);
+    const [getAvailableCustomer, {loading, data}] = useLazyQuery(CUSTOMER_QUERY);
+    const [getFullInfo, {info_loading, info_data}] = useLazyQuery(FULL_INFO_QUERY);
 
-    useEffect(()=>{
+    useEffect(() => {
         get('http://bpaws01l:8087/api/city/table?page=0&size=100').then((res) => {
             setIsFetchingData(false);
             setCity(res?.content?.map((city) => ({
@@ -53,8 +86,18 @@ const CustomerInfo = () => {
     }, [])
 
     const searchOnDatabase = () => {
-        if(customerInfo.name.length && customerInfo.surname.length && customerInfo.finCode.length){
-            getAvailableCustomer({ variables: {name: `${customerInfo.surname} ${customerInfo.name}`} });
+        if (customerInfo.name.length && customerInfo.surname.length) {
+            getAvailableCustomer({
+                variables: {
+                    name: `${customerInfo.surname} ${customerInfo.name}`,
+                    serial: customerInfo.identifierNumber ? customerInfo.identifierNumber : null,
+                    finCode: customerInfo.finCode ? customerInfo.finCode : null
+                }
+            });
+        } else if (!customerInfo.name.length) {
+            setNameInvalid(true);
+        } else if (!customerInfo.surname.length) {
+            setSurnameInvalid(true);
         }
     }
 
@@ -77,6 +120,15 @@ const CustomerInfo = () => {
         setCustomerInfo(alldata);
     }
 
+    const handleFullInfo = (uid) => {
+        console.log(uid)
+        getFullInfo({
+            variables: {
+                uid: `${uid}`
+            }
+        });
+    }
+
     return (
         <div className="card">
             <div className="list-group-item list-group-item-success">Müştəri məlumatları</div>
@@ -85,32 +137,44 @@ const CustomerInfo = () => {
                 <div className="input-group row mb-3">
                     <div className="col-md-4 mb-2">
                         <label>Ad<span className="text-danger">*</span></label>
-                        <input type="text" className="form-control" onChange={e => handleInputChange("name", e.target.value)}/>
+                        <input type="text" className="form-control"
+                               onChange={e => handleInputChange("name", e.target.value)}/>
+                        {nameInvalid && <span className="text-danger">Xananın doldurulması vacibdir.</span>}
                     </div>
                     <div className="col-md-4 mb-2">
                         <label>Soyad<span className="text-danger">*</span></label>
-                        <input type="text" className="form-control" onChange={e => handleInputChange("surname", e.target.value)}/>
+                        <input type="text" className="form-control"
+                               onChange={e => handleInputChange("surname", e.target.value)}/>
+                        {surnameInvalid && <span className="text-danger">Xananın doldurulması vacibdir.</span>}
                     </div>
                     <div className="col-md-4 mb-2">
                         <label>Ata adı</label>
-                        <input type="text" className="form-control" onChange={e => handleInputChange("patronymic", e.target.value)} />
+                        <input type="text" className="form-control"
+                               onChange={e => handleInputChange("patronymic", e.target.value)}/>
                     </div>
                     <div className="col-md-5">
-                        <label>Şəxsiyyət vəsiqəsi Fin Kod<span className="text-danger">*</span></label>
-                        <input type="text" className="form-control" onChange={e => handleInputChange("finCode", e.target.value)}/>
+                        <label>Şəxsiyyət vəsiqəsi Fin Kod</label>
+                        <input type="text" className="form-control"
+                               onChange={e => handleInputChange("finCode", e.target.value)}/>
                     </div>
                     <div className="col-md-4">
                         <label>Şəxsiyyət vəsiqəsi №-i</label>
-                        <input type="text" className="form-control" onChange={e => handleInputChange("ID", e.target.value)}/>
+                        <input type="text" className="form-control"
+                               onChange={e => handleInputChange("ID", e.target.value)}/>
                     </div>
                     <div className="col-md-3 d-flex align-items-end">
                         <div className="btn btn-primary" onClick={searchOnDatabase}>Axtar</div>
                     </div>
                 </div>
-                {console.log(data)}
-                {data && data.search.map(customer => (
-                    <div key={customer.uid}>{customer.name}</div>
-                ))}
+                {loading && <p>Məlumat yüklənir...</p>}
+                {data &&
+                <select className="form-control mb-3" onChange={e => handleFullInfo(e.target.value)}>
+                    {data.search.map(customer => (
+                        <option key={customer.uid} value={customer.uid}>{customer.name}</option>
+                    ))}
+                </select>
+                }
+                {console.log("info_data", info_data)}
                 <div className="mb-3">
                     <div className="form-check">
                         <input
