@@ -28,14 +28,6 @@ const FULL_INFO_QUERY = gql`
         name
         isActive
         note
-        creationDate
-        modifiedDate
-        type {
-          type
-        }
-        group {
-          group
-        }
         details {
           infoTypeField {
             field
@@ -48,7 +40,7 @@ const FULL_INFO_QUERY = gql`
 const CustomerInfo = () => {
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [city, setCity] = useState([]);
-    const [isRefactorDisabled, setIsRefactorDisabled] = useState(false);
+    const [isRefactorDisabled, setIsRefactorDisabled] = useState(true);
     const [nameInvalid, setNameInvalid] = useState(false);
     const [surnameInvalid, setSurnameInvalid] = useState(false);
     const [birthDate, setBirthDate] = useState(new Date());
@@ -67,11 +59,68 @@ const CustomerInfo = () => {
         city_phone: '',
         address: '',
         gender: '',
-        email: ''
+        email: '',
+        note: ''
     });
 
-    const [getAvailableCustomer, {loading, data}] = useLazyQuery(CUSTOMER_QUERY);
-    const [getFullInfo, {info_loading, info_data}] = useLazyQuery(FULL_INFO_QUERY);
+    const [getAvailableCustomer, {data: available_customer, loading: available_customer_loading}] = useLazyQuery(CUSTOMER_QUERY);
+    const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
+        onCompleted: () => {
+            if(customer_full_info){
+                setIsRefactorDisabled(false);
+                customer_full_info.search[0].details.forEach(detail => {
+                    if(detail.infoTypeField.field === "Birthdate"){
+                        setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            birthDate: detail.fieldValue
+                        }));
+                    }else if(detail.infoTypeField.field === "City"){
+                        setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            city: {
+                                id: '',
+                                name: detail.fieldValue
+                            }
+                        }));
+                    }else if(detail.infoTypeField.field === "DocumentPin"){
+                        setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            finCode: detail.fieldValue
+                        }));
+                    }else if(detail.infoTypeField.field === "Number"){
+                        setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            identifierNumber: detail.fieldValue
+                        }));
+                    }else if(detail.infoTypeField.field === "Mobile"){
+                        setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            mobile_phone: detail.fieldValue
+                        }));
+                    }else if(detail.infoTypeField.field === "Email"){
+                        setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            email: detail.fieldValue
+                        }));
+                    }else if(detail.infoTypeField.field === "PhysicalAddress"){
+                        setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            address: detail.fieldValue
+                        }));
+                    }else if(detail.infoTypeField.field === "Gender"){
+                        setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            gender: detail.fieldValue
+                        }));
+                    }
+                })
+            }
+        },
+        onError: (error) => {
+            console.log(error)
+        }
+    })
+
 
     useEffect(() => {
         get('http://bpaws01l:8087/api/city/table?page=0&size=100').then((res) => {
@@ -94,10 +143,6 @@ const CustomerInfo = () => {
                     finCode: customerInfo.finCode ? customerInfo.finCode : null
                 }
             });
-        } else if (!customerInfo.name.length) {
-            setNameInvalid(true);
-        } else if (!customerInfo.surname.length) {
-            setSurnameInvalid(true);
         }
     }
 
@@ -121,7 +166,6 @@ const CustomerInfo = () => {
     }
 
     const handleFullInfo = (uid) => {
-        console.log(uid)
         getFullInfo({
             variables: {
                 uid: `${uid}`
@@ -155,26 +199,31 @@ const CustomerInfo = () => {
                     <div className="col-md-5">
                         <label>Şəxsiyyət vəsiqəsi Fin Kod</label>
                         <input type="text" className="form-control"
+                               value={customerInfo && customerInfo?.finCode}
                                onChange={e => handleInputChange("finCode", e.target.value)}/>
                     </div>
                     <div className="col-md-4">
                         <label>Şəxsiyyət vəsiqəsi №-i</label>
                         <input type="text" className="form-control"
+                               value={customerInfo && customerInfo?.identifierNumber}
                                onChange={e => handleInputChange("ID", e.target.value)}/>
                     </div>
                     <div className="col-md-3 d-flex align-items-end">
                         <div className="btn btn-primary" onClick={searchOnDatabase}>Axtar</div>
                     </div>
                 </div>
-                {loading && <p>Məlumat yüklənir...</p>}
-                {data &&
+                {available_customer_loading && <p>Məlumat yüklənir...</p>}
+                {available_customer &&
                 <select className="form-control mb-3" onChange={e => handleFullInfo(e.target.value)}>
-                    {data.search.map(customer => (
+                    <option defaultValue disabled>Mümkün Siyahı</option>
+                    {available_customer.search.map(customer => (
                         <option key={customer.uid} value={customer.uid}>{customer.name}</option>
                     ))}
                 </select>
                 }
-                {console.log("info_data", info_data)}
+
+                {customerInfo && console.log(customerInfo)}
+
                 <div className="mb-3">
                     <div className="form-check">
                         <input
@@ -251,7 +300,7 @@ const CustomerInfo = () => {
                         <Select
                             styles={selectStyles}
                             options={city}
-                            value={customerInfo?.city ? [{
+                            value={customerInfo && customerInfo?.city ? [{
                                 value: customerInfo?.city?.id,
                                 label: customerInfo?.city?.name
                             }] : ''}
@@ -265,21 +314,43 @@ const CustomerInfo = () => {
                 <div className="row mb-3">
                     <div className="col-12">
                         <label htmlFor='address'>Ünvan<span className="text-danger">*</span></label>
-                        <textarea rows="3" className="form-control"/>
+                        <textarea rows="3" className="form-control"
+                                  value={customerInfo && customerInfo.address}
+                                  onChange={e => handleInputChange("address", e.target.value)}
+                        />
                     </div>
                 </div>
 
                 <div className="row mb-3">
                     <div className="col-md-6">
                         <label htmlFor='birthdate'>Mobil telefon<span className="text-danger">*</span></label>
-                        <input type="text" className="form-control"/>
+                        <input type="text" className="form-control"
+                               onChange={e => handleInputChange("mobile_phone", e.target.value)}
+                               value={customerInfo && customerInfo.mobile_phone}/>
                     </div>
                     <div className="col-md-6">
                         <label>Şəhər telefonu</label>
-                        <input type="text" className="form-control"/>
+                        <input type="text" className="form-control"
+                               onChange={e => handleInputChange("city_phone", e.target.value)}
+                               value={customerInfo && customerInfo.city_phone}/>
                     </div>
                 </div>
-
+                <div className="row mb-3">
+                    <div className="col-md-12">
+                        <label htmlFor='birthdate'>Şərh</label>
+                        <textarea className="form-control"
+                                  onChange={e => handleInputChange("note", e.target.value)}
+                                  value={customerInfo && customerInfo.note}/>
+                    </div>
+                </div>
+                <div className="row mb-3">
+                    <div className="col-md-3">
+                        <label htmlFor='birthdate'>Şərh</label>
+                        <textarea className="form-control"
+                                  onChange={e => handleInputChange("note", e.target.value)}
+                                  value={customerInfo && customerInfo.note}/>
+                    </div>
+                </div>
             </div>
         </div>
     )
