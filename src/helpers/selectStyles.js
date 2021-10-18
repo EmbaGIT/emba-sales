@@ -2,6 +2,8 @@ export const selectStyles = {
     control: (provided) => ({
         ...provided,
         boxShadow: 0,
+        minHeight: '35px',
+        height: '35px',
         fontSize: 14,
         '&:hover': {
             outline: 0,
