@@ -7,7 +7,7 @@ import {BrowserRouter as Router} from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 const client = new ApolloClient({
-    uri: "http://bpaws01l:8088/graphql",
+    uri: "http://bpaws01l.embawood.dm:8088/graphql",
     cache: new InMemoryCache(),
 });
 

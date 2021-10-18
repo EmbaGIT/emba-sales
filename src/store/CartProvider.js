@@ -29,8 +29,6 @@ const SumItem = (state, action) => {
 }
 
 const SumDiscountItem = (state, action) => {
-    console.log(state);
-    console.log(action);
     return state.discountAmount + (action.item.price * action.item.amount - action.item.discount * action.item.price * action.item.amount / 100);
 }
 
@@ -91,13 +89,6 @@ const cartReducer = (state, action) => {
             totalDiscount: Math.round(totalDiscount * 100) / 100,
         }));
 
-        console.log({
-            items: updatedItems,
-            totalAmount: updatedTotalAmount,
-            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-            totalDiscount: Math.round(totalDiscount * 100) / 100,
-        })
-
         return {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
@@ -105,7 +96,6 @@ const cartReducer = (state, action) => {
             totalDiscount: Math.round(totalDiscount * 100) / 100
         };
     }
-
 
     if (action.type === 'DISCOUNT') {
         let updatedTotalAmount = 0;
@@ -136,8 +126,27 @@ const cartReducer = (state, action) => {
         };
     }
 
+    let totalelement=0;
+
+    state.items.forEach(item => {
+        totalelement += item.amount
+    })
+
     if(action.type==="PriceChange"){
-        console.log(action.value)
+        const change_value=action.value.value/totalelement;
+        const updatedItems=[];
+        state.items.forEach(item =>(updatedItems.push({
+            ...item,
+            price: item.price+change_value
+        })));
+
+        console.log(updatedItems);
+
+        return {
+            items: updatedItems,
+            totalAmount: state.totalAmount
+        };
+
     }
 
     return defaultCartState;
