@@ -47,7 +47,8 @@ const cartReducer = (state, action) => {
             const updatedItem = {
                 ...existingCartItem,
                 amount: existingCartItem.amount + action.item.amount,
-                discount: 0
+                discount: 0,
+                discount_price: existingCartItem.price
             };
             updatedItems = [...state.items];
             updatedItems[existingCartItemIndex] = updatedItem;
@@ -100,6 +101,7 @@ const cartReducer = (state, action) => {
     if (action.type === 'DISCOUNT') {
         let updatedTotalAmount = 0;
         let updatedDiscountAmount = 0;
+        const updatedItems=[];
 
         action.discount.items.forEach(item => {
             updatedTotalAmount += item.amount * item.price;
@@ -107,12 +109,16 @@ const cartReducer = (state, action) => {
 
         action.discount.items.forEach(item => {
             updatedDiscountAmount += item.amount * item.price - (item.amount * item.price * item.discount / 100);
+            updatedItems.push({
+                ...item,
+                discount_price: item.amount * item.price - (item.amount * item.price * item.discount / 100)
+            })
         });
 
         const totalDiscount = 100 - (updatedDiscountAmount*100/updatedTotalAmount);
 
         localStorage.setItem('cart', JSON.stringify({
-            items: action.discount.items,
+            items: updatedItems,
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
             totalDiscount: Math.round(totalDiscount * 100) / 100,
@@ -137,7 +143,7 @@ const cartReducer = (state, action) => {
         const updatedItems=[];
         state.items.forEach(item =>(updatedItems.push({
             ...item,
-            price: item.price+change_value
+            discount_price: item.discount_price+change_value
         })));
 
         console.log(updatedItems);

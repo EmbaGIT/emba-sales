@@ -1,9 +1,12 @@
 import Select from "react-select";
 import {selectStyles} from "../../helpers/selectStyles";
+import InputMask from 'react-input-mask';
 import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
 import React, {useEffect, useState} from "react";
 import {gql, useLazyQuery} from "@apollo/client";
-
+import DatePicker  from 'react-datepicker';
+import getYear from "date-fns/getYear";
+import getMonth from "date-fns/getYear";
 import "react-datepicker/dist/react-datepicker.css";
 import {get} from "../../api/Api";
 
@@ -43,7 +46,6 @@ const CustomerInfo = () => {
     const [isRefactorDisabled, setIsRefactorDisabled] = useState(true);
     const [nameInvalid, setNameInvalid] = useState(false);
     const [surnameInvalid, setSurnameInvalid] = useState(false);
-    const [birthDate, setBirthDate] = useState(new Date());
     const [customerInfo, setCustomerInfo] = useState({
         name: '',
         surname: '',
@@ -56,12 +58,31 @@ const CustomerInfo = () => {
             'name': ''
         },
         mobile_phone: '',
-        city_phone: '',
+        other_phone: '',
         address: '',
         gender: '',
         email: '',
         note: ''
     });
+    const range = (start, end) => {
+        return new Array(end - start).fill().map((d, i) => i + start);
+    };
+    const years = range(1960, getYear(new Date()) + 1, 1);
+
+    const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
 
     const [getAvailableCustomer, {data: available_customer, loading: available_customer_loading}] = useLazyQuery(CUSTOMER_QUERY);
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
@@ -72,7 +93,7 @@ const CustomerInfo = () => {
                     if(detail.infoTypeField.field === "Birthdate"){
                         setCustomerInfo(prevstate => ({
                             ...prevstate,
-                            birthDate: detail.fieldValue
+                            birthDate: detail.fieldValue.split(" ")
                         }));
                     }else if(detail.infoTypeField.field === "City"){
                         setCustomerInfo(prevstate => ({
@@ -96,6 +117,11 @@ const CustomerInfo = () => {
                         setCustomerInfo(prevstate => ({
                             ...prevstate,
                             mobile_phone: detail.fieldValue
+                        }));
+                    }else if(detail.infoTypeField.field === "OtherPhone"){
+                        setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            other_phone: detail.fieldValue
                         }));
                     }else if(detail.infoTypeField.field === "Email"){
                         setCustomerInfo(prevstate => ({
@@ -135,7 +161,7 @@ const CustomerInfo = () => {
     }, [])
 
     const searchOnDatabase = () => {
-        if (customerInfo.name.length && customerInfo.surname.length) {
+        if ((customerInfo.name.length && customerInfo.surname.length) || customerInfo.finCode) {
             getAvailableCustomer({
                 variables: {
                     name: `${customerInfo.surname} ${customerInfo.name}`,
@@ -206,7 +232,7 @@ const CustomerInfo = () => {
                         <label>Şəxsiyyət vəsiqəsi №-i</label>
                         <input type="text" className="form-control"
                                value={customerInfo && customerInfo?.identifierNumber}
-                               onChange={e => handleInputChange("ID", e.target.value)}/>
+                               onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
                     </div>
                     <div className="col-md-3 d-flex align-items-end">
                         <div className="btn btn-primary" onClick={searchOnDatabase}>Axtar</div>
@@ -221,8 +247,6 @@ const CustomerInfo = () => {
                     ))}
                 </select>
                 }
-
-                {customerInfo && console.log(customerInfo)}
 
                 <div className="mb-3">
                     <div className="form-check">
@@ -241,59 +265,60 @@ const CustomerInfo = () => {
                 <div className="row mb-3">
                     <div className="col-md-6">
                         <label htmlFor='birthdate'>Doğum tarixi</label>
-                        <input type="text" className="form-control"/>
-                        {/*<DatePicker
-                                    renderCustomHeader={({
-                                                             date,
-                                                             changeYear,
-                                                             changeMonth,
-                                                             decreaseMonth,
-                                                             increaseMonth,
-                                                             prevMonthButtonDisabled,
-                                                             nextMonthButtonDisabled,
-                                                         }) => (
-                                        <div
-                                            style={{
-                                                margin: 10,
-                                                display: "flex",
-                                                justifyContent: "center",
-                                            }}
-                                        >
-                                            <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>
-                                                {"<"}
-                                            </button>
-                                            <select
-                                                value={getYear(date)}
-                                                onChange={({ target: { value } }) => changeYear(value)}
-                                            >
-                                                {years.map((option) => (
-                                                    <option key={option} value={option}>
-                                                        {option}
-                                                    </option>
-                                                ))}
-                                            </select>
+                        <DatePicker
+                            dateFormat="dd.MM.yyyy"
+                            className="form-control"
+                            renderCustomHeader={({
+                                                     date,
+                                                     changeYear,
+                                                     changeMonth,
+                                                     decreaseMonth,
+                                                     increaseMonth,
+                                                     prevMonthButtonDisabled,
+                                                     nextMonthButtonDisabled,
+                                                 }) => (
+                                <div
+                                    style={{
+                                        margin: 10,
+                                        display: "flex",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>
+                                        {"<"}
+                                    </button>
+                                    <select
+                                        value={getYear(date)}
+                                        onChange={({ target: { value } }) => changeYear(value)}
+                                    >
+                                        {years.map((option) => (
+                                            <option key={option} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
 
-                                            <select
-                                                value={months[getMonth(date)]}
-                                                onChange={({ target: { value } }) =>
-                                                    changeMonth(months.indexOf(value))
-                                                }
-                                            >
-                                                {months.map((option) => (
-                                                    <option key={option} value={option}>
-                                                        {option}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                    <select
+                                        value={months[getMonth(date)]}
+                                        onChange={({ target: { value } }) =>
+                                            changeMonth(months.indexOf(value))
+                                        }
+                                    >
+                                        {months.map((option) => (
+                                            <option key={option} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
 
-                                            <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>
-                                                {">"}
-                                            </button>
-                                        </div>
-                                    )}
-                                    selected={setBirthDate}
-                                    onChange={(date) => setBirthDate(date)}
-                                />*/}
+                                    <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>
+                                        {">"}
+                                    </button>
+                                </div>
+                            )}
+                            selected={customerInfo.birthdate}
+                            onChange={(date) => handleInputChange("birthdate", date)}
+                        />
                     </div>
                     <div className="col-md-6">
                         <label>Şəhər<span className="text-danger">*</span></label>
@@ -324,15 +349,15 @@ const CustomerInfo = () => {
                 <div className="row mb-3">
                     <div className="col-md-6">
                         <label htmlFor='birthdate'>Mobil telefon<span className="text-danger">*</span></label>
-                        <input type="text" className="form-control"
-                               onChange={e => handleInputChange("mobile_phone", e.target.value)}
-                               value={customerInfo && customerInfo.mobile_phone}/>
+                        <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
+                                   onChange={e => handleInputChange("mobile_phone", e.target.value)}
+                                   value={customerInfo && customerInfo.mobile_phone}/>
                     </div>
                     <div className="col-md-6">
-                        <label>Şəhər telefonu</label>
-                        <input type="text" className="form-control"
-                               onChange={e => handleInputChange("city_phone", e.target.value)}
-                               value={customerInfo && customerInfo.city_phone}/>
+                        <label htmlFor='birthdate'>Digər telefon</label>
+                        <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
+                                   onChange={e => handleInputChange("other_phone", e.target.value)}
+                                   value={customerInfo && customerInfo.other_phone}/>
                     </div>
                 </div>
                 <div className="row mb-3">
@@ -344,11 +369,8 @@ const CustomerInfo = () => {
                     </div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-md-3">
-                        <label htmlFor='birthdate'>Şərh</label>
-                        <textarea className="form-control"
-                                  onChange={e => handleInputChange("note", e.target.value)}
-                                  value={customerInfo && customerInfo.note}/>
+                    <div className="col-md-12 text-end">
+                        <button className="btn btn-success">Göndər</button>
                     </div>
                 </div>
             </div>

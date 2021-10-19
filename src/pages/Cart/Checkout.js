@@ -66,7 +66,7 @@ const Checkout = () => {
                                             <div className="text-success font-weight-bold">Sayı: {product.amount}</div>
                                         </td>
                                         <td>{product.price} AZN</td>
-                                        <td>{Math.round((product.amount * (product.price - (product.price * product.discount / 100))) * 100) / 100} AZN</td>
+                                        <td>{product.discount_price} AZN</td>
                                     </tr>
                                 ))}
                                 </tbody>
