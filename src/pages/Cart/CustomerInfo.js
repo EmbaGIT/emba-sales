@@ -47,6 +47,7 @@ const CustomerInfo = () => {
     const [nameInvalid, setNameInvalid] = useState(false);
     const [surnameInvalid, setSurnameInvalid] = useState(false);
     const [customerInfo, setCustomerInfo] = useState({
+        uid: '',
         name: '',
         surname: '',
         patronymic: '',
@@ -67,7 +68,7 @@ const CustomerInfo = () => {
     const range = (start, end) => {
         return new Array(end - start).fill().map((d, i) => i + start);
     };
-    const years = range(1960, getYear(new Date()) + 1, 1);
+    const years = range(1950, getYear(new Date()) + 1, 1);
 
     const months = [
         "January",
@@ -87,13 +88,18 @@ const CustomerInfo = () => {
     const [getAvailableCustomer, {data: available_customer, loading: available_customer_loading}] = useLazyQuery(CUSTOMER_QUERY);
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
         onCompleted: () => {
+            console.log(customer_full_info);
             if(customer_full_info){
                 setIsRefactorDisabled(false);
+                setCustomerInfo(prevState => ({
+                    ...prevState,
+                    uid: customer_full_info.search[0].uid
+                }))
                 customer_full_info.search[0].details.forEach(detail => {
                     if(detail.infoTypeField.field === "Birthdate"){
                         setCustomerInfo(prevstate => ({
                             ...prevstate,
-                            birthDate: detail.fieldValue.split(" ")
+                            birthdate: new Date(detail.fieldValue?.split(" ")[0].replace( /(\d{2}).(\d{2}).(\d{4})/, "$2/$1/$3"))
                         }));
                     }else if(detail.infoTypeField.field === "City"){
                         setCustomerInfo(prevstate => ({
@@ -136,7 +142,7 @@ const CustomerInfo = () => {
                     }else if(detail.infoTypeField.field === "Gender"){
                         setCustomerInfo(prevstate => ({
                             ...prevstate,
-                            gender: detail.fieldValue
+                            gender: detail.fieldValue === "Kişi" ? 1 : 0
                         }));
                     }
                 })
@@ -173,6 +179,7 @@ const CustomerInfo = () => {
     }
 
     const handleInputChange = (type, value) => {
+        console.log(type, value)
         let alldata = {...customerInfo};
         if (type === 'select_city') {
             alldata = {
@@ -182,7 +189,17 @@ const CustomerInfo = () => {
                     name: value.label
                 }
             }
-        } else {
+        } else if(type==="male") {
+            alldata = {
+                ...alldata,
+                gender: 1
+            }
+        } else if(type==="female") {
+            alldata = {
+                ...alldata,
+                gender: 0
+            }
+        }else{
             alldata = {
                 ...alldata,
                 [type]: value
@@ -239,15 +256,16 @@ const CustomerInfo = () => {
                     </div>
                 </div>
                 {available_customer_loading && <p>Məlumat yüklənir...</p>}
-                {available_customer &&
+                {available_customer?.search.length &&
                 <select className="form-control mb-3" onChange={e => handleFullInfo(e.target.value)}>
                     <option defaultValue disabled>Mümkün Siyahı</option>
                     {available_customer.search.map(customer => (
                         <option key={customer.uid} value={customer.uid}>{customer.name}</option>
                     ))}
-                </select>
-                }
+                </select>}
+                {!available_customer && <p>Məlumat tapılmadı.</p>}
 
+                {console.log("customer", customerInfo)}
                 <div className="mb-3">
                     <div className="form-check">
                         <input
@@ -326,7 +344,7 @@ const CustomerInfo = () => {
                             styles={selectStyles}
                             options={city}
                             value={customerInfo && customerInfo?.city ? [{
-                                value: customerInfo?.city?.id,
+                                value: customerInfo?.city?.code,
                                 label: customerInfo?.city?.name
                             }] : ''}
                             components={(props) => NoOptionsMessage(props, 'Şəhər tapılmadı.')}
@@ -335,11 +353,10 @@ const CustomerInfo = () => {
                         />
                     </div>
                 </div>
-
                 <div className="row mb-3">
                     <div className="col-12">
                         <label htmlFor='address'>Ünvan<span className="text-danger">*</span></label>
-                        <textarea rows="3" className="form-control"
+                        <textarea className="form-control"
                                   value={customerInfo && customerInfo.address}
                                   onChange={e => handleInputChange("address", e.target.value)}
                         />
@@ -348,29 +365,53 @@ const CustomerInfo = () => {
 
                 <div className="row mb-3">
                     <div className="col-md-6">
-                        <label htmlFor='birthdate'>Mobil telefon<span className="text-danger">*</span></label>
+                        <label>Mobil telefon<span className="text-danger">*</span></label>
                         <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
                                    onChange={e => handleInputChange("mobile_phone", e.target.value)}
                                    value={customerInfo && customerInfo.mobile_phone}/>
                     </div>
                     <div className="col-md-6">
-                        <label htmlFor='birthdate'>Digər telefon</label>
+                        <label>Digər telefon</label>
                         <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
                                    onChange={e => handleInputChange("other_phone", e.target.value)}
                                    value={customerInfo && customerInfo.other_phone}/>
                     </div>
                 </div>
+                {!!(customerInfo.gender === 1)}
                 <div className="row mb-3">
-                    <div className="col-md-12">
-                        <label htmlFor='birthdate'>Şərh</label>
-                        <textarea className="form-control"
-                                  onChange={e => handleInputChange("note", e.target.value)}
-                                  value={customerInfo && customerInfo.note}/>
+                    <div className="col-12">
+                        <div className="d-flex">
+                            <span className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="gender"
+                                    id="male"
+                                    onChange={e => handleInputChange("male", e.target.checked)}
+                                    checked={!!(customerInfo.gender === 1)}
+                                />
+                                <label className="form-check-label" htmlFor="male">Kişi</label>
+                            </span>
+                            <span className="form-check ms-3">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="gender"
+                                    id="female"
+                                    onChange={e => handleInputChange("female", e.target.checked)}
+                                    checked={!!(customerInfo.gender === 0)}
+                                />
+                                <label className="form-check-label" htmlFor="female">Qadın</label>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div className="row mb-3">
-                    <div className="col-md-12 text-end">
-                        <button className="btn btn-success">Göndər</button>
+                    <div className="col-md-12">
+                        <label>Şərh</label>
+                        <textarea className="form-control"
+                                  onChange={e => handleInputChange("note", e.target.value)}
+                                  value={customerInfo && customerInfo.note}/>
                     </div>
                 </div>
             </div>

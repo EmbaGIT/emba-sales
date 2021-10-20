@@ -66,7 +66,7 @@ const Checkout = () => {
                                             <div className="text-success font-weight-bold">Sayı: {product.amount}</div>
                                         </td>
                                         <td>{product.price} AZN</td>
-                                        <td>{product.discount_price} AZN</td>
+                                        <td>{product.amount * product.discount_price} AZN</td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -123,6 +123,11 @@ const Checkout = () => {
             </div>
             <div className="col-md-6">
                 <CustomerInfo/>
+                <div className="row mt-3">
+                    <div className="col-md-12 text-end">
+                        <button className="btn btn-success">Göndər</button>
+                    </div>
+                </div>
             </div>
         </div>
     )

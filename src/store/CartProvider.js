@@ -111,7 +111,7 @@ const cartReducer = (state, action) => {
             updatedDiscountAmount += item.amount * item.price - (item.amount * item.price * item.discount / 100);
             updatedItems.push({
                 ...item,
-                discount_price: item.amount * item.price - (item.amount * item.price * item.discount / 100)
+                discount_price: item.price - (item.price * item.discount / 100)
             })
         });
 
@@ -132,27 +132,28 @@ const cartReducer = (state, action) => {
         };
     }
 
-    let totalelement=0;
-
-    state.items.forEach(item => {
-        totalelement += item.amount
-    })
-
     if(action.type==="PriceChange"){
-        const change_value=action.value.value/totalelement;
-        const updatedItems=[];
-        state.items.forEach(item =>(updatedItems.push({
-            ...item,
-            discount_price: item.discount_price+change_value
-        })));
+        if(action.value.value){
+            let totalelement=0;
+            state.items.forEach(item => {
+                totalelement += item.amount
+            })
+            const change_value=action.value.value/totalelement;
+            const updatedItems=[];
+            state.items.forEach(item =>(updatedItems.push({
+                ...item,
+                discount_price: item.discount_price+change_value,
+            })));
 
-        console.log(updatedItems);
+            const updatedDiscountAmount= state.discountAmount + parseFloat(action.value.value)
 
-        return {
-            items: updatedItems,
-            totalAmount: state.totalAmount
-        };
-
+            return {
+                items: updatedItems,
+                totalAmount: state.totalAmount,
+                discountAmount: updatedDiscountAmount,
+                totalDiscount: state.totalDiscount
+            };
+        }
     }
 
     return defaultCartState;
