@@ -21,7 +21,7 @@ const App = () => {
         get(`menu/search?sort=menuOrder,desc`).then(res => {
             const menuListArr = [];
             res.content.forEach(menu => {
-                get(`http://bpaws01l:8082/api/image/resource?resourceId=${menu.id}&bucket=mobi-c&folder=menu-logo`).then(file => {
+                get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store-icon&parent=${menu.id}`).then(file => {
                     menuListArr.push({
                         ...menu,
                         file

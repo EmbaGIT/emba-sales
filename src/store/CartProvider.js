@@ -125,7 +125,7 @@ const cartReducer = (state, action) => {
         }));
 
         return {
-            items: action.discount.items,
+            items: updatedItems,
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
             totalDiscount: Math.round(totalDiscount * 100) / 100

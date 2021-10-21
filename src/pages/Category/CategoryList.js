@@ -25,7 +25,7 @@ const Category = () => {
             setPageInfo(res);
             const productListArr = [];
             res.content.forEach(product => {
-                get(`http://bpaws01l:8082/api/image/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
+                get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store-icon&parent=${product.id}`).then(file => {
                     productListArr.push({
                         ...product,
                         file

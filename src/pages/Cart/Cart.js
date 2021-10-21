@@ -23,7 +23,8 @@ const Cart = () => {
                     id: cartCtx.items[0].id,
                     name: cartCtx.items[0].name,
                     price: cartCtx.items[0].price,
-                    parent: cartCtx.items[0].parent
+                    parent: cartCtx.items[0].parent,
+                    uid: cartCtx.items[0].uid
                 }],
             });
         }
@@ -44,7 +45,8 @@ const Cart = () => {
                             id: item.id,
                             name: item.name,
                             price: item.price,
-                            parent: item.parent
+                            parent: item.parent,
+                            uid: item.uid
                         }],
                     })
                 }
@@ -63,7 +65,8 @@ const Cart = () => {
                 price: item.price,
                 name: item.name,
                 parent: item.parent,
-                files: item.files
+                files: item.files,
+                uid: item.uid
             })
         })
         cartCtx.discountHandler({

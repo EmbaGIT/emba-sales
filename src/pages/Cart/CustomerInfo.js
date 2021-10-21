@@ -1,6 +1,7 @@
 import Select from "react-select";
 import {selectStyles} from "../../helpers/selectStyles";
 import InputMask from 'react-input-mask';
+import Loader from 'react-loader-spinner';
 import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
 import React, {useEffect, useState} from "react";
 import {gql, useLazyQuery} from "@apollo/client";
@@ -44,6 +45,9 @@ const CustomerInfo = () => {
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [city, setCity] = useState([]);
     const [isRefactorDisabled, setIsRefactorDisabled] = useState(true);
+    const [customerSearch, setCustomerSearch] = useState(false);
+    const [orderDate, setOrderDate] = useState();
+    const [deliveryDate, setDeliveryDate] = useState();
     const [nameInvalid, setNameInvalid] = useState(false);
     const [surnameInvalid, setSurnameInvalid] = useState(false);
     const [customerInfo, setCustomerInfo] = useState({
@@ -167,7 +171,7 @@ const CustomerInfo = () => {
     }, [])
 
     const searchOnDatabase = () => {
-        if ((customerInfo.name.length && customerInfo.surname.length) || customerInfo.finCode) {
+        if ((customerInfo.name.length && customerInfo.surname.length) || customerInfo.finCode || customerInfo.identifierNumber) {
             getAvailableCustomer({
                 variables: {
                     name: `${customerInfo.surname} ${customerInfo.name}`,
@@ -175,11 +179,11 @@ const CustomerInfo = () => {
                     finCode: customerInfo.finCode ? customerInfo.finCode : null
                 }
             });
+            setCustomerSearch(true);
         }
     }
 
     const handleInputChange = (type, value) => {
-        console.log(type, value)
         let alldata = {...customerInfo};
         if (type === 'select_city') {
             alldata = {
@@ -214,6 +218,19 @@ const CustomerInfo = () => {
                 uid: `${uid}`
             }
         });
+    }
+
+    if (isFetchingData) {
+        return (
+            <div className='display-absolute-center'>
+                <Loader
+                    type='Oval'
+                    color='#00BFFF'
+                    height={50}
+                    width={50}
+                />
+            </div>
+        );
     }
 
     return (
@@ -256,16 +273,13 @@ const CustomerInfo = () => {
                     </div>
                 </div>
                 {available_customer_loading && <p>Məlumat yüklənir...</p>}
-                {available_customer?.search.length &&
+                {customerSearch && (available_customer?.search.length ?
                 <select className="form-control mb-3" onChange={e => handleFullInfo(e.target.value)}>
-                    <option defaultValue disabled>Mümkün Siyahı</option>
+                    <option selected={true} disabled>Mümkün Siyahı</option>
                     {available_customer.search.map(customer => (
                         <option key={customer.uid} value={customer.uid}>{customer.name}</option>
                     ))}
-                </select>}
-                {!available_customer && <p>Məlumat tapılmadı.</p>}
-
-                {console.log("customer", customerInfo)}
+                </select> : <p>Məlumat tapılmadı.</p>)}
                 <div className="mb-3">
                     <div className="form-check">
                         <input
@@ -377,7 +391,6 @@ const CustomerInfo = () => {
                                    value={customerInfo && customerInfo.other_phone}/>
                     </div>
                 </div>
-                {!!(customerInfo.gender === 1)}
                 <div className="row mb-3">
                     <div className="col-12">
                         <div className="d-flex">
@@ -404,6 +417,26 @@ const CustomerInfo = () => {
                                 <label className="form-check-label" htmlFor="female">Qadın</label>
                             </span>
                         </div>
+                    </div>
+                </div>
+                <div className="row mb-3">
+                    <div className="col-md-6">
+                        <label>Siafriş tarixi<span className="text-danger">*</span></label>
+                        <DatePicker
+                            className="form-control"
+                            selected={orderDate}
+                            onChange={(date) => setOrderDate(date)}
+                            minDate={new Date()}
+                        />
+                    </div>
+                    <div className="col-md-6">
+                        <label>Çatdırılma tarixi<span className="text-danger">*</span></label>
+                        <DatePicker
+                            className="form-control"
+                            selected={deliveryDate}
+                            onChange={(date) => setDeliveryDate(date)}
+                            minDate={new Date()}
+                        />
                     </div>
                 </div>
                 <div className="row mb-3">
