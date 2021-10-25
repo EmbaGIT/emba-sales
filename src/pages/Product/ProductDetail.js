@@ -55,6 +55,7 @@ const Product = () => {
         });
         get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1`).then((res) => {
             res.content.map(async item => {
+                console.log(item);
                 setPrice += item.price;
                 const items = [];
                 const stock = [];

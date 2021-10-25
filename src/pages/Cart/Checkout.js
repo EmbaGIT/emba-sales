@@ -312,9 +312,6 @@ const Checkout = () => {
             goods: order_goods,
             bank_cash: bankCommission
         }
-        console.log(order_goods);
-        console.log(order_data);
-
     }
 
     return (
