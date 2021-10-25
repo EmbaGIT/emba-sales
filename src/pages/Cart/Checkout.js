@@ -103,7 +103,6 @@ const Checkout = () => {
     }] = useLazyQuery(CUSTOMER_QUERY);
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
         onCompleted: () => {
-            console.log(customer_full_info)
             if (customer_full_info) {
                 setIsRefactorDisabled(false);
                 setCustomerInfo(prevState => ({
@@ -118,13 +117,23 @@ const Checkout = () => {
                         }));
                     } else if (detail.infoTypeField.field === "City") {
                         get(`http://bpaws01l:8087/api/city/search?name.contains=${detail.fieldValue}`).then(res => {
-                            setCustomerInfo(prevstate => ({
-                                ...prevstate,
-                                city: {
-                                    code: res.content[0].code,
-                                    name: detail.fieldValue
-                                }
-                            }));
+                            if(res.content.length>0){
+                                setCustomerInfo(prevstate => ({
+                                    ...prevstate,
+                                    city: {
+                                        code: res.content[0].code,
+                                        name: detail.fieldValue
+                                    }
+                                }));
+                            }else{
+                                setCustomerInfo(prevstate => ({
+                                    ...prevstate,
+                                    city: {
+                                        code: "000000079",
+                                        name: "Digər"
+                                    }
+                                }));
+                            }
                         })
                     } else if (detail.infoTypeField.field === "DocumentPin") {
                         setCustomerInfo(prevstate => ({

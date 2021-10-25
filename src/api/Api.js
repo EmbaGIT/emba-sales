@@ -35,7 +35,7 @@ axiosInstance.interceptors.request.use((config) => {
             Authorization: `Bearer ${jwt}`,
         };
     }
-    if (config.url.includes('http://bpaws01l:8082/api/image')) {
+    if (config.url.includes('http://bpaws01l:8089/api/image')) {
         config.headers = {
             ...config.headers,
             'Content-Type': 'multipart/form-data;',

@@ -25,18 +25,35 @@ const Category = () => {
             setPageInfo(res);
             const productListArr = [];
             res.content.forEach(product => {
-                get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store-icon&parent=${product.id}`).then(file => {
-                    productListArr.push({
-                        ...product,
-                        file
-                    });
-                    productListArr.sort(
-                        (a, b) => parseInt(a.id) - parseInt(b.id)
-                    );
-                    setProductList(prevState => ([
-                        ...productListArr
-                    ]))
-                })
+                if(product.colors.length){
+                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${product.id}/banner&color=${product.colors[0].code}`).then(file => {
+                        productListArr.push({
+                            ...product,
+                            colors: product.colors,
+                            file
+                        });
+                        productListArr.sort(
+                            (a, b) => parseInt(a.id) - parseInt(b.id)
+                        );
+                        setProductList(prevState => ([
+                            ...productListArr
+                        ]))
+                    })
+                }else{
+                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${product.id}/banner`).then(file => {
+                        productListArr.push({
+                            ...product,
+                            file
+                        });
+                        productListArr.sort(
+                            (a, b) => parseInt(a.id) - parseInt(b.id)
+                        );
+                        setProductList(prevState => ([
+                            ...productListArr
+                        ]))
+                    })
+                }
+
             })
             setIsFetchingData(false);
             /*}else{
@@ -44,7 +61,7 @@ const Category = () => {
                     console.log("response", response)
                     const productListArr = [];
                     response.content.forEach(product => {
-                        get(`http://bpaws01l:8082/api/image/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
+                        get(`http://bpaws01l:8089/api/image/resource?resourceId=${product.id}&bucket=mobi-c&folder=parent-banner`).then(file => {
                             productListArr.push({
                                 ...product,
                                 file
@@ -102,10 +119,15 @@ const Category = () => {
                                     <img src={file.lowQualityImageUrl} alt=""/>
                                 )) : <img src={noImage} alt=""/>}
                             </div>
-                            <div className="pr-info">
-                                <div className="model-name">{product.name}</div>
-                            </div>
                         </Link>
+                        <div className="pr-info">
+                            <Link to={`/product/${product.id}`} className="pr-wrapper product-add"><div className="model-name">{product.name}</div></Link>
+                            <div>
+                                {product.colors.length ? product.colors.map(color => (
+                                    <span key={color.id} data-toggle="tooltip" title={color.name}><img className="color-image" src={`../../assets/images/colors/${color.code}.png`}/></span>
+                                )) : ''}
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>

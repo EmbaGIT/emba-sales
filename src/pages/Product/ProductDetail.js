@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
-import {gett, postt, get, post} from "../../api/Api";
+import {gett, postt, get} from "../../api/Api";
 import noImage from '../../assets/images/no-image.png';
 import Loader from "react-loader-spinner";
 import ImageGallery from 'react-image-gallery';
@@ -42,7 +42,7 @@ const Product = () => {
     }
 
     function getProductFiles(id) {
-        return gett(`http://bpaws01l:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-banner`);
+        return gett(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${id}/banner`);
     }
 
     useEffect(() => {
@@ -109,7 +109,7 @@ const Product = () => {
         });
         get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1`).then(res => {
             const images = [];
-            get(`http://bpaws01l:8082/api/image/resource?resourceId=${parent_id}&bucket=mobi-c&folder=parent-products`).then(files => {
+            get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}`).then(files => {
                 files.map(file => (
                     images.push({
                         original: file.originalImageUrl,
@@ -118,7 +118,7 @@ const Product = () => {
                 ))
             });
             res.content.map(item => (
-                get(`http://bpaws01l:8082/api/image/resource?resourceId=${item.id}&bucket=mobi-c&folder=module-banner`).then(files => {
+                get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${item.id}`).then(files => {
                     files.map(file => (
                         images.push({
                             original: file.originalImageUrl,
@@ -134,14 +134,14 @@ const Product = () => {
 
     const handleModuleInfo = (id) => {
         const images = [];
-        get(`http://bpaws01l:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-images`).then(files => {
+        get(`http://bpaws01l:8089/api/image/resource?&bucket=emba-store&parent=${parent_id}&product=${id}`).then(files => {
             files.map(file => (
                 images.push({
                     original: file.originalImageUrl,
                     thumbnail: file.lowQualityImageUrl,
                 })
             ));
-            get(`http://bpaws01l:8082/api/image/resource?resourceId=${id}&bucket=mobi-c&folder=module-banner`).then(banner => {
+            get(`http://bpaws01l:8089/api/image/resource?&bucket=emba-store&parent=${parent_id}&product=${id}/banner`).then(banner => {
                 banner.map(file => (
                     images.push({
                         original: file.originalImageUrl,
@@ -194,6 +194,12 @@ const Product = () => {
                                 </div>
                             </div>
                         </div>
+                        {productInfo.colors &&
+                            <div>
+
+                            </div>
+                        }
+
                     </>
                     }
                 </div>
@@ -204,9 +210,10 @@ const Product = () => {
                     <p className="panel-heading">Dəst Tərkibi</p>
                 </div>
                 {subProductsIsIncluded && subProductsIsIncluded.map((item) => (
-                    <SubProductItem
+                    <SubProductItem key={item.items[0].id}
                         key_id={item.items[0].id}
                         id={item.items[0].id}
+                        uid={item.items[0].uid}
                         name={item.items[0].name}
                         price={item.items[0].price}
                         files={item.files}
@@ -223,9 +230,10 @@ const Product = () => {
                     <p className="panel-heading">Dəstə Daxil Olmayan Modullar</p>
                 </div>
                 {subProductsNotIncluded && subProductsNotIncluded.map((item) => (
-                    <SubProductItem
+                    <SubProductItem key={item.items[0].id}
                         key_id={item.items[0].id}
                         id={item.items[0].id}
+                        uid={item.items[0].uid}
                         name={item.items[0].name}
                         price={item.items[0].price}
                         files={item.files}

@@ -48,7 +48,7 @@ const cartReducer = (state, action) => {
                 ...existingCartItem,
                 amount: existingCartItem.amount + action.item.amount,
                 discount: 0,
-                discount_price: existingCartItem.price
+                discount_price: action.item.amount
             };
             updatedItems = [...state.items];
             updatedItems[existingCartItemIndex] = updatedItem;

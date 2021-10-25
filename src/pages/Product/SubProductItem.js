@@ -31,7 +31,8 @@ const SubProductItem = (props) => {
                 id: props.id,
                 name: props.name,
                 price: props.price,
-                parent : props.parent
+                parent : props.parent,
+                uid: props.uid
             });
         }
     }

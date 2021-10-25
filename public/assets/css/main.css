@@ -121,6 +121,18 @@
 
 .pr-info {
     padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.color-image{
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+    border: 1px solid #676767;
 }
 
 .pr-info .model-name {
