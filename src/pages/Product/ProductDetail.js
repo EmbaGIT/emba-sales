@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {gett, postt, get} from "../../api/Api";
 import noImage from '../../assets/images/no-image.png';
 import Loader from "react-loader-spinner";
@@ -7,12 +7,16 @@ import ImageGallery from 'react-image-gallery';
 import "react-image-gallery/styles/css/image-gallery.css";
 import SubProductItem from "./SubProductItem";
 import SubProductInfo from "./SubProductİnfo";
+import {useQuery} from "../../hooks/useQuery";
 
 const Product = () => {
     const params = useParams();
     const parent_id = params.id;
+    let query = useQuery();
+    const currentColor = query.get("color") || '';
     const [isFetchingData, setIsFetchingData] = useState(true);
-    const [productInfo, setProductInfo] = useState('');
+    const [productColor, setProductColor] = useState(currentColor);
+    const [productInfo, setProductInfo] = useState([]);
     const [totalPrice, setSetPrice] = useState(0);
     const [productImages, setProductImages] = useState();
     const [subProductImages, setSubProductImages] = useState();
@@ -47,91 +51,89 @@ const Product = () => {
 
     useEffect(() => {
         setIsFetchingData(true);
-        let setPrice=0;
+        let setPrice = 0;
         const subProductIsIncludedArr = [];
         const subProductNotIncludedArr = [];
-        get(`parents/${parent_id}`).then(res => {
-            setProductInfo(res);
-        });
-        get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1`).then((res) => {
-            res.content.map(async item => {
-                console.log(item);
-                setPrice += item.price;
-                const items = [];
-                const stock = [];
-                const files = [];
-                await Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
-                    .then(function (results) {
-                        items.push(item);
-                        stock.push(...results[0].data[0].stock);
-                        files.push(...results[1].data);
-                        subProductIsIncludedArr.push({
-                            id: item.id,
-                            items,
-                            stock,
-                            files
+        get(`parents/${parent_id}`).then(productInfo => {
+            setProductInfo(productInfo);
+            get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1&attributeId.equals=${productColor}`).then((res) => {
+                res.content.map(async item => {
+                    setPrice += item.price;
+                    const items = [];
+                    const stock = [];
+                    const files = [];
+                    await Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
+                        .then(function (results) {
+                            items.push(item);
+                            stock.push(...results[0].data[0].stock);
+                            files.push(...results[1].data);
+                            subProductIsIncludedArr.push({
+                                id: item.id,
+                                items,
+                                stock,
+                                files
+                            });
+                            subProductIsIncludedArr.sort(
+                                (a, b) => parseInt(a.id) - parseInt(b.id)
+                            );
+                            setSubProductsIsIncluded(prevState => ([
+                                ...subProductIsIncludedArr
+                            ]));
                         });
-                        subProductIsIncludedArr.sort(
-                            (a, b) => parseInt(a.id) - parseInt(b.id)
-                        );
-                        setSubProductsIsIncluded(prevState => ([
-                            ...subProductIsIncludedArr
-                        ]));
-                    });
-            })
-            setIsFetchingData(false);
-            setSetPrice(setPrice);
-        });
-        get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=4`).then((res) => {
-            res.content.map(async item => {
-                const items = [];
-                const stock = [];
-                const files = [];
-                await Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
-                    .then(function (results) {
-                        items.push(item);
-                        stock.push(...results[0].data[0].stock);
-                        files.push(...results[1].data);
-                        subProductNotIncludedArr.push({
-                            id: item.id,
-                            items,
-                            stock,
-                            files
-                        });
-                        subProductNotIncludedArr.sort(
-                            (a, b) => parseInt(a.id) - parseInt(b.id)
-                        );
-                        setSubProductsNotIncluded(prevState => ([
-                            ...subProductNotIncludedArr
-                        ]));
-                    });
-            })
-            setIsFetchingData(false);
-        });
-        get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1`).then(res => {
-            const images = [];
-            get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}`).then(files => {
-                files.map(file => (
-                    images.push({
-                        original: file.originalImageUrl,
-                        thumbnail: file.lowQualityImageUrl,
-                    })
-                ))
+                })
+                setIsFetchingData(false);
+                setSetPrice(setPrice);
             });
-            res.content.map(item => (
-                get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${item.id}`).then(files => {
+            get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=4&attributeId.equals=${productColor}`).then((res) => {
+                res.content.map(async item => {
+                    const items = [];
+                    const stock = [];
+                    const files = [];
+                    await Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
+                        .then(function (results) {
+                            items.push(item);
+                            stock.push(...results[0].data[0].stock);
+                            files.push(...results[1].data);
+                            subProductNotIncludedArr.push({
+                                id: item.id,
+                                items,
+                                stock,
+                                files
+                            });
+                            subProductNotIncludedArr.sort(
+                                (a, b) => parseInt(a.id) - parseInt(b.id)
+                            );
+                            setSubProductsNotIncluded(prevState => ([
+                                ...subProductNotIncludedArr
+                            ]));
+                        });
+                })
+                setIsFetchingData(false);
+            });
+            get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1&attributeId.equals=${productColor}`).then(res => {
+                const images = [];
+                get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&color=${productColor}`).then(files => {
                     files.map(file => (
                         images.push({
                             original: file.originalImageUrl,
                             thumbnail: file.lowQualityImageUrl,
                         })
                     ))
-                })
-            ))
-            setProductImages(images);
-        })
-
-    }, [parent_id]);
+                });
+                res.content.map(item => (
+                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${item.id}`).then(files => {
+                        files.map(file => (
+                            images.push({
+                                original: file.originalImageUrl,
+                                thumbnail: file.lowQualityImageUrl,
+                            })
+                        ))
+                    })
+                ))
+                setProductImages(images);
+            })
+        });
+    }, [parent_id, productColor]);
 
     const handleModuleInfo = (id) => {
         const images = [];
@@ -156,6 +158,10 @@ const Product = () => {
         get(`products/${id}`).then(res => {
             setSubProductInfo(res);
         })
+    }
+
+    const changeColor = (color) =>{
+        setProductColor(color);
     }
 
     if (isFetchingData) {
@@ -189,18 +195,22 @@ const Product = () => {
                         <div className="product-price-box mt-2">
                             <div className="d-flex align-items-center product-info-wrapper justify-content-between">
                                 <div className="price-block">
-                                        <span className="product-price-current">
-                                            <span className="price">{totalPrice ? totalPrice : 0}</span> AZN
-                                        </span>
+                                    <span className="product-price-current">
+                                        <span className="price">{totalPrice ? totalPrice : 0}</span> AZN
+                                    </span>
                                 </div>
                             </div>
                         </div>
                         {productInfo.colors &&
-                            <div>
-
-                            </div>
+                        <div className="mt-3">
+                            {productInfo.colors.map(color => (
+                                <Link to={`/product/${parent_id}?color=${color.id}`}><span key={color.id} onClick={changeColor.bind(this, color.id)} data-toggle="tooltip" title={color.name}><img
+                                    className="color-image me-2"
+                                    src={`../../assets/images/colors/${color.code}.png`}/></span>
+                                </Link>
+                            ))}
+                        </div>
                         }
-
                     </>
                     }
                 </div>
@@ -212,17 +222,17 @@ const Product = () => {
                 </div>
                 {subProductsIsIncluded && subProductsIsIncluded.map((item) => (
                     <SubProductItem key={item.items[0].id}
-                        key_id={item.items[0].id}
-                        id={item.items[0].id}
-                        uid={item.items[0].uid}
-                        name={item.items[0].name}
-                        price={item.items[0].price}
-                        files={item.files}
-                        defaultValue={1}
-                        parent={item.items[0].parent.name}
-                        product_uid={item.items[0].uid}
-                        stock={item.stock}
-                        onClickHandle = {handleModuleInfo}
+                                    key_id={item.items[0].id}
+                                    id={item.items[0].id}
+                                    uid={item.items[0].uid}
+                                    name={item.items[0].name}
+                                    price={item.items[0].price}
+                                    files={item.files}
+                                    defaultValue={1}
+                                    parent={item.items[0].parent.name}
+                                    product_uid={item.items[0].uid}
+                                    stock={item.stock}
+                                    onClickHandle={handleModuleInfo}
                     />
                 ))}
             </div>
@@ -232,17 +242,17 @@ const Product = () => {
                 </div>
                 {subProductsNotIncluded && subProductsNotIncluded.map((item) => (
                     <SubProductItem key={item.items[0].id}
-                        key_id={item.items[0].id}
-                        id={item.items[0].id}
-                        uid={item.items[0].uid}
-                        name={item.items[0].name}
-                        price={item.items[0].price}
-                        files={item.files}
-                        defaultValue={1}
-                        parent={item.items[0].parent.name}
-                        product_uid={item.items[0].uid}
-                        stock={item.stock}
-                        onClickHandle = {handleModuleInfo}
+                                    key_id={item.items[0].id}
+                                    id={item.items[0].id}
+                                    uid={item.items[0].uid}
+                                    name={item.items[0].name}
+                                    price={item.items[0].price}
+                                    files={item.files}
+                                    defaultValue={1}
+                                    parent={item.items[0].parent.name}
+                                    product_uid={item.items[0].uid}
+                                    stock={item.stock}
+                                    onClickHandle={handleModuleInfo}
                     />
                 ))}
             </div>

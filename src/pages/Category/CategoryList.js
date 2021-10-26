@@ -105,7 +105,7 @@ const Category = () => {
             <div className="grid-wrapper">
                 {productList && productList.map((product, index) => (
                     <div className="grid-item" key={index}>
-                        <Link to={`/product/${product.id}`} className="pr-wrapper product-add">
+                        <Link to={product.colors.length ? `/product/${product.id}?color=${product.colors[0].id}` : `/product/${product.id}`} className="pr-wrapper product-add">
                             <div className="pr-image">
                                 <div className="product-button">
                                     <div className="add-to-cart btn-cart">
@@ -124,7 +124,11 @@ const Category = () => {
                             <Link to={`/product/${product.id}`} className="pr-wrapper product-add"><div className="model-name">{product.name}</div></Link>
                             <div>
                                 {product.colors.length ? product.colors.map(color => (
-                                    <span key={color.id} data-toggle="tooltip" title={color.name}><img className="color-image" src={`../../assets/images/colors/${color.code}.png`}/></span>
+                                    <Link to={`/product/${product.id}?color=${color.id}`}>
+                                        <span key={color.id} data-toggle="tooltip" title={color.name}>
+                                            <img className="color-image" src={`../../assets/images/colors/${color.code}.png`}/>
+                                        </span>
+                                    </Link>
                                 )) : ''}
                             </div>
                         </div>
