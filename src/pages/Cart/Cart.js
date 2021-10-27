@@ -11,6 +11,8 @@ const Cart = () => {
     const [cartState, setCartState] = useState([]);
     const [isDisabled, setIsDisabled] = useState(false);
 
+    console.log(cartCtx);
+
     useEffect(() => {
         const newCartArr = [];
         if (cartCtx.items.length > 0) {
@@ -57,6 +59,7 @@ const Cart = () => {
 
     const clearDiscount = () => {
         const cartItems = [];
+        const cartStateArr = [];
         cartCtx.items.forEach(item => {
             cartItems.push({
                 id: item.id,
@@ -72,6 +75,20 @@ const Cart = () => {
         cartCtx.discountHandler({
             items: cartItems
         });
+        cartState.forEach(item => {
+            const itemArr = [];
+            item.products.forEach(product => (
+                itemArr.push({
+                    ...product,
+                    discount: 0
+                })
+            ));
+            cartStateArr.push({
+                ...item,
+                products: itemArr
+            })
+        })
+        setCartState(cartStateArr);
     }
 
     const applyDiscountProduct = (type, param) => {
@@ -85,7 +102,8 @@ const Cart = () => {
                     price: item.price,
                     name: item.name,
                     parent: item.parent,
-                    files: item.files
+                    files: item.files,
+                    uid: item.uid
                 })
             })
             cartCtx.discountHandler({
@@ -95,9 +113,10 @@ const Cart = () => {
         } else {
             const cartItems = [];
             cartCtx.items.forEach(item => {
-                if(item.id === param[0].id){
+                console.log(item)
+                if (item.id === param[0].id) {
                     cartItems.push(param[0])
-                }else{
+                } else {
                     cartItems.push({
                         id: item.id,
                         discount: item.discount,
@@ -105,10 +124,12 @@ const Cart = () => {
                         price: item.price,
                         name: item.name,
                         parent: item.parent,
-                        files: item.files
+                        files: item.files,
+                        uid: item.uid
                     })
                 }
             })
+            console.log("discount", cartItems);
             cartCtx.discountHandler({
                 type: "single",
                 items: cartItems
@@ -116,11 +137,29 @@ const Cart = () => {
         }
     }
 
+    const handleInputChange = (index, pr_index, param) => {
+        let alldata = [...cartState];
+        let updatedProductDiscount = [...alldata[index].products];
+
+        console.log("alldata", alldata);
+
+        updatedProductDiscount[pr_index] = {
+            ...updatedProductDiscount[pr_index],
+            discount: param
+        }
+        alldata[index] = {
+            ...alldata[index],
+            products: updatedProductDiscount
+        };
+        console.log(alldata);
+        setCartState(alldata);
+    }
+
     const handleDelete = (id) => {
         cartCtx.removeItem(id);
     }
 
-    const handleInputChange = (value) => {
+    const handleCheckboxChange = (value) => {
         setIsDisabled(value);
         clearDiscount();
     }
@@ -139,14 +178,13 @@ const Cart = () => {
                 <div className="col-lg-9">
                     {cartState.length ?
                         <div className="basket-product-wrapper card card-table">
-                            {cartState.map(item => (
+                            {cartState.map((item, index) => (
                                 <div>
                                     <div
                                         className="list-group-item-primary p-3 d-flex justify-content-between align-content-center">
                                         <span>{item.parent}</span>
                                     </div>
-                                    {console.log("cart-CartCtx", cartCtx)}
-                                    {item.products && item.products.map(product => (
+                                    {item.products && item.products.map((product, pr_index) => (
                                         <div className="cart-product-table pr-wrapper" key={product.id}>
                                             <div className="basket-product-image-row">
                                                 {product.files.length ? product.files.map(file => (
@@ -170,20 +208,32 @@ const Cart = () => {
                                             </div>
                                             <div className="basket-product-price-row">
                                                 <input type="text" disabled={isDisabled} className="form-control"
-                                                       onBlur={event => event.target.value.trim() && applyDiscountProduct("single", [{
+                                                       onBlur={event => event.target.value.trim() ? applyDiscountProduct("single", [{
                                                            id: product.id,
                                                            discount: parseInt(event.target.value),
                                                            amount: product.amount,
                                                            price: product.price,
                                                            name: product.name,
                                                            parent: product.parent,
-                                                           files: product.files
+                                                           files: product.files,
+                                                           uid: product.uid
+                                                       }]) : applyDiscountProduct("single", [{
+                                                           id: product.id,
+                                                           discount: 0,
+                                                           amount: product.amount,
+                                                           price: product.price,
+                                                           name: product.name,
+                                                           parent: product.parent,
+                                                           files: product.files,
+                                                           uid: product.uid
                                                        }])}
-                                                       defaultValue={product.discount}
+                                                       onChange={event => handleInputChange(index, pr_index, event.target.value)}
+                                                       value={product.discount}
                                                        style={{width: '80px'}} placeholder="%"/>
                                             </div>
                                             <div className="basket-product-delete-row">
-                                                <div className="delete-cart-item" onClick={handleDelete.bind(this, product.id)}><i
+                                                <div className="delete-cart-item"
+                                                     onClick={handleDelete.bind(this, product.id)}><i
                                                     className="text-danger fas fa-trash-alt"/>
                                                 </div>
                                             </div>
@@ -228,7 +278,7 @@ const Cart = () => {
                             <div className="form-check">
                                 <input
                                     checked={isDisabled}
-                                    onChange={(e) => handleInputChange(e.target.checked)}
+                                    onChange={(e) => handleCheckboxChange(e.target.checked)}
                                     className='form-check-input'
                                     value={isDisabled}
                                     type='checkbox'

@@ -104,6 +104,7 @@ const Checkout = () => {
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
         onCompleted: () => {
             if (customer_full_info) {
+                console.log(customer_full_info);
                 setIsRefactorDisabled(false);
                 setCustomerInfo(prevState => ({
                     ...prevState,
@@ -279,11 +280,11 @@ const Checkout = () => {
 
     const sendOrder = () => {
         const order_goods=[];
-        console.log("cartCtax", cartCtx);
         cartCtx.items.forEach(item => {
+            console.log(item)
             order_goods.push({
                     product_uid: item.uid,
-                    product_characteristic_uid: "string",
+                    product_characteristic_uid: "",
                     product_quantity: item.amount,
                     product_price: item.price,
                     product_discount: item.discount,
@@ -312,6 +313,8 @@ const Checkout = () => {
             goods: order_goods,
             bank_cash: bankCommission
         }
+
+        console.log(order_data)
     }
 
     return (
