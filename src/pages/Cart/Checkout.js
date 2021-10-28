@@ -22,7 +22,6 @@ const CUSTOMER_QUERY = gql`
         name
       }
     }`;
-
 const FULL_INFO_QUERY = gql`
     query fullInfo($uid: String) {
       search(criteria: {
@@ -47,7 +46,6 @@ const Checkout = () => {
         return new Array(end - start).fill().map((d, i) => i + start);
     };
     const years = range(1950, getYear(new Date()) + 1, 1);
-
     const months = [
         "January",
         "February",
@@ -68,15 +66,25 @@ const Checkout = () => {
         items: []
     })
     const [paymentType, setPaymentType] = useState(0);
+    const [deliveryType, setDeliveryType] = useState(0);
     const [bankCommission, setBankCommission] = useState(0);
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [city, setCity] = useState([]);
-    const [isRefactorDisabled, setIsRefactorDisabled] = useState(true);
+    const [isRefactorDisabled, setIsRefactorDisabled] = useState({
+        birthdate: false,
+        city: false,
+        mobile_phone: false,
+        other_phone: false,
+        address: false,
+        gender: false,
+        email: false,
+        note: false,
+        isDisabled: true
+    });
     const [customerSearch, setCustomerSearch] = useState(false);
     const [orderDate, setOrderDate] = useState();
     const [deliveryDate, setDeliveryDate] = useState();
-    const [nameInvalid, setNameInvalid] = useState(false);
-    const [surnameInvalid, setSurnameInvalid] = useState(false);
+    const [availableCustomer, setAvailableCustomer] = useState([]);
     const [customerInfo, setCustomerInfo] = useState({
         uid: '',
         name: '',
@@ -96,20 +104,56 @@ const Checkout = () => {
         email: '',
         note: ''
     });
-
-    const [getAvailableCustomer, {
-        data: available_customer,
-        loading: available_customer_loading
-    }] = useLazyQuery(CUSTOMER_QUERY);
+    const [customerRefactoringInfo, setCustomerRefactoringInfo] = useState({
+        address: '',
+        mobile_phone: '',
+        other_phone: '',
+    });
+    const [oldCustomerInfo, setOldCustomerInfo] = useState({
+        address: '',
+        mobile_phone: '',
+        other_phone: '',
+    });
+    const [getAvailableCustomer, {data: available_customer, loading: available_customer_loading}] = useLazyQuery(CUSTOMER_QUERY, {
+        onCompleted: () => {
+            setCustomerSearch(true);
+            if (available_customer.search.length) {
+                setAvailableCustomer(available_customer.search);
+            }
+        }, onError: (err) => {
+            console.log(err)
+        }
+    });
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
         onCompleted: () => {
             if (customer_full_info) {
-                console.log(customer_full_info);
-                setIsRefactorDisabled(false);
+                setIsRefactorDisabled({
+                    birthdate: true,
+                    city: true,
+                    mobile_phone: true,
+                    other_phone: true,
+                    address: true,
+                    gender: true,
+                    email: true,
+                    note: true,
+                    isDisabled: false
+                })
                 setCustomerInfo(prevState => ({
                     ...prevState,
                     uid: customer_full_info.search[0].uid
-                }))
+                }));
+                setCustomerInfo(prevState => ({
+                    ...prevState,
+                    name: customer_full_info.search[0].name.split(' ')[1]
+                }));
+                setCustomerInfo(prevState => ({
+                    ...prevState,
+                    surname: customer_full_info.search[0].name.split(' ')[0]
+                }));
+                setCustomerInfo(prevState => ({
+                    ...prevState,
+                    patronymic: customer_full_info.search[0].name.split(' ')[2]
+                }));
                 customer_full_info.search[0].details.forEach(detail => {
                     if (detail.infoTypeField.field === "Birthdate") {
                         setCustomerInfo(prevstate => ({
@@ -118,7 +162,7 @@ const Checkout = () => {
                         }));
                     } else if (detail.infoTypeField.field === "City") {
                         get(`http://bpaws01l:8087/api/city/search?name.contains=${detail.fieldValue}`).then(res => {
-                            if(res.content.length>0){
+                            if (res.content.length > 0) {
                                 setCustomerInfo(prevstate => ({
                                     ...prevstate,
                                     city: {
@@ -126,7 +170,7 @@ const Checkout = () => {
                                         name: detail.fieldValue
                                     }
                                 }));
-                            }else{
+                            } else {
                                 setCustomerInfo(prevstate => ({
                                     ...prevstate,
                                     city: {
@@ -151,8 +195,16 @@ const Checkout = () => {
                             ...prevstate,
                             mobile_phone: detail.fieldValue
                         }));
+                        setOldCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            mobile_phone: detail.fieldValue
+                        }));
                     } else if (detail.infoTypeField.field === "OtherPhone") {
                         setCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            other_phone: detail.fieldValue
+                        }));
+                        setOldCustomerInfo(prevstate => ({
                             ...prevstate,
                             other_phone: detail.fieldValue
                         }));
@@ -166,12 +218,28 @@ const Checkout = () => {
                             ...prevstate,
                             address: detail.fieldValue
                         }));
+                        setOldCustomerInfo(prevstate => ({
+                            ...prevstate,
+                            address: detail.fieldValue
+                        }));
                     } else if (detail.infoTypeField.field === "Gender") {
                         setCustomerInfo(prevstate => ({
                             ...prevstate,
                             gender: detail.fieldValue === "Kişi" ? 1 : 0
                         }));
                     }
+                })
+            }else{
+                setIsRefactorDisabled({
+                    birthdate: false,
+                    city: false,
+                    mobile_phone: false,
+                    other_phone: false,
+                    address: false,
+                    gender: false,
+                    email: false,
+                    note: false,
+                    isDisabled: true
                 })
             }
         },
@@ -207,7 +275,7 @@ const Checkout = () => {
             alldata = {
                 ...alldata,
                 city: {
-                    id: value.value,
+                    code: value.value,
                     name: value.label
                 }
             }
@@ -227,34 +295,74 @@ const Checkout = () => {
         } else if (type === "credit") {
             setPaymentType(1);
             setBankCommission(Math.round((cartCtx.discountAmount * 2 / 100) * 100) / 100)
+        } else if (type === 'byStore') {
+            setDeliveryType(0);
+        } else if (type === "byCustomer") {
+            setDeliveryType(1);
+        } else if (type === "refactor") {
+           if(value){
+               setIsRefactorDisabled(prevState => ({
+                   ...prevState,
+                   mobile_phone: false,
+                   other_phone: false,
+                   address: false,
+               }))
+           }else{
+               setIsRefactorDisabled(prevState => ({
+                   ...prevState,
+                   mobile_phone: true,
+                   other_phone: true,
+                   address: true,
+               }))
+           }
         } else {
             alldata = {
                 ...alldata,
                 [type]: value
             }
+            !isRefactorDisabled.isDisabled && setCustomerRefactoringInfo(prevState => ({
+                ...prevState,
+                [type]: value
+            }))
         }
         setCustomerInfo(alldata);
     }
-
+    const searchOnDatabase = () => {
+        setAvailableCustomer([]);
+        setCustomerInfo(prevstate => ({
+            ...prevstate,
+            uid: '',
+            birthdate: '',
+            city: {
+                code: '',
+                name: ''
+            },
+            mobile_phone: '',
+            other_phone: '',
+            address: '',
+            gender: '',
+            email: '',
+            note: ''
+        }));
+        setOldCustomerInfo(prevstate => ({
+            mobile_phone: '',
+            other_phone: '',
+            address: '',
+        }));
+        getAvailableCustomer({
+            variables: {
+                name: `${customerInfo.surname} ${customerInfo.name} ${customerInfo.patronymic}`,
+                serial: customerInfo.identifierNumber ? customerInfo.identifierNumber : null,
+                finCode: customerInfo.finCode ? customerInfo.finCode : null
+            }
+        });
+    }
     const handleFullInfo = (uid) => {
         getFullInfo({
             variables: {
                 uid: `${uid}`
             }
         });
-    }
-
-    const searchOnDatabase = () => {
-        if ((customerInfo.name.length && customerInfo.surname.length) || customerInfo.finCode || customerInfo.identifierNumber) {
-            getAvailableCustomer({
-                variables: {
-                    name: `${customerInfo.surname} ${customerInfo.name}`,
-                    serial: customerInfo.identifierNumber ? customerInfo.identifierNumber : null,
-                    finCode: customerInfo.finCode ? customerInfo.finCode : null
-                }
-            });
-            setCustomerSearch(true);
-        }
     }
 
     if (isFetchingData) {
@@ -270,28 +378,20 @@ const Checkout = () => {
         );
     }
 
-    /*const onPriceChange = (event) => {
-        const enteredValue = event.target.value;
-
-        cartCtx.checkoutPriceChange({
-            value: enteredValue
-        });
-    }*/
-
     const sendOrder = () => {
-        const order_goods=[];
+        const order_goods = [];
         cartCtx.items.forEach(item => {
-            console.log(item)
             order_goods.push({
-                    product_uid: item.uid,
-                    product_characteristic_uid: "",
-                    product_quantity: item.amount,
-                    product_price: item.price,
-                    product_discount: item.discount,
-                    product_total: item.amount*item.price
-                })
+                product_uid: item.uid,
+                product_characteristic_uid: "",
+                product_quantity: item.amount,
+                product_price: item.price,
+                product_discount: item.discount,
+                product_total: item.amount * item.price
+            })
         })
-        const order_data={
+
+        const order_data = {
             user_uid: "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
             payment_date: orderDate,
             delivery_date: deliveryDate,
@@ -299,22 +399,29 @@ const Checkout = () => {
             client_name: `${customerInfo.name} ${customerInfo.surname} ${customerInfo.patronymic}`,
             client_date_born: customerInfo.birthdate,
             client_gender: customerInfo.gender,
-            client_new_phone: 0,
+            client_new_phone: customerRefactoringInfo.mobile_phone ?
+                (oldCustomerInfo.mobile_phone === customerRefactoringInfo.mobile_phone ? 0 : 1) : 0,
             client_mobil_phone: customerInfo.mobile_phone,
-            client_new_phone2: 0,
+            client_new_phone2: customerRefactoringInfo.other_phone ?
+                (oldCustomerInfo.other_phone === customerRefactoringInfo.other_phone ? 0 : 1) : 0,
             client_mobil_phone2: customerInfo.other_phone,
-            client_new_delivery_address: 0,
+            client_new_delivery_address: customerRefactoringInfo.address ?
+                (oldCustomerInfo.address === customerRefactoringInfo.address ? 0 : 1) : 0,
             client_delivery_city_code: customerInfo.city.code,
             client_delivery_address: customerInfo.address,
             client_mail: customerInfo.email,
             comment: customerInfo.note,
-            delivery_type: 0,
+            delivery_type: deliveryType,
             payment_method: paymentType,
             goods: order_goods,
             bank_cash: bankCommission
         }
-
         console.log(order_data)
+        /*post(`http://bpaws01l:8087/api/order`, order_data).then(res => {
+            console.log(res);
+        }).catch(err => {
+            console.log(err);
+        })*/
     }
 
     return (
@@ -373,6 +480,33 @@ const Checkout = () => {
                                 </span>
                             </div>
                         </div>
+                        <div className="mt-3">
+                            <h6>Çatdırılma</h6>
+                            <div className="d-flex">
+                                <span className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        name="deliveryType"
+                                        id="byStore"
+                                        onChange={e => handleInputChange("byStore", e.target.checked)}
+                                        checked={!!(deliveryType === 0)}
+                                    />
+                                    <label className="form-check-label" htmlFor="byStore">Mağaza</label>
+                                </span>
+                                <span className="form-check ms-3">
+                                    <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        name="deliveryType"
+                                        id="byCustomer"
+                                        onChange={e => handleInputChange("byCustomer", e.target.checked)}
+                                        checked={!!(deliveryType === 1)}
+                                    />
+                                    <label className="form-check-label" htmlFor="byCustomer">Müştəri</label>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div className="card-footer">
                         <ul className="ps-0">
@@ -384,13 +518,6 @@ const Checkout = () => {
                                 <strong>Endirimli məbləğ:</strong>
                                 <div className="float-end">{cartCtx.discountAmount} AZN</div>
                             </li>
-                            {/*
-                            <li className="d-flex align-content-center justify-content-between mb-2">
-                                <strong>Qiymət dəyişikliyi:</strong>
-                                <div className="float-end"><input type="text" onBlur={onPriceChange}
-                                                                  className="form-control" style={{width: '80px'}}/>
-                                </div>
-                            </li>*/}
                             <li className="d-flex align-content-center justify-content-between mb-2">
                                 <strong>Bank komissiyası:</strong>
                                 <div className="float-end"><strong>{bankCommission} AZN</strong></div>
@@ -408,18 +535,19 @@ const Checkout = () => {
                             <div className="col-md-4 mb-2">
                                 <label>Ad<span className="text-danger">*</span></label>
                                 <input type="text" className="form-control"
+                                       value={customerInfo && customerInfo?.name}
                                        onChange={e => handleInputChange("name", e.target.value)}/>
-                                {nameInvalid && <span className="text-danger">Xananın doldurulması vacibdir.</span>}
                             </div>
                             <div className="col-md-4 mb-2">
                                 <label>Soyad<span className="text-danger">*</span></label>
                                 <input type="text" className="form-control"
+                                       value={customerInfo && customerInfo?.surname}
                                        onChange={e => handleInputChange("surname", e.target.value)}/>
-                                {surnameInvalid && <span className="text-danger">Xananın doldurulması vacibdir.</span>}
                             </div>
                             <div className="col-md-4 mb-2">
                                 <label>Ata adı</label>
                                 <input type="text" className="form-control"
+                                       value={customerInfo && customerInfo?.patronymic}
                                        onChange={e => handleInputChange("patronymic", e.target.value)}/>
                             </div>
                             <div className="col-md-5">
@@ -439,10 +567,11 @@ const Checkout = () => {
                             </div>
                         </div>
                         {available_customer_loading && <p>Məlumat yüklənir...</p>}
-                        {customerSearch && (available_customer?.search.length ?
-                            <select className="form-control mb-3" onChange={e => handleFullInfo(e.target.value)}>
+                        {customerSearch && (availableCustomer?.length ?
+                            <select className="form-control mb-3"
+                                    onChange={e => handleFullInfo(e.target.value)}>
                                 <option selected={true} disabled>Mümkün Siyahı</option>
-                                {available_customer.search.map(customer => (
+                                {availableCustomer.map(customer => (
                                     <option key={customer.uid} value={customer.uid}>{customer.name}</option>
                                 ))}
                             </select> : <p>Məlumat tapılmadı.</p>)}
@@ -452,7 +581,8 @@ const Checkout = () => {
                                     className="form-check-input"
                                     type="checkbox"
                                     id="refactorInfo"
-                                    disabled={isRefactorDisabled}
+                                    onChange={e => handleInputChange("refactor", e.target.checked)}
+                                    disabled={isRefactorDisabled.isDisabled}
                                 />
                                 <label className="form-check-label" htmlFor="refactorInfo">
                                     Məlumatları Yenilə
@@ -464,6 +594,7 @@ const Checkout = () => {
                             <div className="col-md-6">
                                 <label htmlFor='birthdate'>Doğum tarixi</label>
                                 <DatePicker
+                                    disabled={isRefactorDisabled.birthdate}
                                     dateFormat="dd.MM.yyyy"
                                     className="form-control"
                                     renderCustomHeader={({
@@ -521,6 +652,7 @@ const Checkout = () => {
                             <div className="col-md-6">
                                 <label>Şəhər<span className="text-danger">*</span></label>
                                 <Select
+                                    isDisabled={isRefactorDisabled.city}
                                     styles={selectStyles}
                                     options={city}
                                     value={customerInfo && customerInfo?.city ? [{
@@ -537,6 +669,7 @@ const Checkout = () => {
                             <div className="col-12">
                                 <label htmlFor='address'>Ünvan<span className="text-danger">*</span></label>
                                 <textarea className="form-control"
+                                          disabled={isRefactorDisabled.address}
                                           value={customerInfo && customerInfo.address}
                                           onChange={e => handleInputChange("address", e.target.value)}
                                 />
@@ -547,12 +680,14 @@ const Checkout = () => {
                             <div className="col-md-6">
                                 <label>Mobil telefon<span className="text-danger">*</span></label>
                                 <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
+                                           disabled={isRefactorDisabled.mobile_phone}
                                            onChange={e => handleInputChange("mobile_phone", e.target.value)}
                                            value={customerInfo && customerInfo.mobile_phone}/>
                             </div>
                             <div className="col-md-6">
                                 <label>Digər telefon</label>
                                 <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
+                                           disabled={isRefactorDisabled.other_phone}
                                            onChange={e => handleInputChange("other_phone", e.target.value)}
                                            value={customerInfo && customerInfo.other_phone}/>
                             </div>
@@ -560,28 +695,30 @@ const Checkout = () => {
                         <div className="row mb-3">
                             <div className="col-12">
                                 <div className="d-flex">
-                            <span className="form-check">
-                                <input
-                                    className="form-check-input"
-                                    type="radio"
-                                    name="gender"
-                                    id="male"
-                                    onChange={e => handleInputChange("male", e.target.checked)}
-                                    checked={!!(customerInfo.gender === 1)}
-                                />
-                                <label className="form-check-label" htmlFor="male">Kişi</label>
-                            </span>
+                                    <span className="form-check">
+                                        <input
+                                            disabled={isRefactorDisabled.gender}
+                                            className="form-check-input"
+                                            type="radio"
+                                            name="gender"
+                                            id="male"
+                                            onChange={e => handleInputChange("male", e.target.checked)}
+                                            checked={!!(customerInfo.gender === 1)}
+                                        />
+                                        <label className="form-check-label" htmlFor="male">Kişi</label>
+                                    </span>
                                     <span className="form-check ms-3">
-                                <input
-                                    className="form-check-input"
-                                    type="radio"
-                                    name="gender"
-                                    id="female"
-                                    onChange={e => handleInputChange("female", e.target.checked)}
-                                    checked={!!(customerInfo.gender === 0)}
-                                />
-                                <label className="form-check-label" htmlFor="female">Qadın</label>
-                            </span>
+                                        <input
+                                            disabled={isRefactorDisabled.gender}
+                                            className="form-check-input"
+                                            type="radio"
+                                            name="gender"
+                                            id="female"
+                                            onChange={e => handleInputChange("female", e.target.checked)}
+                                            checked={!!(customerInfo.gender === 0)}
+                                        />
+                                        <label className="form-check-label" htmlFor="female">Qadın</label>
+                                    </span>
                                 </div>
                             </div>
                         </div>
