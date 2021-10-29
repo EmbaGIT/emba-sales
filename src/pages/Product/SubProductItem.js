@@ -17,6 +17,7 @@ const SubProductItem = (props) => {
     const [isAmountValid, setIsAmountValid] = useState(true);
 
     const addToCartHandler = () => {
+        console.log(amountInputRef);
         const enteredAmount = amountInputRef.current.value;
         const enteredAmountNumber = +enteredAmount;
 
@@ -64,7 +65,7 @@ const SubProductItem = (props) => {
                         : <div>Anbar məlumatı yoxdur</div>
                     }
                 </div>
-                <div className="line"></div>
+                <div className="line"/>
                 <div className="d-flex justify-content-between p-2 align-items-center">
                     <div className="sub-item-price-block">
                         {props.price ? props.price : 0} AZN

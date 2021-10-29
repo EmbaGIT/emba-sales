@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 
 const CountInput = React.forwardRef((props, ref) => {
-
     const [count, setCount] = useState(props.defaultValue);
 
     const handleOnChange = (type) => {

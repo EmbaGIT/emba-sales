@@ -416,12 +416,11 @@ const Checkout = () => {
             goods: order_goods,
             bank_cash: bankCommission
         }
-        console.log(order_data)
-        /*post(`http://bpaws01l:8087/api/order`, order_data).then(res => {
+        post(`http://bpaws01l:8087/api/order`, order_data).then(res => {
             console.log(res);
         }).catch(err => {
             console.log(err);
-        })*/
+        })
     }
 
     return (

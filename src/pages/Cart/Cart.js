@@ -1,17 +1,13 @@
-import React, {useContext, useRef, useState, useEffect} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {Link} from 'react-router-dom'
 import CartContext from "../../store/CartContext";
-import noImage from "../../assets/images/no-image.png";
-import CountInput from "../../UI/countInput";
+import CartItem from "./CartItem";
 
 const Cart = () => {
     const cartCtx = useContext(CartContext);
-    const amountInputRef = useRef();
     const [hasItem, setHasItem] = useState(cartCtx.items.length > 0);
     const [cartState, setCartState] = useState([]);
     const [isDisabled, setIsDisabled] = useState(false);
-
-    console.log(cartCtx);
 
     useEffect(() => {
         const newCartArr = [];
@@ -129,7 +125,6 @@ const Cart = () => {
                     })
                 }
             })
-            console.log("discount", cartItems);
             cartCtx.discountHandler({
                 type: "single",
                 items: cartItems
@@ -141,8 +136,6 @@ const Cart = () => {
         let alldata = [...cartState];
         let updatedProductDiscount = [...alldata[index].products];
 
-        console.log("alldata", alldata);
-
         updatedProductDiscount[pr_index] = {
             ...updatedProductDiscount[pr_index],
             discount: param
@@ -151,12 +144,7 @@ const Cart = () => {
             ...alldata[index],
             products: updatedProductDiscount
         };
-        console.log(alldata);
         setCartState(alldata);
-    }
-
-    const handleDelete = (id) => {
-        cartCtx.removeItem(id);
     }
 
     const handleCheckboxChange = (value) => {
@@ -185,59 +173,13 @@ const Cart = () => {
                                         <span>{item.parent}</span>
                                     </div>
                                     {item.products && item.products.map((product, pr_index) => (
-                                        <div className="cart-product-table pr-wrapper" key={product.id}>
-                                            <div className="basket-product-image-row">
-                                                {product.files.length ? product.files.map(file => (
-                                                        <img src={file.originalImageUrl} alt=""
-                                                             className="basket-product-image"/>
-                                                    )) :
-                                                    <img src={noImage} alt="" className="basket-product-image"/>
-                                                }
-                                            </div>
-                                            <div className="basket-product-name-row">
-                                                <p className="fm-poppins_bold mb-0">{product.name}</p>
-                                                <span className="text-success">Qiymət: {product.price} ₼</span>
-                                            </div>
-                                            <CountInput ref={amountInputRef} defaultValue={product.amount}/>
-                                            <div className="basket-product-price-row">
-                                                <div className="basket-product-old-price">
-                                                    <span>{product.price * product.amount} ₼</span></div>
-                                                <div className="basket-product-price">
-                                                    <span>{product.price * product.amount - (product.price * product.amount * product.discount / 100)} ₼</span>
-                                                </div>
-                                            </div>
-                                            <div className="basket-product-price-row">
-                                                <input type="text" disabled={isDisabled} className="form-control"
-                                                       onBlur={event => event.target.value.trim() ? applyDiscountProduct("single", [{
-                                                           id: product.id,
-                                                           discount: parseInt(event.target.value),
-                                                           amount: product.amount,
-                                                           price: product.price,
-                                                           name: product.name,
-                                                           parent: product.parent,
-                                                           files: product.files,
-                                                           uid: product.uid
-                                                       }]) : applyDiscountProduct("single", [{
-                                                           id: product.id,
-                                                           discount: 0,
-                                                           amount: product.amount,
-                                                           price: product.price,
-                                                           name: product.name,
-                                                           parent: product.parent,
-                                                           files: product.files,
-                                                           uid: product.uid
-                                                       }])}
-                                                       onChange={event => handleInputChange(index, pr_index, event.target.value)}
-                                                       value={product.discount}
-                                                       style={{width: '80px'}} placeholder="%"/>
-                                            </div>
-                                            <div className="basket-product-delete-row">
-                                                <div className="delete-cart-item"
-                                                     onClick={handleDelete.bind(this, product.id)}><i
-                                                    className="text-danger fas fa-trash-alt"/>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <CartItem product={product}
+                                                  isDisabled={isDisabled}
+                                                  index={index}
+                                                  pr_index={pr_index}
+                                                  applyDiscountProduct={applyDiscountProduct}
+                                                  handleInputChange={handleInputChange}
+                                        />
                                     ))}
                                 </div>
                             ))}

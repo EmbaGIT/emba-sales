@@ -132,6 +132,14 @@ const cartReducer = (state, action) => {
         };
     }
 
+    if (action.type === 'UPDATE') {
+        let updatedTotalAmount = 0;
+        let updatedDiscountAmount = 0;
+        const updatedItems=[];
+
+        console.log(action)
+    }
+
     if(action.type==="PriceChange"){
         if(action.value.value){
             let totalelement=0;
@@ -178,6 +186,11 @@ const CartProvider = (props) => {
         dispatchCartAction({type: 'DISCOUNT', discount: discount});
     };
 
+
+    const updateCartHandler = (amount, id) => {
+        dispatchCartAction({type: 'UPDATE', amount, id});
+    };
+
     const priceChangeHandler = (value) => {
         dispatchCartAction({type: 'PriceChange', value: value});
     }
@@ -190,6 +203,7 @@ const CartProvider = (props) => {
         addItem: addItemToCartHandler,
         removeItem: removeItemFromCartHandler,
         discountHandler: discountCartHandler,
+        updateItem: updateCartHandler,
         checkoutPriceChange: priceChangeHandler,
     };
 
