@@ -239,8 +239,7 @@ const Cart = () => {
                         </div>
                     </div>
                     {hasItem &&
-                    <Link to="/checkout" className="btn btn-success py-2 mt-2 fm-poppins w-100">Səbəti təsdiq et<i
-                        className="fas fa-chevron-right ms-1"/></Link>
+                    <Link to="/checkout" className="btn btn-success py-2 mt-2 fm-poppins w-100">Səbəti təsdiq et<i className="fas fa-chevron-right ms-1"/></Link>
                     }
                 </div>
             </div>
