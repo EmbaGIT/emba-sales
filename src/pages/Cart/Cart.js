@@ -6,6 +6,7 @@ import CartItem from "./CartItem";
 const Cart = () => {
     const cartCtx = useContext(CartContext);
     const [hasItem, setHasItem] = useState(cartCtx.items.length > 0);
+    const [totalDiscount, setTotalDiscount] = useState(0);
     const [cartState, setCartState] = useState([]);
     const [isDisabled, setIsDisabled] = useState(false);
 
@@ -149,6 +150,7 @@ const Cart = () => {
 
     const handleCheckboxChange = (value) => {
         setIsDisabled(value);
+        setTotalDiscount('');
         clearDiscount();
     }
 
@@ -232,6 +234,8 @@ const Cart = () => {
                             <div className="input-group">
                                 <div>
                                     <input type="text" id="isDisabled" disabled={!isDisabled} autoComplete="off"
+                                           value={totalDiscount}
+                                           onChange={e => setTotalDiscount(e.target.value)}
                                            onBlur={event => event.target.value.trim() && applyDiscountProduct("all", event.target.value)}
                                            className="form-control"/>
                                 </div>
