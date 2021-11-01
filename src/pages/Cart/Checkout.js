@@ -1,4 +1,5 @@
 import React, {useEffect, useContext, useState} from 'react';
+import {toast} from "react-toastify";
 import CartContext from "../../store/CartContext";
 import DatePicker from "react-datepicker";
 import getYear from "date-fns/getYear";
@@ -42,6 +43,19 @@ const FULL_INFO_QUERY = gql`
     }`
 
 const Checkout = () => {
+    const MessageComponent = ({text}) => (
+        <span style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center'}}>
+            <span
+                style={{
+                    fontWeight: 500,
+                    fontSize: 16,
+                    lineHeight: '24px',
+                    color: '#FFEDED',
+                }}>
+              {text}
+            </span>
+        </span>
+    );
     const range = (start, end) => {
         return new Array(end - start).fill().map((d, i) => i + start);
     };
@@ -114,7 +128,22 @@ const Checkout = () => {
         mobile_phone: '',
         other_phone: '',
     });
-    const [getAvailableCustomer, {data: available_customer, loading: available_customer_loading}] = useLazyQuery(CUSTOMER_QUERY, {
+    const [formValidation, setFormValidation] = useState({
+        name: true,
+        surname: true,
+        city: true,
+        address: true,
+        mobile_phone: true,
+        other_phone: true,
+        email: true,
+        delivery_date: true,
+        order_date: true
+    })
+
+    const [getAvailableCustomer, {
+        data: available_customer,
+        loading: available_customer_loading
+    }] = useLazyQuery(CUSTOMER_QUERY, {
         onCompleted: () => {
             setCustomerSearch(true);
             if (available_customer.search.length) {
@@ -229,7 +258,7 @@ const Checkout = () => {
                         }));
                     }
                 })
-            }else{
+            } else {
                 setIsRefactorDisabled({
                     birthdate: false,
                     city: false,
@@ -300,21 +329,21 @@ const Checkout = () => {
         } else if (type === "byCustomer") {
             setDeliveryType(1);
         } else if (type === "refactor") {
-           if(value){
-               setIsRefactorDisabled(prevState => ({
-                   ...prevState,
-                   mobile_phone: false,
-                   other_phone: false,
-                   address: false,
-               }))
-           }else{
-               setIsRefactorDisabled(prevState => ({
-                   ...prevState,
-                   mobile_phone: true,
-                   other_phone: true,
-                   address: true,
-               }))
-           }
+            if (value) {
+                setIsRefactorDisabled(prevState => ({
+                    ...prevState,
+                    mobile_phone: false,
+                    other_phone: false,
+                    address: false,
+                }))
+            } else {
+                setIsRefactorDisabled(prevState => ({
+                    ...prevState,
+                    mobile_phone: true,
+                    other_phone: true,
+                    address: true,
+                }))
+            }
         } else {
             alldata = {
                 ...alldata,
@@ -349,13 +378,25 @@ const Checkout = () => {
             other_phone: '',
             address: '',
         }));
-        getAvailableCustomer({
-            variables: {
-                name: `${customerInfo.surname} ${customerInfo.name} ${customerInfo.patronymic}`,
-                serial: customerInfo.identifierNumber ? customerInfo.identifierNumber : null,
-                finCode: customerInfo.finCode ? customerInfo.finCode : null
-            }
-        });
+
+        !customerInfo.name ? setFormValidation(prevState => ({
+            ...prevState,
+            name: false
+        })) : setFormValidation(prevState => ({...prevState, name: true}))
+        !customerInfo.surname ? setFormValidation(prevState => ({
+            ...prevState,
+            surname: false
+        })) : setFormValidation(prevState => ({...prevState, surname: true}))
+
+        if (customerInfo.name && customerInfo.surname) {
+            getAvailableCustomer({
+                variables: {
+                    name: `${customerInfo.surname} ${customerInfo.name} ${customerInfo.patronymic}`,
+                    serial: customerInfo.identifierNumber ? customerInfo.identifierNumber : null,
+                    finCode: customerInfo.finCode ? customerInfo.finCode : null
+                }
+            });
+        }
     }
     const handleFullInfo = (uid) => {
         getFullInfo({
@@ -365,17 +406,42 @@ const Checkout = () => {
         });
     }
 
-    if (isFetchingData) {
-        return (
-            <div className='display-absolute-center'>
-                <Loader
-                    type='Oval'
-                    color='#00BFFF'
-                    height={50}
-                    width={50}
-                />
-            </div>
-        );
+    const handleValidation = () => {
+        !customerInfo.name ? setFormValidation(prevState => ({
+            ...prevState,
+            name: false
+        })) : setFormValidation(prevState => ({...prevState, name: true}))
+        !customerInfo.surname ? setFormValidation(prevState => ({
+            ...prevState,
+            surname: false
+        })) : setFormValidation(prevState => ({...prevState, surname: true}))
+        !customerInfo.address ? setFormValidation(prevState => ({
+            ...prevState,
+            address: false
+        })) : setFormValidation(prevState => ({...prevState, address: true}))
+        !customerInfo.mobile_phone ? setFormValidation(prevState => ({
+            ...prevState,
+            mobile_phone: false
+        })) : setFormValidation(prevState => ({...prevState, mobile_phone: true}))
+        !customerInfo.other_phone ? setFormValidation(prevState => ({
+            ...prevState,
+            other_phone: false
+        })) : setFormValidation(prevState => ({...prevState, other_phone: true}))
+        !deliveryDate ? setFormValidation(prevState => ({
+            ...prevState,
+            delivery_date: false
+        })) : setFormValidation(prevState => ({...prevState, delivery_date: true}))
+        !orderDate ? setFormValidation(prevState => ({
+            ...prevState,
+            order_date: false
+        })) : setFormValidation(prevState => ({...prevState, order_date: true}))
+        !customerInfo.city.code ? setFormValidation(prevState => ({
+            ...prevState,
+            city: false
+        })) : setFormValidation(prevState => ({...prevState, city: true}))
+
+        return !(!customerInfo.name || !customerInfo.surname || !customerInfo.city || !customerInfo.address || !customerInfo.mobile_phone || !deliveryDate || !orderDate);
+
     }
 
     const sendOrder = () => {
@@ -390,7 +456,6 @@ const Checkout = () => {
                 product_total: item.amount * item.price
             })
         })
-
         const order_data = {
             user_uid: "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
             payment_date: orderDate,
@@ -416,11 +481,40 @@ const Checkout = () => {
             goods: order_goods,
             bank_cash: bankCommission
         }
-        post(`http://bpaws01l:8087/api/order`, order_data).then(res => {
-            console.log(res);
-        }).catch(err => {
-            console.log(err);
-        })
+        if(handleValidation()){
+            post(`http://bpaws01l:8087/api/order`, order_data).then(res => {
+                if (res.Status === "OK") {
+                    toast.success(<MessageComponent text='Sifariş göndərildi!'/>, {
+                        position: toast.POSITION.TOP_LEFT,
+                        toastId: 'success-toast-message',
+                        autoClose: 1500,
+                        closeOnClick: true,
+                    });
+                } else if (res.Status === "ERROR") {
+                    toast.error(<MessageComponent text='Sifariş göndərilmədi!'/>, {
+                        position: toast.POSITION.TOP_LEFT,
+                        toastId: 'success-toast-message',
+                        autoClose: 1500,
+                        closeOnClick: true,
+                    });
+                }
+            }).catch(err => {
+                console.log(err);
+            })
+        }
+    }
+
+    if (isFetchingData) {
+        return (
+            <div className='display-absolute-center'>
+                <Loader
+                    type='Oval'
+                    color='#00BFFF'
+                    height={50}
+                    width={50}
+                />
+            </div>
+        );
     }
 
     return (
@@ -536,12 +630,16 @@ const Checkout = () => {
                                 <input type="text" className="form-control"
                                        value={customerInfo && customerInfo?.name}
                                        onChange={e => handleInputChange("name", e.target.value)}/>
+                                {!formValidation.name &&
+                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                             <div className="col-md-4 mb-2">
                                 <label>Soyad<span className="text-danger">*</span></label>
                                 <input type="text" className="form-control"
                                        value={customerInfo && customerInfo?.surname}
                                        onChange={e => handleInputChange("surname", e.target.value)}/>
+                                {!formValidation.surname &&
+                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                             <div className="col-md-4 mb-2">
                                 <label>Ata adı</label>
@@ -662,6 +760,8 @@ const Checkout = () => {
                                     onChange={value => handleInputChange("select_city", value)}
                                     placeholder='Şəhər seçin...'
                                 />
+                                {!formValidation.city &&
+                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                         </div>
                         <div className="row mb-3">
@@ -672,6 +772,8 @@ const Checkout = () => {
                                           value={customerInfo && customerInfo.address}
                                           onChange={e => handleInputChange("address", e.target.value)}
                                 />
+                                {!formValidation.address &&
+                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                         </div>
 
@@ -682,6 +784,8 @@ const Checkout = () => {
                                            disabled={isRefactorDisabled.mobile_phone}
                                            onChange={e => handleInputChange("mobile_phone", e.target.value)}
                                            value={customerInfo && customerInfo.mobile_phone}/>
+                                {!formValidation.mobile_phone &&
+                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                             <div className="col-md-6">
                                 <label>Digər telefon</label>
@@ -689,6 +793,15 @@ const Checkout = () => {
                                            disabled={isRefactorDisabled.other_phone}
                                            onChange={e => handleInputChange("other_phone", e.target.value)}
                                            value={customerInfo && customerInfo.other_phone}/>
+                            </div>
+                        </div>
+                        <div className="row mb-3">
+                            <div className="col-md-12">
+                                <label>Email</label>
+                                <input className="form-control"
+                                       disabled={isRefactorDisabled.email}
+                                       onChange={e => handleInputChange("email", e.target.value)}
+                                       value={customerInfo && customerInfo.email}/>
                             </div>
                         </div>
                         <div className="row mb-3">
@@ -730,6 +843,8 @@ const Checkout = () => {
                                     onChange={(date) => setOrderDate(date)}
                                     minDate={new Date()}
                                 />
+                                {!formValidation.delivery_date &&
+                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                             <div className="col-md-6">
                                 <label>Çatdırılma tarixi<span className="text-danger">*</span></label>
@@ -739,6 +854,8 @@ const Checkout = () => {
                                     onChange={(date) => setDeliveryDate(date)}
                                     minDate={new Date()}
                                 />
+                                {!formValidation.order_date &&
+                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                         </div>
                         <div className="row mb-3">

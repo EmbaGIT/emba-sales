@@ -92,7 +92,6 @@ const CustomerInfo = () => {
     const [getAvailableCustomer, {data: available_customer, loading: available_customer_loading}] = useLazyQuery(CUSTOMER_QUERY);
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
         onCompleted: () => {
-            console.log(customer_full_info);
             if(customer_full_info){
                 setIsRefactorDisabled(false);
                 setCustomerInfo(prevState => ({

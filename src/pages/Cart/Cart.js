@@ -110,7 +110,6 @@ const Cart = () => {
         } else {
             const cartItems = [];
             cartCtx.items.forEach(item => {
-                console.log(item)
                 if (item.id === param[0].id) {
                     cartItems.push(param[0])
                 } else {

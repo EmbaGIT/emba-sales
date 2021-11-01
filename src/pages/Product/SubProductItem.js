@@ -17,7 +17,6 @@ const SubProductItem = (props) => {
     const [isAmountValid, setIsAmountValid] = useState(true);
 
     const addToCartHandler = () => {
-        console.log(amountInputRef);
         const enteredAmount = amountInputRef.current.value;
         const enteredAmountNumber = +enteredAmount;
 
