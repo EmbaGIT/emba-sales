@@ -96,7 +96,7 @@ const Checkout = () => {
         isDisabled: true
     });
     const [customerSearch, setCustomerSearch] = useState(false);
-    const [orderDate, setOrderDate] = useState();
+    const [paymentDate, setPaymentDate] = useState();
     const [deliveryDate, setDeliveryDate] = useState();
     const [availableCustomer, setAvailableCustomer] = useState([]);
     const [customerInfo, setCustomerInfo] = useState({
@@ -137,7 +137,7 @@ const Checkout = () => {
         other_phone: true,
         email: true,
         delivery_date: true,
-        order_date: true
+        payment_date: true
     })
 
     const [getAvailableCustomer, {
@@ -431,16 +431,16 @@ const Checkout = () => {
             ...prevState,
             delivery_date: false
         })) : setFormValidation(prevState => ({...prevState, delivery_date: true}))
-        !orderDate ? setFormValidation(prevState => ({
+        !paymentDate ? setFormValidation(prevState => ({
             ...prevState,
-            order_date: false
-        })) : setFormValidation(prevState => ({...prevState, order_date: true}))
+            payment_date: false
+        })) : setFormValidation(prevState => ({...prevState, payment_date: true}))
         !customerInfo.city.code ? setFormValidation(prevState => ({
             ...prevState,
             city: false
         })) : setFormValidation(prevState => ({...prevState, city: true}))
 
-        return !(!customerInfo.name || !customerInfo.surname || !customerInfo.city || !customerInfo.address || !customerInfo.mobile_phone || !deliveryDate || !orderDate);
+        return !(!customerInfo.name || !customerInfo.surname || !customerInfo.city || !customerInfo.address || !customerInfo.mobile_phone || !deliveryDate || !paymentDate);
 
     }
 
@@ -458,10 +458,10 @@ const Checkout = () => {
         })
         const order_data = {
             user_uid: "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
-            payment_date: orderDate,
+            payment_date: paymentDate,
             delivery_date: deliveryDate,
             client_uid: customerInfo.uid,
-            client_name: `${customerInfo.name} ${customerInfo.surname} ${customerInfo.patronymic}`,
+            client_name: `${customerInfo.surname} ${customerInfo.name} ${customerInfo.patronymic}`,
             client_date_born: customerInfo.birthdate,
             client_gender: customerInfo.gender,
             client_new_phone: customerRefactoringInfo.mobile_phone ?
@@ -836,11 +836,11 @@ const Checkout = () => {
                         </div>
                         <div className="row mb-3">
                             <div className="col-md-6">
-                                <label>Siafriş tarixi<span className="text-danger">*</span></label>
+                                <label>Ödəniş tarixi<span className="text-danger">*</span></label>
                                 <DatePicker
                                     className="form-control"
-                                    selected={orderDate}
-                                    onChange={(date) => setOrderDate(date)}
+                                    selected={paymentDate}
+                                    onChange={(date) => setPaymentDate(date)}
                                     minDate={new Date()}
                                 />
                                 {!formValidation.delivery_date &&
@@ -854,7 +854,7 @@ const Checkout = () => {
                                     onChange={(date) => setDeliveryDate(date)}
                                     minDate={new Date()}
                                 />
-                                {!formValidation.order_date &&
+                                {!formValidation.payment_date &&
                                 <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                         </div>

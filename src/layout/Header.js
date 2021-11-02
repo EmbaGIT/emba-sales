@@ -11,17 +11,6 @@ const Header = (props) => {
         return curNumber + item.amount;
     }, 0);
 
-/*    const numberOfCartItem = cartCtx.items.reduce((cardNumber, item) => {
-        console.log("cardNumber", cardNumber);
-        console.log("item", item);
-        item.products.map(item => {
-            cartTotalElement += item.amount;
-        })
-        return cartTotalElement;
-    }, 0)*/
-
-// const numberOfCartItem = 0;
-
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container-fluid">
@@ -64,7 +53,7 @@ const Header = (props) => {
                         </Link>
                     </div>
 
-                    <NavLink to="/wishlist"><i className="fas fa-heart me-5 text-body" style={{fontSize: '20px'}}/></NavLink>
+                    <NavLink to="/saved"><i className="fas fa-cloud-download-alt me-5 text-body" style={{fontSize: '20px'}}/></NavLink>
 
                     <div className="">
                         <button type="button" className="btn btn-primary">Çıxış</button>
