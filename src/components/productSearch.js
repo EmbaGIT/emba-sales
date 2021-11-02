@@ -1,0 +1,44 @@
+import {useState} from "react";
+import {get} from "../api/Api";
+import {Link} from "react-router-dom";
+const ProductSearch = () => {
+    const [searchResult, setSearchResult] = useState([]);
+    const [searchParam, setSearchParam] = useState('');
+
+    const handleSearch = (value) => {
+        setSearchParam(value);
+        if(value.trim().length > 3){
+            get(`products/search?name.contains=${value}&page=0&size=5`).then(res => {
+                setSearchResult(res);
+            }).catch(err => console.log(err));
+        }else{
+            setSearchResult([]);
+        }
+    }
+
+    return (
+        <div className="position-relative">
+            <input className="form-control" onChange={e => handleSearch(e.target.value)}/>
+            <div className="live-search" style={searchResult.content?.length ? {display: 'block'} : {}}>
+                <ul>
+                    {searchResult.content?.length && searchResult.content.map(product => (
+                        <li className="result-box-wrapper" key={product.id}>
+                            <div className="flex-1">
+                                <Link to={`/product/${product.parent.id}`}>
+                                    <div className="product-name">{product.name}</div>
+                                    <div className="product-price">{product.price} AZN</div>
+                                </Link>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+                <div className="result-text">
+                    <Link to={`/search?param=${searchParam}`} className="text-light">Bütün nəticələr ({searchResult.totalElements})</Link>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+
+export default ProductSearch;
