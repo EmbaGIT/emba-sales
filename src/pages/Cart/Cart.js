@@ -1,8 +1,9 @@
-import React, {useContext, useState, useEffect} from 'react';
+import {useContext, useState, useEffect} from 'react';
 import {Link} from 'react-router-dom'
 import CartContext from "../../store/CartContext";
 import CartItem from "./CartItem";
-
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 const Cart = () => {
     const cartCtx = useContext(CartContext);
     const [hasItem, setHasItem] = useState(cartCtx.items.length > 0);
@@ -153,6 +154,23 @@ const Cart = () => {
         clearDiscount();
     }
 
+    const clearBasket = () => {
+        confirmAlert({
+            title: '',
+            message: 'Bütün məhsullar səbətdən silinəcək!',
+            buttons: [
+                {
+                    label: 'Sil',
+                    onClick: () =>  cartCtx.clearBasket()
+                },
+                {
+                    label: 'Ləğv et',
+                    onClick: () => {}
+                }
+            ]
+        });
+    }
+
     return (
         <>
             <div className="row mb-2">
@@ -166,24 +184,29 @@ const Cart = () => {
             <div className="row mb-3">
                 <div className="col-lg-9">
                     {cartState.length ?
-                        <div className="basket-product-wrapper card card-table">
-                            {cartState.map((item, index) => (
-                                <div>
-                                    <div
-                                        className="list-group-item-primary p-3 d-flex justify-content-between align-content-center">
-                                        <span>{item.parent}</span>
+                        <div>
+                            <div className="basket-product-wrapper card card-table">
+                                {cartState.map((item, index) => (
+                                    <div>
+                                        <div
+                                            className="list-group-item-primary p-3 d-flex justify-content-between align-content-center">
+                                            <span>{item.parent}</span>
+                                        </div>
+                                        {item.products && item.products.map((product, pr_index) => (
+                                            <CartItem product={product}
+                                                      isDisabled={isDisabled}
+                                                      index={index}
+                                                      pr_index={pr_index}
+                                                      applyDiscountProduct={applyDiscountProduct}
+                                                      handleInputChange={handleInputChange}
+                                            />
+                                        ))}
                                     </div>
-                                    {item.products && item.products.map((product, pr_index) => (
-                                        <CartItem product={product}
-                                                  isDisabled={isDisabled}
-                                                  index={index}
-                                                  pr_index={pr_index}
-                                                  applyDiscountProduct={applyDiscountProduct}
-                                                  handleInputChange={handleInputChange}
-                                        />
-                                    ))}
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                            <div className="text-end">
+                                <div className="btn btn-danger mt-3" onClick={clearBasket}>Səbəti təmizlə</div>
+                            </div>
                         </div>
                         :
                         <p>Səbətdə məhsul yoxdur</p>

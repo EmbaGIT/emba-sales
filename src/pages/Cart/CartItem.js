@@ -1,14 +1,29 @@
-import React, {useRef, useContext} from 'react';
+import {useRef, useContext} from 'react';
 import noImage from "../../assets/images/no-image.png";
 import CountInput from "../../UI/countInput";
 import CartContext from "../../store/CartContext";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const CartItem = (props) =>{
     const amountInputRef = useRef();
     const cartCtx = useContext(CartContext);
 
     const handleDelete = (id) => {
-        cartCtx.removeItem(id);
+        confirmAlert({
+            title: '',
+            message: 'Məhsul səbətdən silinəcək!',
+            buttons: [
+                {
+                    label: 'Sil',
+                    onClick: () => cartCtx.removeItem(id)
+                },
+                {
+                    label: 'Ləğv et',
+                    onClick: () => {}
+                }
+            ]
+        });
     }
 
     const handleUpdate = ( id) => {

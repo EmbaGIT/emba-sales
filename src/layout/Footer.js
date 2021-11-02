@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Footer = () => (
     <footer className='container-fluid bg-light py-3'>
         <div className='row'>

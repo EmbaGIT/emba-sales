@@ -1,4 +1,4 @@
-import React, {useContext, useRef, useState} from 'react';
+import {useContext, useRef, useState} from 'react';
 import noImage from "../../assets/images/no-image.png";
 import CountInput from "../../UI/countInput";
 import CartContext from "../../store/CartContext";

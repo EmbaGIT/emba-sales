@@ -13,6 +13,7 @@
     "lightgallery": "^2.2.1",
     "moment": "^2.29.1",
     "react": "^17.0.2",
+    "react-confirm-alert": "^2.7.0",
     "react-datepicker": "^4.2.1",
     "react-dom": "^17.0.2",
     "react-image-gallery": "^1.2.7",

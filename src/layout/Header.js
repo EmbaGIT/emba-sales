@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import {useContext} from "react";
 import logo from '../assets/images/logo.png';
 import CartContext from "../store/CartContext";
 import {Link, NavLink} from "react-router-dom";

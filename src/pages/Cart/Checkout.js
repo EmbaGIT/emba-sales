@@ -1,4 +1,4 @@
-import React, {useEffect, useContext, useState} from 'react';
+import {useEffect, useContext, useState} from 'react';
 import {toast} from "react-toastify";
 import CartContext from "../../store/CartContext";
 import DatePicker from "react-datepicker";
@@ -490,6 +490,7 @@ const Checkout = () => {
                         autoClose: 1500,
                         closeOnClick: true,
                     });
+                    cartCtx.clearBasket();
                 } else if (res.Status === "ERROR") {
                     toast.error(<MessageComponent text='Sifariş göndərilmədi!'/>, {
                         position: toast.POSITION.TOP_LEFT,

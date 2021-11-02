@@ -2,7 +2,6 @@ import Modal from '../../UI/Modal';
 import ImageGallery from 'react-image-gallery';
 import "react-image-gallery/styles/css/image-gallery.css";
 import noImage from "../../assets/images/no-image.png";
-import React from "react";
 
 const SubProductInfo = (props) => {
     return (

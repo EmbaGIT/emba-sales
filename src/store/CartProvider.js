@@ -195,6 +195,21 @@ const cartReducer = (state, action) => {
         }
     }
 
+    if(action.type==="CLEAR"){
+        localStorage.setItem('cart', JSON.stringify({
+            items: [],
+            totalAmount: 0,
+            discountAmount: 0,
+            totalDiscount: 0
+        }));
+        return {
+            items: [],
+            totalAmount: 0,
+            discountAmount: 0,
+            totalDiscount: 0
+        };
+    }
+
     return defaultCartState;
 }
 
@@ -211,6 +226,10 @@ const CartProvider = (props) => {
 
     const removeItemFromCartHandler = (id) => {
         dispatchCartAction({type: 'REMOVE', id: id});
+    };
+
+    const clearCartHandler = () => {
+        dispatchCartAction({type: 'CLEAR'});
     };
 
     const discountCartHandler = (discount) => {
@@ -233,6 +252,7 @@ const CartProvider = (props) => {
         totalDiscount: cartState.totalDiscount,
         addItem: addItemToCartHandler,
         removeItem: removeItemFromCartHandler,
+        clearBasket: clearCartHandler,
         discountHandler: discountCartHandler,
         updateItem: updateCartHandler,
         checkoutPriceChange: priceChangeHandler,
