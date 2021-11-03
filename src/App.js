@@ -18,7 +18,7 @@ const App = () => {
     const [isFetchingData, setIsFetchingData] = useState(true);
 
     useEffect(() => {
-        get(`menu/search?sort=menuOrder,desc`).then(res => {
+        get(`menu/search?sort=menuOrder,desc&size=20`).then(res => {
             const menuListArr = [];
             res.content.forEach(menu => {
                 get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store-icon&parent=${menu.id}`).then(file => {

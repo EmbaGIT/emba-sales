@@ -51,6 +51,9 @@ const Product = () => {
 
     useEffect(() => {
         setIsFetchingData(true);
+        setProductColor(currentColor);
+        setSubProductsIsIncluded([]);
+        setSubProductsNotIncluded([]);
         let setPrice = 0;
         const subProductIsIncludedArr = [];
         const subProductNotIncludedArr = [];
@@ -81,11 +84,10 @@ const Product = () => {
                             ]));
                         });
                 })
-                setIsFetchingData(false);
                 setSetPrice(setPrice);
             });
             get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=4&attributeId.equals=${productColor}`).then((res) => {
-                res.content.map(async item => {
+                 res.content.map(async item => {
                     const items = [];
                     const stock = [];
                     const files = [];
@@ -108,7 +110,6 @@ const Product = () => {
                             ]));
                         });
                 })
-                setIsFetchingData(false);
             });
             get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1&attributeId.equals=${productColor}`).then(res => {
                 const images = [];
@@ -131,6 +132,7 @@ const Product = () => {
                     })
                 ))
                 setProductImages(images);
+                setIsFetchingData(false);
             })
         });
     }, [parent_id, productColor]);
