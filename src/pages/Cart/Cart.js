@@ -10,7 +10,7 @@ const Cart = () => {
     const [totalDiscount, setTotalDiscount] = useState(0);
     const [cartState, setCartState] = useState([]);
     const [isDisabled, setIsDisabled] = useState(false);
-
+    console.log("cartCtx", cartCtx);
     useEffect(() => {
         const newCartArr = [];
         if (cartCtx.items.length > 0) {
@@ -22,6 +22,8 @@ const Cart = () => {
                     files: cartCtx.items[0].files,
                     id: cartCtx.items[0].id,
                     name: cartCtx.items[0].name,
+                    characteristic_uid: cartCtx.items[0].characteristic_uid,
+                    characteristic_code: cartCtx.items[0].characteristic_code,
                     price: cartCtx.items[0].price,
                     parent: cartCtx.items[0].parent,
                     uid: cartCtx.items[0].uid
@@ -44,6 +46,8 @@ const Cart = () => {
                             files: item.files,
                             id: item.id,
                             name: item.name,
+                            characteristic_uid: item.characteristic_uid,
+                            characteristic_code: item.characteristic_code,
                             price: item.price,
                             parent: item.parent,
                             uid: item.uid
@@ -60,14 +64,8 @@ const Cart = () => {
         const cartStateArr = [];
         cartCtx.items.forEach(item => {
             cartItems.push({
-                id: item.id,
+                ...item,
                 discount: 0,
-                amount: item.amount,
-                price: item.price,
-                name: item.name,
-                parent: item.parent,
-                files: item.files,
-                uid: item.uid
             })
         })
         cartCtx.discountHandler({
@@ -94,14 +92,8 @@ const Cart = () => {
             const cartItems = [];
             cartCtx.items.forEach(item => {
                 cartItems.push({
-                    id: item.id,
+                    ...item,
                     discount: param,
-                    amount: item.amount,
-                    price: item.price,
-                    name: item.name,
-                    parent: item.parent,
-                    files: item.files,
-                    uid: item.uid
                 })
             })
             cartCtx.discountHandler({
@@ -120,6 +112,8 @@ const Cart = () => {
                         amount: item.amount,
                         price: item.price,
                         name: item.name,
+                        characteristic_uid: item.characteristic_uid,
+                        characteristic_code: item.characteristic_code,
                         parent: item.parent,
                         files: item.files,
                         uid: item.uid
@@ -192,6 +186,7 @@ const Cart = () => {
                                             className="list-group-item-primary p-3 d-flex justify-content-between align-content-center">
                                             <span>{item.parent}</span>
                                         </div>
+                                        {console.log("products", item.products)}
                                         {item.products && item.products.map((product, pr_index) => (
                                             <CartItem product={product}
                                                       isDisabled={isDisabled}

@@ -1,4 +1,4 @@
-import {useContext, useRef, useState} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import noImage from "../../assets/images/no-image.png";
 import CountInput from "../../UI/countInput";
 import CartContext from "../../store/CartContext";
@@ -15,6 +15,25 @@ const SubProductItem = (props) => {
     const amountInputRef = useRef();
     const cartCtx = useContext(CartContext);
     const [isAmountValid, setIsAmountValid] = useState(true);
+    const [charUID, setCharUID] = useState('');
+    const [charCode, setCharCode] = useState('');
+    const [price, setPrice] = useState(props.price);
+
+    useEffect(() => {
+        if(props.characteristics.length){
+            setCharUID(props.characteristics[0].uid);
+            setCharCode(props.characteristics[0].code);
+            setPrice(props.characteristics[0].price ? props.characteristics[0].price : 0)
+        }
+    }, []);
+
+    const handleInputChange = (value) => {
+        console.log(value);
+        const selectValue=value.split(',');
+        setCharUID(selectValue[0]);
+        setCharCode(selectValue[1]);
+        setPrice(selectValue[2] ? selectValue[2] : 0);
+    }
 
     const addToCartHandler = () => {
         const enteredAmount = amountInputRef.current.value;
@@ -30,14 +49,15 @@ const SubProductItem = (props) => {
                 files: props.files,
                 id: props.id,
                 name: props.name,
-                price: props.price,
-                discount_price: props.price,
+                price: price,
+                discount_price: price,
                 parent : props.parent,
-                uid: props.uid
+                uid: props.uid,
+                characteristic_uid: charUID,
+                characteristic_code: charCode,
             });
         }
     }
-
 
     return (
         <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-3" key={props.id}>
@@ -55,6 +75,16 @@ const SubProductItem = (props) => {
                     <div className="sub-item">
                         <p className="sub-item-name" onClick={props.onClickHandle.bind(null, props.id)}>{props.name}</p>
                     </div>
+                </div>
+                <div className="p-2">
+                    {props.characteristics.length ?
+                        <select className="form-control" onChange={e => handleInputChange(e.target.value)}>
+                            {props.characteristics.map(characteristic  => (
+                                <option key={characteristic.id} value={`${characteristic.uid},${characteristic.code},${characteristic.price}`}>{characteristic.name} - ({characteristic.code}) - {characteristic.price}AZN</option>
+                            ))}
+                        </select>
+                        : ''
+                    }
                 </div>
                 <div className="p-2">
                     {props.stock.length ?

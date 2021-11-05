@@ -8,7 +8,6 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const CartItem = (props) =>{
     const amountInputRef = useRef();
     const cartCtx = useContext(CartContext);
-
     const handleDelete = (id) => {
         confirmAlert({
             title: '',
@@ -44,6 +43,7 @@ const CartItem = (props) =>{
             </div>
             <div className="basket-product-name-row">
                 <p className="fm-poppins_bold mb-0">{props.product.name}</p>
+                {props.product.characteristic_code && <p className="mb-0"><span className="text-warning">Xar.Code: {props.product.characteristic_code}</span></p>}
                 <span className="text-success">Qiymət: {props.product.price} ₼</span>
             </div>
             <div>
@@ -65,6 +65,8 @@ const CartItem = (props) =>{
                            amount: props.product.amount,
                            price: props.product.price,
                            name: props.product.name,
+                           characteristic_uid: props.product.characteristic_uid,
+                           characteristic_code: props.product.characteristic_code,
                            parent: props.product.parent,
                            files: props.product.files,
                            uid: props.product.uid
@@ -74,6 +76,8 @@ const CartItem = (props) =>{
                            amount: props.product.amount,
                            price: props.product.price,
                            name: props.product.name,
+                           characteristic_uid: props.product.characteristic_uid,
+                           characteristic_code: props.product.characteristic_code,
                            parent: props.product.parent,
                            files: props.product.files,
                            uid: props.product.uid

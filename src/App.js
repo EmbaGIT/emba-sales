@@ -9,16 +9,18 @@ import Loader from "react-loader-spinner";
 import Home from './pages/HomePage';
 import Category from './pages/Category/CategoryList';
 import Product from './pages/Product/ProductDetail';
+import SearchResult from './pages/SearchResult';
 import CartProvider from "./store/CartProvider";
 import Cart from "./pages/Cart/Cart";
 import Checkout from "./pages/Cart/Checkout";
+import OrderInfo from "./pages/Cart/OrderInfo";
 
 const App = () => {
     const [menuList, setMenuList] = useState([]);
     const [isFetchingData, setIsFetchingData] = useState(true);
 
     useEffect(() => {
-        get(`menu/search?sort=menuOrder,desc&size=20`).then(res => {
+        get(`/menu/search?sort=menuOrder,desc&size=20`).then(res => {
             const menuListArr = [];
             res.content.forEach(menu => {
                 get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store-icon&parent=${menu.id}`).then(file => {
@@ -55,8 +57,10 @@ const App = () => {
                     </Route>
                     <Route path='/category/:id' component={Category}/>
                     <Route path='/product/:id' component={Product}/>
+                    <Route path='/search' component={SearchResult}/>
                     <Route path='/cart' exact component={Cart}/>
                     <Route path='/checkout' exact component={Checkout}/>
+                    <Route path='/orderInfo' exact component={OrderInfo}/>
                 </Switch>
             </Layout>
             }

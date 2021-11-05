@@ -24,7 +24,6 @@ const ProductSearch = () => {
         if(value.trim().length > 3){
             get(`products/search?name.contains=${value}&page=0&size=5`).then(res => {
                 setSearchResult(res);
-                console.log(res);
                 setSearchDisplay('block');
             }).catch(err => console.log(err));
         }else{
@@ -40,7 +39,7 @@ const ProductSearch = () => {
                     {searchResult.content?.length && searchResult.content.map(product => (
                         <li className="result-box-wrapper" key={product.id}>
                             <div className="flex-1">
-                                <Link to={`/product/${product.parent.id}?color=${product.colors[0]?.id}`}>
+                                <Link to={product.colors.length ? `/product/${product.parent.id}?color=${product.colors[0]?.id}` : `/product/${product.parent.id}`}>
                                     <div className="product-name">{product.name}</div>
                                     <div className="product-price">{product.price} AZN</div>
                                 </Link>

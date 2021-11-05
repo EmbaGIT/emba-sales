@@ -196,12 +196,7 @@ const cartReducer = (state, action) => {
     }
 
     if(action.type==="CLEAR"){
-        localStorage.setItem('cart', JSON.stringify({
-            items: [],
-            totalAmount: 0,
-            discountAmount: 0,
-            totalDiscount: 0
-        }));
+        localStorage.removeItem('cart');
         return {
             items: [],
             totalAmount: 0,

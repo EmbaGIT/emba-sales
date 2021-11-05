@@ -1,4 +1,5 @@
 import {useEffect, useContext, useState} from 'react';
+import {useHistory} from "react-router-dom";
 import {toast} from "react-toastify";
 import CartContext from "../../store/CartContext";
 import DatePicker from "react-datepicker";
@@ -43,6 +44,7 @@ const FULL_INFO_QUERY = gql`
     }`
 
 const Checkout = () => {
+    const history = useHistory();
     const MessageComponent = ({text}) => (
         <span style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center'}}>
             <span
@@ -76,6 +78,7 @@ const Checkout = () => {
     ];
 
     const cartCtx = useContext(CartContext);
+    const [isSending, setIsSending] = useState(false);
     const [checkoutState, setCheckoutState] = useState({
         items: []
     })
@@ -444,12 +447,12 @@ const Checkout = () => {
 
     }
 
-    const sendOrder = () => {
+    const sendOrder = (status) => {
         const order_goods = [];
         cartCtx.items.forEach(item => {
             order_goods.push({
                 product_uid: item.uid,
-                product_characteristic_uid: "",
+                product_characteristic_uid: item.characteristic_uid,
                 product_quantity: item.amount,
                 product_price: item.price,
                 product_discount: item.discount,
@@ -481,9 +484,14 @@ const Checkout = () => {
             goods: order_goods,
             bank_cash: bankCommission
         }
+        console.log(order_data);
         if(handleValidation()){
-            post(`http://bpaws01l:8087/api/order`, order_data).then(res => {
+            setIsSending(true);
+            post(`http://bpaws01l:8087/api/order?status=${status}`, order_data).then(res => {
+                console.log(res);
+                setIsSending(false);
                 if (res.Status === "OK") {
+                    history.push('/orderInfo');
                     toast.success(<MessageComponent text='Sifariş göndərildi!'/>, {
                         position: toast.POSITION.TOP_LEFT,
                         toastId: 'success-toast-message',
@@ -500,6 +508,7 @@ const Checkout = () => {
                     });
                 }
             }).catch(err => {
+                setIsSending(false);
                 console.log(err);
             })
         }
@@ -871,7 +880,12 @@ const Checkout = () => {
                 </div>
                 <div className="row mt-3">
                     <div className="col-md-12 text-end">
-                        <button className="btn btn-success" onClick={sendOrder}>Göndər</button>
+                        <button
+                            disabled={isSending}
+                            className="btn btn-success"
+                            onClick={sendOrder.bind(this, 'ORDERED')}>
+                            {isSending ? "Gözləyin" : "Göndər"}
+                        </button>
                     </div>
                 </div>
             </div>

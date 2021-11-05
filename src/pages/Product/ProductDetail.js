@@ -49,6 +49,10 @@ const Product = () => {
         return gett(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${id}/banner`);
     }
 
+    function getCharacteristics(id) {
+        return gett(`products/${id}`);
+    }
+
     useEffect(() => {
         setIsFetchingData(true);
         setProductColor(currentColor);
@@ -65,16 +69,20 @@ const Product = () => {
                     const items = [];
                     const stock = [];
                     const files = [];
-                    await Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
+                    const characteristic = [];
+                    await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
                         .then(function (results) {
+                            console.log(results[2].data.characteristics);
                             items.push(item);
                             stock.push(...results[0].data[0].stock);
                             files.push(...results[1].data);
+                            characteristic.push(...results[2].data.characteristics)
                             subProductIsIncludedArr.push({
                                 id: item.id,
                                 items,
                                 stock,
-                                files
+                                files,
+                                characteristic
                             });
                             subProductIsIncludedArr.sort(
                                 (a, b) => parseInt(a.id) - parseInt(b.id)
@@ -91,16 +99,19 @@ const Product = () => {
                     const items = [];
                     const stock = [];
                     const files = [];
-                    await Promise.all([getProductStock(item.uid), getProductFiles(item.id)])
+                    const characteristic = [];
+                    await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
                         .then(function (results) {
                             items.push(item);
                             stock.push(...results[0].data[0].stock);
                             files.push(...results[1].data);
+                            characteristic.push(...results[2].data.characteristics);
                             subProductNotIncludedArr.push({
                                 id: item.id,
                                 items,
                                 stock,
-                                files
+                                files,
+                                characteristic
                             });
                             subProductNotIncludedArr.sort(
                                 (a, b) => parseInt(a.id) - parseInt(b.id)
@@ -192,7 +203,6 @@ const Product = () => {
                     <>
                         <div className="d-flex">
                             <h1 className="product-name">{productInfo.name}</h1>
-                            <div className="ms-3"><i className="far fa-heart"/></div>
                         </div>
                         <div className="product-price-box mt-2">
                             <div className="d-flex align-items-center product-info-wrapper justify-content-between">
@@ -230,6 +240,7 @@ const Product = () => {
                                     name={item.items[0].name}
                                     price={item.items[0].price}
                                     files={item.files}
+                                    characteristics={item.characteristic}
                                     defaultValue={1}
                                     parent={item.items[0].parent.name}
                                     product_uid={item.items[0].uid}
@@ -250,6 +261,7 @@ const Product = () => {
                                     name={item.items[0].name}
                                     price={item.items[0].price}
                                     files={item.files}
+                                    characteristics={item.characteristic}
                                     defaultValue={1}
                                     parent={item.items[0].parent.name}
                                     product_uid={item.items[0].uid}
