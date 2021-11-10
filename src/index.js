@@ -4,6 +4,7 @@ import {ApolloProvider, ApolloClient, InMemoryCache} from "@apollo/client";
 import App from './App';
 import {ToastContainer} from 'react-toastify';
 import {BrowserRouter as Router} from 'react-router-dom';
+import {AuthContextProvider} from "./store/AuthContext";
 import 'react-toastify/dist/ReactToastify.min.css';
 
 const client = new ApolloClient({
@@ -14,11 +15,13 @@ const client = new ApolloClient({
 ReactDOM.render(
     <Router>
         <ToastContainer/>
-        <React.StrictMode>
-            <ApolloProvider client={client}>
-                <App/>
-            </ApolloProvider>
-        </React.StrictMode>
+        <AuthContextProvider>
+            <React.StrictMode>
+                <ApolloProvider client={client}>
+                    <App/>
+                </ApolloProvider>
+            </React.StrictMode>
+        </AuthContextProvider>
     </Router>,
     document.getElementById('root')
 );

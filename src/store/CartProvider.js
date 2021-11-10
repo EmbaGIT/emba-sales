@@ -30,7 +30,7 @@ const cartReducer = (state, action) => {
         let updatedDiscountAmount = 0;
         let updatedItems;
         const existingCartItemIndex = state.items.findIndex(
-            (item) => item.id === action.item.id
+            (item) => item.id === action.item.id && item.characteristic_uid === action.item.characteristic_uid
         );
         const existingCartItem = state.items[existingCartItemIndex];
         if (existingCartItem) {

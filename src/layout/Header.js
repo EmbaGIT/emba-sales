@@ -1,11 +1,16 @@
 import {useContext} from "react";
 import logo from '../assets/images/logo.png';
 import CartContext from "../store/CartContext";
+import AuthContext from "../store/AuthContext";
 import {Link, NavLink} from "react-router-dom";
 import ProductSearch from "../components/productSearch";
 
 const Header = (props) => {
     const cartCtx = useContext(CartContext);
+    const authCtx = useContext(AuthContext);
+    const logout = () => {
+        authCtx.logout();
+    };
 
     const {items} = cartCtx;
     const numberOfCartItem = items.reduce((curNumber, item) => {
@@ -25,13 +30,14 @@ const Header = (props) => {
                                 loading="lazy"
                             />
                         </Link>
+                        {authCtx.isLoggedIn && (
                         <div className="position-relative">
-                        <span className="dropdown-toggle d-flex align-items-center"
-                              data-mdb-toggle="dropdown"
-                              aria-expanded="false"
-                              role="button"
-                              id="navbarDropdownMenuLink"
-                        >Kateqoriyalar</span>
+                            <span className="dropdown-toggle d-flex align-items-center"
+                                  data-mdb-toggle="dropdown"
+                                  aria-expanded="false"
+                                  role="button"
+                                  id="navbarDropdownMenuLink"
+                            >Kateqoriyalar</span>
                             <ul
                                 className="dropdown-menu dropdown-menu-end"
                                 aria-labelledby="navbarDropdownMenuLink"
@@ -41,16 +47,17 @@ const Header = (props) => {
                                                             className="dropdown-item">{menu.nameAz}</Link></li>
                                 ))}
                             </ul>
-                        </div>
+                        </div>)}
                     </div>
                 </div>
-
+                {authCtx.isLoggedIn && (
                 <div className="col-lg-4">
                     <ProductSearch/>
                 </div>
-
+                )}
                 <div className="col-lg-4">
                     <div className="d-flex align-items-center justify-content-end">
+                        {authCtx.isLoggedIn && (
                         <div className="position-relative">
                             <Link to="/cart">
                             <span
@@ -62,12 +69,13 @@ const Header = (props) => {
                             </span>
                             </Link>
                         </div>
-
+                        )}
+                        {authCtx.isLoggedIn && (
                         <NavLink to="/saved"><i className="fas fa-cloud-download-alt me-5 text-body"
-                                                style={{fontSize: '20px'}}/></NavLink>
+                                                style={{fontSize: '20px'}}/></NavLink>)}
 
                         <div className="">
-                            <button type="button" className="btn btn-primary">Çıxış</button>
+                            <button type="button" className="btn btn-primary" onClick={logout}>Çıxış</button>
                         </div>
                     </div>
                 </div>

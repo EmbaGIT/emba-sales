@@ -1,4 +1,5 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, createContext} from "react";
+import PrivateRoute from "./helpers/PrivateRoute";
 import {
     Switch,
     Route
@@ -14,8 +15,11 @@ import CartProvider from "./store/CartProvider";
 import Cart from "./pages/Cart/Cart";
 import Checkout from "./pages/Cart/Checkout";
 import OrderInfo from "./pages/Cart/OrderInfo";
+import Login from "./pages/Login";
+export const IsAuth = createContext(null);
 
 const App = () => {
+    const [isUserAuth, setIsUserAuth] = useState(!!localStorage.getItem('jwt_token'));
     const [menuList, setMenuList] = useState([]);
     const [isFetchingData, setIsFetchingData] = useState(true);
 
@@ -42,25 +46,22 @@ const App = () => {
 
     return (
         <CartProvider>
-            {isFetchingData &&
-            <div className="d-flex align-items-center justify-content-center">
-                <Loader
-                    type="ThreeDots"
-                    color="#00BFFF"
-                    height={60}
-                    width={60}/>
-            </div>}
             {!isFetchingData && <Layout menuData={menuList}>
                 <Switch>
-                    <Route path='/' exact>
+                    {!isUserAuth && (
+                        <Route path='/login'>
+                            <Login/>
+                        </Route>
+                    )}
+                    <PrivateRoute path='/' exact>
                         <Home menuData={menuList}/>
-                    </Route>
-                    <Route path='/category/:id' component={Category}/>
-                    <Route path='/product/:id' component={Product}/>
-                    <Route path='/search' component={SearchResult}/>
-                    <Route path='/cart' exact component={Cart}/>
-                    <Route path='/checkout' exact component={Checkout}/>
-                    <Route path='/orderInfo' exact component={OrderInfo}/>
+                    </PrivateRoute>
+                    <PrivateRoute path='/category/:id' component={Category}/>
+                    <PrivateRoute path='/product/:id' component={Product}/>
+                    <PrivateRoute path='/search' component={SearchResult}/>
+                    <PrivateRoute path='/cart' exact component={Cart}/>
+                    <PrivateRoute path='/checkout' exact component={Checkout}/>
+                    <PrivateRoute path='/orderInfo' exact component={OrderInfo}/>
                 </Switch>
             </Layout>
             }

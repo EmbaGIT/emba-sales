@@ -32,7 +32,7 @@ const SubProductItem = (props) => {
         const selectValue=value.split(',');
         setCharUID(selectValue[0]);
         setCharCode(selectValue[1]);
-        setPrice(selectValue[2] ? selectValue[2] : 0);
+        setPrice(selectValue[2]);
     }
 
     const addToCartHandler = () => {
@@ -80,7 +80,7 @@ const SubProductItem = (props) => {
                     {props.characteristics.length ?
                         <select className="form-control" onChange={e => handleInputChange(e.target.value)}>
                             {props.characteristics.map(characteristic  => (
-                                <option key={characteristic.id} value={`${characteristic.uid},${characteristic.code},${characteristic.price}`}>{characteristic.name} - ({characteristic.code}) - {characteristic.price}AZN</option>
+                                <option key={characteristic.id} value={`${characteristic.uid},${characteristic.code}, ${characteristic.price ? characteristic.price : 0}`}>{characteristic.name} - ({characteristic.code}) - {characteristic.price}AZN</option>
                             ))}
                         </select>
                         : ''

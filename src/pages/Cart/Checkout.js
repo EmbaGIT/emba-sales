@@ -101,6 +101,7 @@ const Checkout = () => {
     const [customerSearch, setCustomerSearch] = useState(false);
     const [paymentDate, setPaymentDate] = useState();
     const [deliveryDate, setDeliveryDate] = useState();
+    const [selectedCustomer, setSelectedCustomer] = useState('');
     const [availableCustomer, setAvailableCustomer] = useState([]);
     const [customerInfo, setCustomerInfo] = useState({
         uid: '',
@@ -109,6 +110,7 @@ const Checkout = () => {
         patronymic: '',
         finCode: '',
         identifierNumber: '',
+        passport_series: 'AZE',
         birthdate: '',
         city: {
             code: '',
@@ -391,7 +393,7 @@ const Checkout = () => {
             surname: false
         })) : setFormValidation(prevState => ({...prevState, surname: true}))
 
-        if (customerInfo.name && customerInfo.surname) {
+        if (customerInfo.name && customerInfo.surname){
             getAvailableCustomer({
                 variables: {
                     name: `${customerInfo.surname} ${customerInfo.name} ${customerInfo.patronymic}`,
@@ -402,6 +404,7 @@ const Checkout = () => {
         }
     }
     const handleFullInfo = (uid) => {
+        setSelectedCustomer(uid)
         getFullInfo({
             variables: {
                 uid: `${uid}`
@@ -481,6 +484,9 @@ const Checkout = () => {
             comment: customerInfo.note,
             delivery_type: deliveryType,
             payment_method: paymentType,
+            client_number_passport: customerInfo.identifierNumber,
+            client_fin_code: customerInfo.finCode,
+            client_passport_series: customerInfo.passport_series,
             goods: order_goods,
             bank_cash: bankCommission
         }
@@ -529,7 +535,7 @@ const Checkout = () => {
 
     return (
         <div className="row">
-            <div className="col-md-6">
+            <div className="col-lg-6">
                 <div className="card">
                     <div className="list-group-item list-group-item-success">Sifarişin təsviri</div>
                     <div className="card-body">
@@ -629,7 +635,7 @@ const Checkout = () => {
                     </div>
                 </div>
             </div>
-            <div className="col-md-6">
+            <div className="col-lg-6">
                 <div className="card">
                     <div className="list-group-item list-group-item-success">Müştəri məlumatları</div>
                     <div className="card-body">
@@ -657,17 +663,30 @@ const Checkout = () => {
                                        value={customerInfo && customerInfo?.patronymic}
                                        onChange={e => handleInputChange("patronymic", e.target.value)}/>
                             </div>
-                            <div className="col-md-5">
-                                <label>Şəxsiyyət vəsiqəsi Fin Kod</label>
+                            <div className="col-md-4">
+                                <label>ŞV-i Fin Kod</label>
                                 <input type="text" className="form-control"
                                        value={customerInfo && customerInfo?.finCode}
                                        onChange={e => handleInputChange("finCode", e.target.value)}/>
                             </div>
-                            <div className="col-md-4">
+                            <div className="col-md-5">
                                 <label>Şəxsiyyət vəsiqəsi №-i</label>
-                                <input type="text" className="form-control"
-                                       value={customerInfo && customerInfo?.identifierNumber}
-                                       onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
+                                <div className="row">
+                                    <div className="col-md-4 pe-0">
+                                        <select className="form-control"
+                                            value={customerInfo && customerInfo?.passport_series ? customerInfo?.passport_series : ''}
+                                            onChange={e => handleInputChange("passport_series", e.target.value)}
+                                            placeholder='ŞV seriyası'>
+                                            <option value="AZE">AZE</option>
+                                            <option value="AA">AA</option>
+                                        </select>
+                                    </div>
+                                    <div className="col-md-8">
+                                        <input type="text" className="form-control"
+                                               value={customerInfo && customerInfo?.identifierNumber}
+                                               onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
+                                    </div>
+                                </div>
                             </div>
                             <div className="col-md-3 d-flex align-items-end">
                                 <div className="btn btn-primary" onClick={searchOnDatabase}>Axtar</div>
@@ -676,8 +695,9 @@ const Checkout = () => {
                         {available_customer_loading && <p>Məlumat yüklənir...</p>}
                         {customerSearch && (availableCustomer?.length ?
                             <select className="form-control mb-3"
+                                    defaultValue={'DEFAULT'}
                                     onChange={e => handleFullInfo(e.target.value)}>
-                                <option selected={true} disabled>Mümkün Siyahı</option>
+                                <option value='DEFAULT' disabled>Müştəri seçin</option>
                                 {availableCustomer.map(customer => (
                                     <option key={customer.uid} value={customer.uid}>{customer.name}</option>
                                 ))}
@@ -738,8 +758,7 @@ const Checkout = () => {
                                                 value={months[getMonth(date)]}
                                                 onChange={({target: {value}}) =>
                                                     changeMonth(months.indexOf(value))
-                                                }
-                                            >
+                                                }>
                                                 {months.map((option) => (
                                                     <option key={option} value={option}>
                                                         {option}
