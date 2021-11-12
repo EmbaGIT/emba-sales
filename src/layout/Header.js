@@ -20,7 +20,7 @@ const Header = (props) => {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container-fluid row">
-                <div className="col-lg-4">
+                <div className="col-lg-4 col-md-6 order-lg-1">
                     <div className="d-flex flex-grow-1 align-items-center" id="navbarSupportedContent">
                         <Link className="navbar-brand mt-lg-0" to="/">
                             <img
@@ -50,12 +50,7 @@ const Header = (props) => {
                         </div>)}
                     </div>
                 </div>
-                {authCtx.isLoggedIn && (
-                <div className="col-lg-4">
-                    <ProductSearch/>
-                </div>
-                )}
-                <div className="col-lg-4">
+                <div className="col-lg-4 col-md-6 order-lg-3">
                     <div className="d-flex align-items-center justify-content-end">
                         {authCtx.isLoggedIn && (
                         <div className="position-relative">
@@ -79,6 +74,11 @@ const Header = (props) => {
                         </div>
                     </div>
                 </div>
+                {authCtx.isLoggedIn && (
+                    <div className="col-lg-4 col-md-12 order-lg-2">
+                        <ProductSearch/>
+                    </div>
+                )}
             </div>
         </nav>
     )

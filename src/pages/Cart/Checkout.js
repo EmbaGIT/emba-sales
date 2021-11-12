@@ -450,6 +450,14 @@ const Checkout = () => {
 
     }
 
+    const onPriceChange = (event) => {
+        const enteredValue = event.target.value;
+        cartCtx.checkoutPriceChange({
+            value: enteredValue
+        });
+    }
+
+
     const sendOrder = (status) => {
         const order_goods = [];
         cartCtx.items.forEach(item => {
@@ -556,7 +564,7 @@ const Checkout = () => {
                                             <div className="text-success font-weight-bold">Sayı: {product.amount}</div>
                                         </td>
                                         <td>{product.price} AZN</td>
-                                        <td>{product.amount * product.discount_price} AZN</td>
+                                        <td>{ (product.amount * product.discount_price).toFixed(2)} AZN</td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -628,6 +636,10 @@ const Checkout = () => {
                                 <div className="float-end">{cartCtx.discountAmount} AZN</div>
                             </li>
                             <li className="d-flex align-content-center justify-content-between mb-2">
+                                <strong>Qiymətdə dəyişiklik:</strong>
+                                <div className="float-end"><input className="form-control" onBlur={onPriceChange} style={{width: '80px'}}/></div>
+                            </li>
+                            <li className="d-flex align-content-center justify-content-between mb-2">
                                 <strong>Bank komissiyası:</strong>
                                 <div className="float-end"><strong>{bankCommission} AZN</strong></div>
                             </li>
@@ -666,6 +678,7 @@ const Checkout = () => {
                             <div className="col-md-4">
                                 <label>ŞV-i Fin Kod</label>
                                 <input type="text" className="form-control"
+                                       maxLength="7"
                                        value={customerInfo && customerInfo?.finCode}
                                        onChange={e => handleInputChange("finCode", e.target.value)}/>
                             </div>
@@ -682,7 +695,8 @@ const Checkout = () => {
                                         </select>
                                     </div>
                                     <div className="col-md-8">
-                                        <input type="text" className="form-control"
+                                        <input type="number" className="form-control"
+                                               maxLength="8"
                                                value={customerInfo && customerInfo?.identifierNumber}
                                                onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
                                     </div>

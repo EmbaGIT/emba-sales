@@ -33,7 +33,7 @@ const ProductSearch = () => {
 
     return (
         <div className="position-relative">
-            <input className="form-control" ref={inputBox} value={searchParam} onChange={e => handleSearch(e.target.value)}/>
+            <input className="form-control" placeholder="Ən az 3 simvol daxil edib axtarış edin" ref={inputBox} value={searchParam} onChange={e => handleSearch(e.target.value)}/>
             <div className="live-search" style={{display: searchDisplay}}>
                 <ul>
                     {searchResult.content?.length && searchResult.content.map(product => (

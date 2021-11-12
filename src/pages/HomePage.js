@@ -8,9 +8,9 @@ const Home = (props) => {
     return (
         <React.Fragment>
             {authContext.isLoggedIn &&
-            <div className="row py-5">
+            <div className="row py-3">
                 {props.menuData && props.menuData.map((menu, index) => (
-                    <div key={index} className="col-md-3 mb-3">
+                    <div key={index} className="col-lg-3 col-md-4 mb-3">
                         <Link to={`category/${menu.attributes.id}`}>
                             <div className="category-box">
                                 <div className="category-hover-box">

@@ -69,6 +69,7 @@ axiosInstance.interceptors.response.use((res) => {
     return res;
 }, (error) => {
     if (error?.response?.status === 403 || error?.response?.status === 401) {
+        // REFRESH TOKEN SORGUSU BURDA, NE VAXT KI ACCESS TOKEN EXPIRED OLUR, AVTOMATIK REFRESH TOKEN SORGUSU GEDIB LOCALDA EVEZLENIR.
         localStorage.removeItem('jwt_token');
         window.location.href = '/login';
     }
