@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import Layout from "./layout/Layout";
 import {get} from "./api/Api";
-import Loader from "react-loader-spinner";
 import Home from './pages/HomePage';
 import Category from './pages/Category/CategoryList';
 import Product from './pages/Product/ProductDetail';
@@ -23,30 +22,34 @@ const App = () => {
     const [menuList, setMenuList] = useState([]);
     const [isFetchingData, setIsFetchingData] = useState(true);
 
+    console.log(isUserAuth);
+
     useEffect(() => {
-        get(`/menu/search?sort=menuOrder,desc&size=20`).then(res => {
-            const menuListArr = [];
-            res.content.forEach(menu => {
-                get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store-icon&parent=${menu.id}`).then(file => {
-                    menuListArr.push({
-                        ...menu,
-                        file
-                    });
-                    menuListArr.sort(
-                        (a, b) => parseInt(a.id) - parseInt(b.id)
-                    );
-                    setMenuList(prevState => ([
-                        ...menuListArr
-                    ]))
+        if(isUserAuth){
+            get(`/menu/search?sort=menuOrder,desc&size=20`).then(res => {
+                const menuListArr = [];
+                res.content.forEach(menu => {
+                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store-icon&parent=${menu.id}`).then(file => {
+                        menuListArr.push({
+                            ...menu,
+                            file
+                        });
+                        menuListArr.sort(
+                            (a, b) => parseInt(a.id) - parseInt(b.id)
+                        );
+                        setMenuList(prevState => ([
+                            ...menuListArr
+                        ]))
+                    })
                 })
-            })
-            setIsFetchingData(false)
-        }).catch(err => console.log(err))
+                setIsFetchingData(false)
+            }).catch(err => console.log(err))
+        }
     }, [])
 
     return (
         <CartProvider>
-            {!isFetchingData && <Layout menuData={menuList}>
+            <Layout menuData={menuList}>
                 <Switch>
                     {!isUserAuth && (
                         <Route path='/login'>
@@ -64,7 +67,6 @@ const App = () => {
                     <PrivateRoute path='/orderInfo' exact component={OrderInfo}/>
                 </Switch>
             </Layout>
-            }
         </CartProvider>
 
     );
