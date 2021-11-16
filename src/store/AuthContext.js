@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 const AuthContext = React.createContext({
     token: '',
@@ -10,6 +10,12 @@ const AuthContext = React.createContext({
 export const AuthContextProvider = (props) => {
     const [token, setToken] = useState(!!localStorage.getItem('jwt_token'));
     const isLoggedIn = !!token;
+
+    useEffect(() => {
+        if(!token){
+            localStorage.removeItem("cart");
+        }
+    }, []);
 
     const logoutHandler = () => {
         setToken(null);

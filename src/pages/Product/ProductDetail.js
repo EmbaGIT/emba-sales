@@ -72,7 +72,6 @@ const Product = () => {
                     const characteristic = [];
                     await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
                         .then(function (results) {
-                            console.log(results[2].data.characteristics);
                             items.push(item);
                             stock.push(...results[0].data[0].stock);
                             files.push(...results[1].data);
@@ -124,14 +123,53 @@ const Product = () => {
             });
             get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1&attributeId.equals=${productColor}`).then(res => {
                 const images = [];
-                get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&color=${productColor}`).then(files => {
-                    files.map(file => (
-                        images.push({
-                            original: file.originalImageUrl,
-                            thumbnail: file.lowQualityImageUrl,
+                if(productColor){
+                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&color=${productColor}`).then(files => {
+                        console.log("files", files)
+                        files.map(file => (
+                            images.push({
+                                original: file.originalImageUrl,
+                                thumbnail: file.lowQualityImageUrl,
+                            })
+                        ))
+                    });
+                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}/banner&color=${productColor}`).then(files => {
+                        console.log("banner files", files)
+                        files.map(file => (
+                            images.push({
+                                original: file.originalImageUrl,
+                                thumbnail: file.lowQualityImageUrl,
+                            })
+                        ))
+                    });
+                    res.content.map(item => (
+                        get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${item.id}/banner`).then(files => {
+                            files.map(file => (
+                                images.push({
+                                    original: file.originalImageUrl,
+                                    thumbnail: file.lowQualityImageUrl,
+                                })
+                            ))
                         })
                     ))
-                });
+                }else{
+                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}`).then(files => {
+                        files.map(file => (
+                            images.push({
+                                original: file.originalImageUrl,
+                                thumbnail: file.lowQualityImageUrl,
+                            })
+                        ))
+                    });
+                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}/banner`).then(files => {
+                        files.map(file => (
+                            images.push({
+                                original: file.originalImageUrl,
+                                thumbnail: file.lowQualityImageUrl,
+                            })
+                        ))
+                    });
+                }
                 res.content.map(item => (
                     get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${item.id}`).then(files => {
                         files.map(file => (

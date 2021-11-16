@@ -78,6 +78,7 @@ const Checkout = () => {
     ];
 
     const cartCtx = useContext(CartContext);
+    const token = localStorage.getItem('jwt_token');
     const [isSending, setIsSending] = useState(false);
     const [checkoutState, setCheckoutState] = useState({
         items: []
@@ -149,6 +150,7 @@ const Checkout = () => {
         data: available_customer,
         loading: available_customer_loading
     }] = useLazyQuery(CUSTOMER_QUERY, {
+        context: { headers: { authorization: `Bearer ${token}` }},
         onCompleted: () => {
             setCustomerSearch(true);
             if (available_customer.search.length) {
@@ -159,6 +161,7 @@ const Checkout = () => {
         }
     });
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
+        context: { headers: { authorization: `Bearer ${token}` }},
         onCompleted: () => {
             if (customer_full_info) {
                 setIsRefactorDisabled({
