@@ -2,6 +2,7 @@ import {useEffect, useContext, useState} from 'react';
 import {useHistory} from "react-router-dom";
 import {toast} from "react-toastify";
 import CartContext from "../../store/CartContext";
+import AuthContext from "../../store/AuthContext";
 import DatePicker from "react-datepicker";
 import getYear from "date-fns/getYear";
 import getMonth from "date-fns/getYear";
@@ -78,8 +79,9 @@ const Checkout = () => {
     ];
 
     const cartCtx = useContext(CartContext);
-    const token = localStorage.getItem('jwt_token');
+    const authCtx = useContext(AuthContext);
     const [isSending, setIsSending] = useState(false);
+    const [isAddingWishlist, setIsAddingWishlist] = useState(false);
     const [checkoutState, setCheckoutState] = useState({
         items: []
     })
@@ -102,7 +104,6 @@ const Checkout = () => {
     const [customerSearch, setCustomerSearch] = useState(false);
     const [paymentDate, setPaymentDate] = useState();
     const [deliveryDate, setDeliveryDate] = useState();
-    const [selectedCustomer, setSelectedCustomer] = useState('');
     const [availableCustomer, setAvailableCustomer] = useState([]);
     const [customerInfo, setCustomerInfo] = useState({
         uid: '',
@@ -150,7 +151,7 @@ const Checkout = () => {
         data: available_customer,
         loading: available_customer_loading
     }] = useLazyQuery(CUSTOMER_QUERY, {
-        context: { headers: { authorization: `Bearer ${token}` }},
+        context: {headers: {authorization: `Bearer ${authCtx.token}`}},
         onCompleted: () => {
             setCustomerSearch(true);
             if (available_customer.search.length) {
@@ -160,8 +161,9 @@ const Checkout = () => {
             console.log(err)
         }
     });
+
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
-        context: { headers: { authorization: `Bearer ${token}` }},
+        context: {headers: {authorization: `Bearer ${authCtx.token}`}},
         onCompleted: () => {
             if (customer_full_info) {
                 setIsRefactorDisabled({
@@ -386,17 +388,7 @@ const Checkout = () => {
             other_phone: '',
             address: '',
         }));
-
-        !customerInfo.name ? setFormValidation(prevState => ({
-            ...prevState,
-            name: false
-        })) : setFormValidation(prevState => ({...prevState, name: true}))
-        !customerInfo.surname ? setFormValidation(prevState => ({
-            ...prevState,
-            surname: false
-        })) : setFormValidation(prevState => ({...prevState, surname: true}))
-
-        if (customerInfo.name && customerInfo.surname){
+        if (handleNameSurnameValidation()) {
             getAvailableCustomer({
                 variables: {
                     name: `${customerInfo.surname} ${customerInfo.name} ${customerInfo.patronymic}`,
@@ -407,12 +399,23 @@ const Checkout = () => {
         }
     }
     const handleFullInfo = (uid) => {
-        setSelectedCustomer(uid)
         getFullInfo({
             variables: {
                 uid: `${uid}`
             }
         });
+    }
+
+    const handleNameSurnameValidation = () => {
+        !customerInfo.name ? setFormValidation(prevState => ({
+            ...prevState,
+            name: false
+        })) : setFormValidation(prevState => ({...prevState, name: true}))
+        !customerInfo.surname ? setFormValidation(prevState => ({
+            ...prevState,
+            surname: false
+        })) : setFormValidation(prevState => ({...prevState, surname: true}))
+        return !(!customerInfo.name || !customerInfo.surname);
     }
 
     const handleValidation = () => {
@@ -450,7 +453,6 @@ const Checkout = () => {
         })) : setFormValidation(prevState => ({...prevState, city: true}))
 
         return !(!customerInfo.name || !customerInfo.surname || !customerInfo.city || !customerInfo.address || !customerInfo.mobile_phone || !deliveryDate || !paymentDate);
-
     }
 
     const onPriceChange = (event) => {
@@ -501,14 +503,13 @@ const Checkout = () => {
             goods: order_goods,
             bank_cash: bankCommission
         }
-        console.log(order_data);
-        if(handleValidation()){
+        if (status === "ORDERED" && handleValidation()) {
             setIsSending(true);
-            post(`http://bpaws01l:8087/api/order?status=${status}`, order_data).then(res => {
+            post(`http://bpaws01l:8087/api/order/send`, order_data).then(res => {
                 console.log(res);
                 setIsSending(false);
-                if (res.Status === "OK") {
-                    history.push('/orderInfo');
+                if (res.status === "ORDERED") {
+                    history.push(`/orderPrint/${res.id}`);
                     toast.success(<MessageComponent text='Sifariş göndərildi!'/>, {
                         position: toast.POSITION.TOP_LEFT,
                         toastId: 'success-toast-message',
@@ -516,8 +517,8 @@ const Checkout = () => {
                         closeOnClick: true,
                     });
                     cartCtx.clearBasket();
-                } else if (res.Status === "ERROR") {
-                    toast.error(<MessageComponent text='Sifariş göndərilmədi!'/>, {
+                } else if (res.status === "ORDER_FAILED") {
+                    toast.error(<MessageComponent text={`Sifariş göndərilmədi! ${res.orderStateList[0].erpResponseMessage}`}/>, {
                         position: toast.POSITION.TOP_LEFT,
                         toastId: 'success-toast-message',
                         autoClose: 1500,
@@ -529,6 +530,23 @@ const Checkout = () => {
                 console.log(err);
             })
         }
+        if (status === "SAVED" && handleNameSurnameValidation()) {
+            setIsAddingWishlist(true);
+            post(`http://bpaws01l:8087/api/order/wishlist`, order_data).then(res => {
+                setIsAddingWishlist(false);
+                toast.success(<MessageComponent text='Sifariş yadda saxlanıldı!'/>, {
+                    position: toast.POSITION.TOP_LEFT,
+                    toastId: 'success-toast-message',
+                    autoClose: 1500,
+                    closeOnClick: true,
+                });
+                cartCtx.clearBasket();
+            }).catch(err => {
+                setIsAddingWishlist(false);
+                console.log(err);
+            })
+        }
+
     }
 
     if (isFetchingData) {
@@ -567,7 +585,7 @@ const Checkout = () => {
                                             <div className="text-success font-weight-bold">Sayı: {product.amount}</div>
                                         </td>
                                         <td>{product.price} AZN</td>
-                                        <td>{ (product.amount * product.discount_price).toFixed(2)} AZN</td>
+                                        <td>{(product.amount * product.discount_price).toFixed(2)} AZN</td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -640,7 +658,8 @@ const Checkout = () => {
                             </li>
                             <li className="d-flex align-content-center justify-content-between mb-2">
                                 <strong>Qiymətdə dəyişiklik:</strong>
-                                <div className="float-end"><input className="form-control" onBlur={onPriceChange} style={{width: '80px'}}/></div>
+                                <div className="float-end"><input className="form-control" onBlur={onPriceChange}
+                                                                  style={{width: '80px'}}/></div>
                             </li>
                             <li className="d-flex align-content-center justify-content-between mb-2">
                                 <strong>Bank komissiyası:</strong>
@@ -690,9 +709,9 @@ const Checkout = () => {
                                 <div className="row">
                                     <div className="col-md-4 pe-0">
                                         <select className="form-control"
-                                            value={customerInfo && customerInfo?.passport_series ? customerInfo?.passport_series : ''}
-                                            onChange={e => handleInputChange("passport_series", e.target.value)}
-                                            placeholder='ŞV seriyası'>
+                                                value={customerInfo && customerInfo?.passport_series ? customerInfo?.passport_series : ''}
+                                                onChange={e => handleInputChange("passport_series", e.target.value)}
+                                                placeholder='ŞV seriyası'>
                                             <option value="AZE">AZE</option>
                                             <option value="AA">AA</option>
                                         </select>
@@ -915,7 +934,13 @@ const Checkout = () => {
                     </div>
                 </div>
                 <div className="row mt-3">
-                    <div className="col-md-12 text-end">
+                    <div className="col-md-12 d-flex justify-content-between">
+                        <button
+                            disabled={isAddingWishlist}
+                            className="btn btn-warning"
+                            onClick={sendOrder.bind(this, 'SAVED')}>
+                            {isAddingWishlist ? "Gözləyin" : "Yadda saxla"}
+                        </button>
                         <button
                             disabled={isSending}
                             className="btn btn-success"

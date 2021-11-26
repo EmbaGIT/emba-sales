@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react';
+import jwt_decode from 'jwt-decode';
 
 const AuthContext = React.createContext({
     token: '',
+    user_uid: '',
     isLoggedIn: false,
     login: (token) => {},
     logout: () => {},
@@ -10,6 +12,8 @@ const AuthContext = React.createContext({
 export const AuthContextProvider = (props) => {
     const [token, setToken] = useState(!!localStorage.getItem('jwt_token'));
     const isLoggedIn = !!token;
+    const decoded = token && jwt_decode(localStorage.getItem('jwt_token'));
+    const uid = decoded && decoded.uid;
 
     useEffect(() => {
         if(!token){
@@ -31,7 +35,8 @@ export const AuthContextProvider = (props) => {
     };
 
     const contextValue = {
-        token: token,
+        token: localStorage.getItem('jwt_token'),
+        user_uid: uid,
         isLoggedIn: isLoggedIn,
         login: loginHandler,
         logout: logoutHandler,

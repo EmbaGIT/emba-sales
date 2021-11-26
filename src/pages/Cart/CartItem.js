@@ -25,7 +25,7 @@ const CartItem = (props) =>{
         });
     }
 
-    const handleUpdate = ( id) => {
+    const handleUpdate = (id) => {
         const enteredAmount = amountInputRef.current.value;
         const enteredAmountNumber = +enteredAmount;
         cartCtx.updateItem(enteredAmountNumber, id);
@@ -52,9 +52,9 @@ const CartItem = (props) =>{
             </div>
             <div className="basket-product-price-row">
                 <div className="basket-product-old-price">
-                    <span>{props.product.price * props.product.amount} ₼</span></div>
+                    <span>{(props.product.price * props.product.amount).toFixed(2)} ₼</span></div>
                 <div className="basket-product-price">
-                    <span>{props.product.price * props.product.amount - (props.product.price * props.product.amount * props.product.discount / 100)} ₼</span>
+                    <span>{(props.product.price * props.product.amount - (props.product.price * props.product.amount * props.product.discount / 100)).toFixed(2)} ₼</span>
                 </div>
             </div>
             <div className="basket-product-price-row">

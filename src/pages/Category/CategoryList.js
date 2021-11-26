@@ -20,7 +20,7 @@ const Category = () => {
     useEffect(() => {
         setProductList([]);
         setIsFetchingData(true);
-        get(`parents/byAttributeId/${category_id}?page=${page}&size=15`).then((res) => {
+        get(`parents/byAttributeId/${category_id}?page=${page}&size=16`).then((res) => {
             /*if(res.content.length){*/
             setPageInfo(res);
             const productListArr = [];
@@ -84,7 +84,7 @@ const Category = () => {
         setPage(+n.selected);
         history.push({
             pathname: `/category/${category_id}`,
-            search: '?page=' + n.selected + '&size=15'
+            search: '?page=' + n.selected + '&size=16'
         })
     }
 
@@ -115,18 +115,18 @@ const Category = () => {
                                         <i className="fas fa-heart text-body"/>
                                     </div>
                                 </div>*/}
-                                {product.file.length ? product.file.map(file => (
-                                    <img src={file.lowQualityImageUrl} alt=""/>
+                                {product.file.length ? product.file.map((file, index) => (
+                                    <img src={file.lowQualityImageUrl} alt="" key={index}/>
                                 )) : <img src={noImage} alt=""/>}
                             </div>
                         </Link>
                         <div className="pr-info">
                             <Link to={`/product/${product.id}`} className="pr-wrapper product-add"><div className="model-name">{product.name}</div></Link>
                             <div>
-                                {product.colors.length ? product.colors.map(color => (
-                                    <Link to={`/product/${product.id}?color=${color.id}`}>
+                                {product.colors.length ? product.colors.map((color, index) => (
+                                    <Link to={`/product/${product.id}?color=${color.id}`} key={index}>
                                         <span key={color.id} data-toggle="tooltip" title={color.name}>
-                                            <img className="color-image" src={`../../assets/images/colors/${color.code}.png`}/>
+                                            <img className="color-image" src={`../../assets/images/colors/${color.code}.png`} alt=""/>
                                         </span>
                                     </Link>
                                 )) : ''}

@@ -3,23 +3,23 @@
     src: url('../fonts/Poppins-SemiBold.ttf');
 }
 
-.react-confirm-alert-overlay{
+.react-confirm-alert-overlay {
     background: rgba(55, 55, 55, 0.9) !important;
 }
 
-.react-confirm-alert-button-group{
-    justify-content: flex-end!important;
+.react-confirm-alert-button-group {
+    justify-content: flex-end !important;
 }
 
-.flex-1{
-    flex:1;
+.flex-1 {
+    flex: 1;
 }
 
-.cursor-pointer{
+.cursor-pointer {
     cursor: pointer;
 }
 
-.fm-poppins{
+.fm-poppins {
     font-family: Poppins;
 }
 
@@ -36,11 +36,11 @@
     transition: .3s;
 }
 
-.category-hover-box:hover{
+.category-hover-box:hover {
     background: #ffffff;
 }
 
-.category-box-image{
+.category-box-image {
     max-width: 80px;
     width: 100%;
 }
@@ -99,8 +99,8 @@
 }
 
 .image-gallery-left-nav .image-gallery-svg,
-.image-gallery-right-nav .image-gallery-svg{
-    height: 80px!important;
+.image-gallery-right-nav .image-gallery-svg {
+    height: 80px !important;
 }
 
 .product-button > * {
@@ -134,7 +134,7 @@
     justify-content: space-between;
 }
 
-.color-image{
+.color-image {
     width: 35px;
     height: 35px;
     object-fit: cover;
@@ -149,7 +149,7 @@
     font-size: 1.1rem;
 }
 
-.product-name{
+.product-name {
     font-size: 22px;
     font-family: Poppins;
     display: flex;
@@ -163,7 +163,7 @@
     max-width: 450px;
 }
 
-.price{
+.price {
     font-family: Poppins;
     font-size: 1.2rem;
 }
@@ -189,11 +189,11 @@
     width: 100px;
 }
 
-.sub-item-name{
+.sub-item-name {
     cursor: pointer;
 }
 
-.sub-product-info-table.table>:not(caption)>*>* {
+.sub-product-info-table.table > :not(caption) > * > * {
     padding: 0.5rem 0.7rem;
 }
 
@@ -239,6 +239,7 @@ input[type="number"] {
     padding: 0;
     min-height: 30px;
 }
+
 .live-search .result-text {
     font-weight: 600;
     text-align: center;
@@ -251,6 +252,7 @@ input[type="number"] {
     border-bottom-right-radius: 10px;
     padding: 5px 0;
 }
+
 .result-box-wrapper {
     width: 100%;
     padding: 5px;
@@ -258,9 +260,11 @@ input[type="number"] {
     align-items: center;
     color: #2d2d2d;
 }
+
 .live-search ul li:nth-child(even) {
     background-color: #FAFAFA;
 }
+
 .live-search ul li .product-name {
     font-weight: 500;
     float: left;
@@ -268,6 +272,7 @@ input[type="number"] {
     color: #000;
     font-size: 14px;
 }
+
 .live-search ul li .product-price {
     text-align: right;
     font-size: 12px;
@@ -288,7 +293,7 @@ input[type=number] {
     -moz-appearance: textfield;
 }
 
-.form-check-input[type=checkbox]{
+.form-check-input[type=checkbox] {
     margin-right: 0;
 }
 
@@ -411,7 +416,7 @@ input[type=number] {
     font-size: 16px;
 }
 
-.panel-heading{
+.panel-heading {
     color: #444;
     font-size: 16px;
     font-weight: 500;
@@ -426,37 +431,128 @@ input[type=number] {
     font-family: Poppins;
 }
 
-.delete-cart-item{
+.delete-cart-item {
     cursor: pointer;
 }
 
-.table>:not(caption)>*>*{
+.table > :not(caption) > * > * {
     padding: 0.5rem 0.7rem;
 }
 
-.table th{
+.table th {
     font-weight: 600;
 }
 
-/* DatePicker */
-.DatePicker{
-    display: block!important;
+.wish-box-wrapper {
+    position: fixed;
+    bottom: 40px;
+    left: 25px;
+    width: 65px;
+    height: 65px;
+    z-index: 1000;
+    background: #398420;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 1px 10px 1px rgba(39, 39, 39, 0.30);
+    display: flex;
 }
+.wish-box-wrapper.position2 {
+    bottom: 40px;
+    left: 120px;
+}
+
+.wish-box-mobile {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background: #398420 center center no-repeat;
+    background-size: 50%;
+    left: -1px;
+    box-shadow: 0 0 30px rgba(116, 116, 116, 0.33);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.wish-box {
+    text-align: center;
+}
+
+.wish-box-mobile .rings {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    opacity: .6;
+    z-index: 3;
+    display: block;
+    top: 0;
+    left: 0;
+}
+
+.wish-box-mobile .ring {
+    border: 1px solid #398420;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0;
+    animation: launcher-button-pulsate infinite 3s;
+}
+
+.wish-box-mobile .rings .ring:nth-child(1) {
+    animation-delay: .1s;
+}
+
+.wish-box-mobile .rings .ring:nth-child(2) {
+    animation-delay: .25s;
+}
+
+.wish-box-mobile .rings .ring:nth-child(3) {
+    animation-delay: .4s;
+}
+@keyframes launcher-button-pulsate {
+    60% {
+        transform: scale(1,1);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1,1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.7,1.7);
+        opacity: 0;
+    }
+}
+
+/* DatePicker */
+.DatePicker {
+    display: block !important;
+}
+
 .DatePicker__input {
     display: block;
     width: 100%;
-    padding: 3.28px .75rem 4px!important;
-    font-size: 1rem!important;
+    padding: 3.28px .75rem 4px !important;
+    font-size: 1rem !important;
     font-weight: 400;
     line-height: 1.6;
-    color: #4f4f4f!important;
+    color: #4f4f4f !important;
     background-color: #fff;
     background-clip: padding-box;
-    border: 1px solid #bdbdbd!important;
+    border: 1px solid #bdbdbd !important;
     appearance: none;
     border-radius: .25rem;
     transition: all .2s linear;
-    text-align: left!important;
+    text-align: left !important;
 }
 
 @media (max-width: 1440px) {

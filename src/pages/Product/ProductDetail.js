@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Link, useParams} from "react-router-dom";
 import {gett, postt, get} from "../../api/Api";
 import noImage from '../../assets/images/no-image.png';
@@ -6,13 +6,15 @@ import Loader from "react-loader-spinner";
 import ImageGallery from 'react-image-gallery';
 import "react-image-gallery/styles/css/image-gallery.css";
 import SubProductItem from "./SubProductItem";
-import SubProductInfo from "./SubProductİnfo";
+import SubProductInfo from "./SubProductInfo";
 import {useQuery} from "../../hooks/useQuery";
+import AuthContext from "../../store/AuthContext";
 
 const Product = () => {
     const params = useParams();
     const parent_id = params.id;
     let query = useQuery();
+    const authCtx=useContext(AuthContext);
     const currentColor = query.get("color") || '';
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [productColor, setProductColor] = useState(currentColor);
@@ -35,7 +37,7 @@ const Product = () => {
 
     function getProductStock(uid) {
         return postt(`http://bpaws01l:8087/api/inventory`, {
-            "user_uid": "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
+            "user_uid": authCtx.user_uid,
             "goods": [
                 {
                     "product_uid": uid,
@@ -125,7 +127,6 @@ const Product = () => {
                 const images = [];
                 if(productColor){
                     get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&color=${productColor}`).then(files => {
-                        console.log("files", files)
                         files.map(file => (
                             images.push({
                                 original: file.originalImageUrl,
@@ -134,7 +135,6 @@ const Product = () => {
                         ))
                     });
                     get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}/banner&color=${productColor}`).then(files => {
-                        console.log("banner files", files)
                         files.map(file => (
                             images.push({
                                 original: file.originalImageUrl,
@@ -233,7 +233,7 @@ const Product = () => {
                 <div className="col-lg-7">
                     {productImages?.length ?
                         <ImageGallery items={productImages}/>
-                        : <img src={noImage} className="w-100"/>
+                        : <img src={noImage} className="w-100" alt=""/>
                     }
                 </div>
                 <div className="col-lg-5">
@@ -254,8 +254,8 @@ const Product = () => {
                         {productInfo.colors &&
                         <div className="mt-3">
                             {productInfo.colors.map(color => (
-                                <Link to={`/product/${parent_id}?color=${color.id}`}><span key={color.id} onClick={changeColor.bind(this, color.id)} data-toggle="tooltip" title={color.name}><img
-                                    className="color-image me-2"
+                                <Link to={`/product/${parent_id}?color=${color.id}`} key={color.id}><span onClick={changeColor.bind(this, color.id)} data-toggle="tooltip" title={color.name}><img
+                                    className="color-image me-2" alt=""
                                     src={`../../assets/images/colors/${color.code}.png`}/></span>
                                 </Link>
                             ))}

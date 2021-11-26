@@ -21,7 +21,7 @@ const SearchProductList = () => {
         setProductList([]);
         setIsFetchingData(true);
         setSearchParam(searchParameter);
-        get(`/products/search?name.contains=${searchParameter}&page=${currentPage}&size=14`).then((res) => {
+        get(`/products/search?name.contains=${searchParameter}&page=${currentPage}&size=16`).then((res) => {
             setPageInfo(res);
             const productListArr = [];
             res.content.forEach(product => {
@@ -64,7 +64,7 @@ const SearchProductList = () => {
         setPage(+n.selected);
         history.push({
             pathname: `/search`,
-            search: `?param=${searchParam}&page=${n.selected}&size=15`
+            search: `?param=${searchParam}&page=${n.selected}&size=16`
         })
     }
 
@@ -96,9 +96,9 @@ const SearchProductList = () => {
                             <Link to={product.colors.length ? `/product/${product.parent.id}?color=${product.colors[0].id}` : `/product/${product.parent.id}`} className="pr-wrapper product-add"><div className="model-name">{product.name}</div></Link>
                             <div>
                                 {product.colors.length ? product.colors.map(color => (
-                                    <Link to={`/product/${product.parent.id}?color=${color.id}`}>
-                                        <span key={color.id} data-toggle="tooltip" title={color.name}>
-                                            <img className="color-image" src={`../../assets/images/colors/${color.code}.png`}/>
+                                    <Link to={`/product/${product.parent.id}?color=${color.id}`} key={color.id}>
+                                        <span data-toggle="tooltip" title={color.name}>
+                                            <img className="color-image" alt="" src={`../../assets/images/colors/${color.code}.png`}/>
                                         </span>
                                     </Link>
                                 )) : ''}

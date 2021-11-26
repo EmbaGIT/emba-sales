@@ -28,7 +28,6 @@ const SubProductItem = (props) => {
     }, []);
 
     const handleInputChange = (value) => {
-        console.log(value);
         const selectValue=value.split(',');
         setCharUID(selectValue[0]);
         setCharCode(selectValue[1]);
@@ -60,7 +59,7 @@ const SubProductItem = (props) => {
     }
 
     return (
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-3" key={props.id}>
+        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-3">
             <div className="sub-item-wrapper">
                 <div className="sub-item-info">
                     <div className="sub-item-image">

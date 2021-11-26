@@ -19,6 +19,7 @@ const Login = () => {
         if (enteredPassword.trim().length && enteredName.trim().length) {
             post('http://bpaws01l:8081/api/auth/login', { username: enteredName, password: enteredPassword })
                 .then((res) => {
+                    console.log("res", res);
                     setIsFetching(false);
                     localStorage.setItem('jwt_token', res.token);
                     res && authCtx.login(res.token);

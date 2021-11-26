@@ -10,7 +10,6 @@ const Cart = () => {
     const [totalDiscount, setTotalDiscount] = useState(0);
     const [cartState, setCartState] = useState([]);
     const [isDisabled, setIsDisabled] = useState(false);
-    console.log("cartCtx", cartCtx);
     useEffect(() => {
         const newCartArr = [];
         if (cartCtx.items.length > 0) {
@@ -186,7 +185,6 @@ const Cart = () => {
                                             className="list-group-item-primary p-3 d-flex justify-content-between align-content-center">
                                             <span>{item.parent}</span>
                                         </div>
-                                        {console.log("products", item.products)}
                                         {item.products && item.products.map((product, pr_index) => (
                                             <CartItem product={product}
                                                       isDisabled={isDisabled}

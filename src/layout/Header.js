@@ -66,7 +66,7 @@ const Header = (props) => {
                         </div>
                         )}
                         {authCtx.isLoggedIn && (
-                        <NavLink to="/saved"><i className="fas fa-cloud-download-alt me-5 text-body"
+                        <NavLink to="/allOrder"><i className="fas fa-cloud-download-alt me-5 text-body"
                                                 style={{fontSize: '20px'}}/></NavLink>)}
 
                         <div className="">

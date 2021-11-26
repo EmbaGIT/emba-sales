@@ -184,9 +184,6 @@ const cartReducer = (state, action) => {
                 discount_price: item.discount_price+change_value,
                 discount: 100-((item.discount_price+change_value)*100/item.price)
             })));
-
-            console.log(updatedItems);
-
             const updatedDiscountAmount= state.discountAmount + parseFloat(action.value.value);
 
             localStorage.setItem('cart', JSON.stringify({

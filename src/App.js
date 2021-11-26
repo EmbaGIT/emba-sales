@@ -13,16 +13,15 @@ import SearchResult from './pages/SearchResult';
 import CartProvider from "./store/CartProvider";
 import Cart from "./pages/Cart/Cart";
 import Checkout from "./pages/Cart/Checkout";
-import OrderInfo from "./pages/Cart/OrderInfo";
+import OrderPrint from "./pages/Order/OrderPrint";
 import Login from "./pages/Login";
+import AllOrders from "./pages/OrderHistory/AllOrders";
 export const IsAuth = createContext(null);
 
 const App = () => {
     const [isUserAuth, setIsUserAuth] = useState(!!localStorage.getItem('jwt_token'));
     const [menuList, setMenuList] = useState([]);
     const [isFetchingData, setIsFetchingData] = useState(true);
-
-    console.log(isUserAuth);
 
     useEffect(() => {
         if(isUserAuth){
@@ -64,7 +63,8 @@ const App = () => {
                     <PrivateRoute path='/search' component={SearchResult}/>
                     <PrivateRoute path='/cart' exact component={Cart}/>
                     <PrivateRoute path='/checkout' exact component={Checkout}/>
-                    <PrivateRoute path='/orderInfo' exact component={OrderInfo}/>
+                    <PrivateRoute path='/orderPrint/:id' exact component={OrderPrint}/>
+                    <PrivateRoute path='/allOrder' exact component={AllOrders}/>
                 </Switch>
             </Layout>
         </CartProvider>
