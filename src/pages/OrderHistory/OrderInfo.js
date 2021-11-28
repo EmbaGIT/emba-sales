@@ -1,18 +1,27 @@
 import Modal from '../../UI/Modal';
-import React, {useRef} from "react";
-import CountInput from "../../UI/countInput";
+import CountUpdate from "../../UI/CountUpdate";
 
 const OrderInfo = (props) => {
-    const amountInputRef = useRef();
 
-    const handleUpdate = (id) => {
-        const enteredAmount = amountInputRef.current.value;
+    const handleUpdate = (id, enteredAmount) => {
         const enteredAmountNumber = +enteredAmount;
-
         if (enteredAmount.trim().length === 0 || enteredAmountNumber < 1 || enteredAmountNumber > 12) {
             return;
         } else {
-            console.log(id, enteredAmountNumber)
+            const updatedItem=[];
+            let updatedGoods=[];
+            props.info.goods.map(good => {
+                good.id === id ? updatedGoods.push({
+                        ...good,
+                        product_quantity: enteredAmountNumber
+                }) : updatedGoods.push(good);
+            })
+            updatedItem.push({
+                ...props.info,
+                goods: updatedGoods
+            })
+
+            console.log(updatedItem);
         }
     }
 
@@ -36,10 +45,7 @@ const OrderInfo = (props) => {
                             <tr key={item.id}>
                                 <td><b>{item.product_name}</b></td>
                                 <td>{props.info.status === "SAVED" ?
-                                    <div>
-                                        <CountInput defaultValue={item.product_quantity} ref={amountInputRef}/>
-                                        <div className="btn btn-success btn-sm w-100" onClick={handleUpdate.bind(this, item.id)}><i className="fas fa-sync-alt"/></div>
-                                    </div>
+                                    <CountUpdate id={item.id} quantity={item.product_quantity} onHandleUpdate={handleUpdate}/>
                                     : item.product_quantity}</td>
                                 <td>{item.product_price} AZN</td>
                                 <td>{item.product_discount.toFixed(2)} %</td>
