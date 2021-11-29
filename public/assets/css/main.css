@@ -555,6 +555,11 @@ input[type=number] {
     text-align: left !important;
 }
 
+.Modal_modal__1fEdk{
+    max-height: 600px;
+    overflow-y: scroll;
+}
+
 @media (max-width: 1440px) {
     .grid-wrapper {
         grid-template-columns: repeat(3, 1fr);

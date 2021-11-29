@@ -462,7 +462,6 @@ const Checkout = () => {
         });
     }
 
-
     const sendOrder = (status) => {
         const order_goods = [];
         cartCtx.items.forEach(item => {
@@ -546,7 +545,6 @@ const Checkout = () => {
                 console.log(err);
             })
         }
-
     }
 
     if (isFetchingData) {

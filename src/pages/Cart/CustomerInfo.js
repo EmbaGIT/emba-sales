@@ -21,7 +21,6 @@ const CUSTOMER_QUERY = gql`
         name
       }
     }`;
-
 const FULL_INFO_QUERY = gql`
     query fullInfo($uid: String) {
       search(criteria: {
@@ -48,8 +47,6 @@ const CustomerInfo = () => {
     const [customerSearch, setCustomerSearch] = useState(false);
     const [orderDate, setOrderDate] = useState();
     const [deliveryDate, setDeliveryDate] = useState();
-    const [nameInvalid, setNameInvalid] = useState(false);
-    const [surnameInvalid, setSurnameInvalid] = useState(false);
     const [customerInfo, setCustomerInfo] = useState({
         uid: '',
         name: '',
@@ -242,13 +239,11 @@ const CustomerInfo = () => {
                         <label>Ad<span className="text-danger">*</span></label>
                         <input type="text" className="form-control"
                                onChange={e => handleInputChange("name", e.target.value)}/>
-                        {nameInvalid && <span className="text-danger">Xananın doldurulması vacibdir.</span>}
                     </div>
                     <div className="col-md-4 mb-2">
                         <label>Soyad<span className="text-danger">*</span></label>
                         <input type="text" className="form-control"
                                onChange={e => handleInputChange("surname", e.target.value)}/>
-                        {surnameInvalid && <span className="text-danger">Xananın doldurulması vacibdir.</span>}
                     </div>
                     <div className="col-md-4 mb-2">
                         <label>Ata adı</label>
@@ -420,7 +415,7 @@ const CustomerInfo = () => {
                 </div>
                 <div className="row mb-3">
                     <div className="col-md-6">
-                        <label>Siafriş tarixi<span className="text-danger">*</span></label>
+                        <label>Sifariş tarixi<span className="text-danger">*</span></label>
                         <DatePicker
                             className="form-control"
                             selected={orderDate}

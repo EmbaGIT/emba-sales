@@ -16,8 +16,10 @@ const AllOrders = () => {
     const [orderInfo, setOrderInfo] = useState({});
     const [cartIsShown, setCartIsShown] = useState(false);
 
+    console.log(authCtx.user_uid)
+
     useEffect(() => {
-        post(`http://bpaws01l:8087/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}`).then(res => {
+        post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&size=10&page=${page}`).then(res => {
             const orders=[];
             res.content.forEach(order => {
                 let totalPrice=0;
@@ -37,31 +39,35 @@ const AllOrders = () => {
 
     const handleModuleInfo = (id) => {
         post(`http://bpaws01l:8087/api/order/search?id.equals=${id}`).then(resOrderInfo => {
-            const products = [];
-            let total_price=0;
-            let discount_total_price=0;
-            resOrderInfo.content[0].goods.map(item => {
-                total_price += item.product_price * item.product_quantity;
-                discount_total_price += item.product_price * item.product_quantity - item.product_quantity * item.product_price * item.product_discount / 100;
-                get(`/products/uid/${item.product_uid}`).then(res => {
-                    products.push({
-                        ...item,
-                        product_name: res.name
-                    });
-                    products.sort(
-                        (a, b) => parseInt(a.id) - parseInt(b.id)
-                    );
-                    setOrderInfo(prevstate => ({
-                        ...resOrderInfo.content[0],
-                        goods: products,
-                        totalPrice: total_price,
-                        discountPrice: discount_total_price
-                    }))
-                })
-            })
+            setOrderInfo(resOrderInfo.content[0])
             showCartHandler();
         })
     }
+
+    /*const handleOrderInfo = (resOrderInfo) => {
+        const products = [];
+        let total_price=0;
+        let discount_total_price=0;
+        resOrderInfo.goods.map(item => {
+            total_price += item.product_price * item.product_quantity;
+            discount_total_price += item.product_price * item.product_quantity - item.product_quantity * item.product_price * item.product_discount / 100;
+            get(`/products/uid/${item.product_uid}`).then(res => {
+                products.push({
+                    ...item,
+                    product_name: res.name
+                });
+                products.sort(
+                    (a, b) => parseInt(a.id) - parseInt(b.id)
+                );
+                setOrderInfo(prevstate => ({
+                    ...resOrderInfo,
+                    goods: products,
+                    totalPrice: total_price,
+                    discountPrice: discount_total_price
+                }))
+            })
+        })
+    }*/
 
     const showCartHandler = () => {
         setCartIsShown(true);
@@ -73,9 +79,8 @@ const AllOrders = () => {
     };
 
     const deleteGoodFromOrder = (id) => {
-        console.log(`http://bpaws01l:8087/api/order/goods/${id}`)
         remove(`http://bpaws01l:8087/api/order/goods/${id}`).then(res => {
-            console.log(res)
+            setOrderInfo(res)
         })
     }
 
@@ -105,6 +110,7 @@ const AllOrders = () => {
                                         <th scope='col'>Sifariş statusu</th>
                                         <th scope='col'>Sifariş tarixi</th>
                                         <th scope='col'>Ümumi Qiymət</th>
+                                        <th scope='col'></th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -114,7 +120,7 @@ const AllOrders = () => {
                                             <td><span className="cursor-pointer text-primary font-weight-bolder" onClick={handleModuleInfo.bind(null, order.id)}>{order.client_name}</span></td>
                                             <td>
                                                 {order.status === 'ORDER_FAILED' &&
-                                                <span className="badge bg-warning text-dark">Uğursuz siafriş</span>}
+                                                <span className="badge bg-warning text-dark">Uğursuz sifariş</span>}
                                                 {order.status === 'ORDERED' &&
                                                 <span className="badge bg-success">Tamamlandı</span>}
                                                 {order.status === 'SAVED' &&
@@ -122,6 +128,14 @@ const AllOrders = () => {
                                             </td>
                                             <td>{order.createdAt} {order.creationTime}</td>
                                             <td>{order.totalPrice} AZN</td>
+                                            <td>
+                                                {(order.status === 'ORDER_FAILED' || order.status === 'SAVED') &&
+                                                <i className="fas fa-trash-alt text-danger cursor-pointer" onClick={() => {
+                                                    remove(`http://bpaws01l:8087/api/order/${order.id}`).then(res => {
+                                                        console.log(orderState.filter(item => item.id === order.id));
+                                                    })
+                                                }}/>}
+                                            </td>
                                         </tr>
                                     ))}
                                     </tbody>
