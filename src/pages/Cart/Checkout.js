@@ -14,6 +14,7 @@ import {gql, useLazyQuery} from "@apollo/client";
 import {get, post} from "../../api/Api";
 import Loader from "react-loader-spinner";
 import "react-datepicker/dist/react-datepicker.css";
+import {formattedDate} from "../../helpers/formattedDate";
 
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
@@ -476,11 +477,11 @@ const Checkout = () => {
         })
         const order_data = {
             user_uid: "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
-            payment_date: paymentDate,
-            delivery_date: deliveryDate,
+            payment_date: formattedDate(paymentDate),
+            delivery_date: formattedDate(deliveryDate),
             client_uid: customerInfo.uid,
             client_name: `${customerInfo.surname} ${customerInfo.name} ${customerInfo.patronymic}`,
-            client_date_born: customerInfo.birthdate,
+            client_date_born: customerInfo.birthdate ? formattedDate(customerInfo.birthdate) : "0001-01-01",
             client_gender: customerInfo.gender,
             client_new_phone: customerRefactoringInfo.mobile_phone ?
                 (oldCustomerInfo.mobile_phone === customerRefactoringInfo.mobile_phone ? 0 : 1) : 0,
@@ -502,10 +503,10 @@ const Checkout = () => {
             goods: order_goods,
             bank_cash: bankCommission
         }
+        console.log(order_data);
         if (status === "ORDERED" && handleValidation()) {
             setIsSending(true);
             post(`http://bpaws01l:8087/api/order/send`, order_data).then(res => {
-                console.log(res);
                 setIsSending(false);
                 if (res.status === "ORDERED") {
                     history.push(`/orderPrint/${res.id}`);
@@ -755,8 +756,9 @@ const Checkout = () => {
                             <div className="col-md-6">
                                 <label htmlFor='birthdate'>Doğum tarixi</label>
                                 <DatePicker
+                                    onChangeRaw={(e) => e.preventDefault()}
                                     disabled={isRefactorDisabled.birthdate}
-                                    dateFormat="dd.MM.yyyy"
+                                    dateFormat="yyyy-MM-dd"
                                     className="form-control"
                                     renderCustomHeader={({
                                                              date,
@@ -901,6 +903,8 @@ const Checkout = () => {
                             <div className="col-md-6">
                                 <label>Ödəniş tarixi<span className="text-danger">*</span></label>
                                 <DatePicker
+                                    onChangeRaw={(e) => e.preventDefault()}
+                                    dateFormat="yyyy-MM-dd"
                                     className="form-control"
                                     selected={paymentDate}
                                     onChange={(date) => setPaymentDate(date)}
@@ -912,6 +916,8 @@ const Checkout = () => {
                             <div className="col-md-6">
                                 <label>Çatdırılma tarixi<span className="text-danger">*</span></label>
                                 <DatePicker
+                                    onChangeRaw={(e) => e.preventDefault()}
+                                    dateFormat="yyyy-MM-dd"
                                     className="form-control"
                                     selected={deliveryDate}
                                     onChange={(date) => setDeliveryDate(date)}

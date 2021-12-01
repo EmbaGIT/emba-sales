@@ -4,6 +4,8 @@ import AuthContext from "../../store/AuthContext";
 import {useQuery} from "../../hooks/useQuery";
 import ReactPaginate from "react-paginate";
 import OrderInfo from "./OrderInfo";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const AllOrders = () => {
     const query = useQuery();
@@ -11,28 +13,31 @@ const AllOrders = () => {
     const [page, setPage] = useState(+currentPage);
     const authCtx = useContext(AuthContext);
     const [rows, setRows] = useState(1);
+    const [statusValue, setStatusValue] = useState('all');
     const [orderState, setOrderState] = useState([]);
     const [pageState, setPageState] = useState({});
     const [orderInfo, setOrderInfo] = useState({});
     const [cartIsShown, setCartIsShown] = useState(false);
 
-    console.log(authCtx.user_uid)
+    const orderList = (list, page) => {
+        const orders=[];
+        list.content.forEach(order => {
+            let totalPrice=0;
+            order.goods.map(item => {
+                totalPrice += (item.product_price*item.product_quantity - (item.product_price*item.product_quantity*item.product_discount/100));
+            })
+            orders.push({
+                ...order,
+                totalPrice
+            })
+        })
+        setOrderState(orders);
+        setRows(page === 0 ? 1 : (page * 10) + 1);
+    }
 
     useEffect(() => {
-        post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&size=10&page=${page}`).then(res => {
-            const orders=[];
-            res.content.forEach(order => {
-                let totalPrice=0;
-                order.goods.map(item => {
-                    totalPrice += (item.product_price*item.product_quantity - (item.product_price*item.product_quantity*item.product_discount/100));
-                })
-                orders.push({
-                    ...order,
-                    totalPrice
-                })
-            })
-            setOrderState(orders);
-            setRows(page === 0 ? 1 : (page * 10) + 1);
+        post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&size=10&page=${page}&size=10`).then(res => {
+            orderList(res, page);
             setPageState(res);
         })
     }, [page]);
@@ -44,31 +49,6 @@ const AllOrders = () => {
         })
     }
 
-    /*const handleOrderInfo = (resOrderInfo) => {
-        const products = [];
-        let total_price=0;
-        let discount_total_price=0;
-        resOrderInfo.goods.map(item => {
-            total_price += item.product_price * item.product_quantity;
-            discount_total_price += item.product_price * item.product_quantity - item.product_quantity * item.product_price * item.product_discount / 100;
-            get(`/products/uid/${item.product_uid}`).then(res => {
-                products.push({
-                    ...item,
-                    product_name: res.name
-                });
-                products.sort(
-                    (a, b) => parseInt(a.id) - parseInt(b.id)
-                );
-                setOrderInfo(prevstate => ({
-                    ...resOrderInfo,
-                    goods: products,
-                    totalPrice: total_price,
-                    discountPrice: discount_total_price
-                }))
-            })
-        })
-    }*/
-
     const showCartHandler = () => {
         setCartIsShown(true);
     };
@@ -78,27 +58,76 @@ const AllOrders = () => {
         setOrderInfo([]);
     };
 
+    const handleOrderDelete = (id) => {
+        confirmAlert({
+            title: '',
+            message: 'Sifariş bazadan silinəcək!',
+            buttons: [
+                {
+                    label: 'Sil',
+                    onClick: () => {
+                        remove(`http://bpaws01l:8087/api/order/${id}`).then(res => {
+                            const newList = orderState.filter(item => item.id !== id);
+                            setOrderState(newList);
+                        })
+                    }
+                },
+                {
+                    label: 'Ləğv et',
+                    onClick: () => {}
+                }
+            ]
+        });
+    }
+
     const deleteGoodFromOrder = (id) => {
         remove(`http://bpaws01l:8087/api/order/goods/${id}`).then(res => {
             setOrderInfo(res)
         })
     }
 
-    const handleUpdateOrder = () => {
-
-    }
-
     const paginate = (n) => {
         setPage(+n.selected);
+        statusFilter(statusValue, n.selected);
+    }
+
+    const onStatusFilter = (value) => {
+        setStatusValue(value);
+        statusFilter(value, 0);
+    }
+
+    const statusFilter = (value, currentPage) => {
+        console.log(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&status.equals=${value}&size=10&page=${currentPage}`);
+        if(value==="all"){
+            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&size=10&page=${currentPage}`).then(res => {
+                orderList(res, currentPage);
+                setPageState(res);
+            })
+        }else{
+            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&status.equals=${value}&size=10&page=${currentPage}`).then(res => {
+                orderList(res, currentPage);
+                setPageState(res);
+            })
+        }
     }
 
     return (
         <div>
-            <div className="row mb-2">
-                <div className="col-lg-12 col-md-12">
-                    <h3 className="fm-poppins">Satıcı sifarişləri</h3>
+            <div className="mb-2">
+                <div className="row">
+                    <div className="col-md-6 row">
+                        <div className="col-md-6"><h4 className="fm-poppins flex-1">Satıcı sifarişləri</h4></div>
+                        <div className="col-md-6">
+                            <select className="form-control ms-2" onChange={e => onStatusFilter(e.target.value)}>
+                                <option value="all">Bütün sifarişlər</option>
+                                <option value="ORDERED">Tamamlanmış</option>
+                                <option value="ORDER_FAILED">Uğursuz Sifariş</option>
+                                <option value="SAVED">Yadda saxlanılan</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div className="col-lg-12">
+                <div className="mt-3">
                     {orderState.length ?
                         <div>
                             <div className="table-responsive">
@@ -110,7 +139,7 @@ const AllOrders = () => {
                                         <th scope='col'>Sifariş statusu</th>
                                         <th scope='col'>Sifariş tarixi</th>
                                         <th scope='col'>Ümumi Qiymət</th>
-                                        <th scope='col'></th>
+                                        <th scope='col'>-</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -130,11 +159,7 @@ const AllOrders = () => {
                                             <td>{order.totalPrice} AZN</td>
                                             <td>
                                                 {(order.status === 'ORDER_FAILED' || order.status === 'SAVED') &&
-                                                <i className="fas fa-trash-alt text-danger cursor-pointer" onClick={() => {
-                                                    remove(`http://bpaws01l:8087/api/order/${order.id}`).then(res => {
-                                                        console.log(orderState.filter(item => item.id === order.id));
-                                                    })
-                                                }}/>}
+                                                <i className="fas fa-trash-alt text-danger cursor-pointer" onClick={handleOrderDelete.bind(this, order.id)}/>}
                                             </td>
                                         </tr>
                                     ))}
@@ -142,7 +167,7 @@ const AllOrders = () => {
                                 </table>
                             </div>
                             {cartIsShown && <OrderInfo onClose={hideCartHandler} info={orderInfo}
-                                                   onItemDelete={deleteGoodFromOrder} onUpdateOrder={handleUpdateOrder}/>}
+                                                   onItemDelete={deleteGoodFromOrder}/>}
                             <ReactPaginate
                                 previousLabel={'Əvvəlki'}
                                 nextLabel={'Növbəti'}

@@ -41,7 +41,6 @@ const FULL_INFO_QUERY = gql`
       }
     }`
 
-
 const OrderInfo = (props) => {
     const range = (start, end) => {
         return new Array(end - start).fill().map((d, i) => i + start);
@@ -100,7 +99,33 @@ const OrderInfo = (props) => {
         delivery_date: true,
         payment_date: true
     })
-    const [orderInfo, setOrderInfo] = useState({});
+    const [orderInfo, setOrderInfo] = useState({
+        id: '',
+        uid: '',
+        name: '',
+        surname: '',
+        patronymic: '',
+        finCode: '',
+        identifierNumber: '',
+        passport_series: 'AZE',
+        birthdate: '',
+        city: {
+            code: '',
+            name: ''
+        },
+        mobile_phone: '',
+        other_phone: '',
+        address: '',
+        gender: '',
+        email: '',
+        note: '',
+        goods: [],
+        totalPrice: 0,
+        discountPrice: 0,
+        bank_cash: 0,
+        deliveryType: 0,
+        paymentType: 0
+    });
 
     const [getAvailableCustomer, {
         data: available_customer,
@@ -117,6 +142,7 @@ const OrderInfo = (props) => {
         }
     });
 
+    console.log(props.info);
 
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
         context: {headers: {authorization: `Bearer ${authCtx.token}`}},
@@ -135,24 +161,35 @@ const OrderInfo = (props) => {
                 })
                 setOrderInfo(prevState => ({
                     ...prevState,
-                    client_uid: customer_full_info.search[0].uid
+                    uid: customer_full_info.search[0].uid
                 }));
                 setOrderInfo(prevState => ({
                     ...prevState,
-                    client_name: customer_full_info.search[0].name
+                    name: customer_full_info.search[0].name.split(' ')[1]
+                }));
+                setOrderInfo(prevState => ({
+                    ...prevState,
+                    surname: customer_full_info.search[0].name.split(' ')[0]
+                }));
+                setOrderInfo(prevState => ({
+                    ...prevState,
+                    patronymic: customer_full_info.search[0].name.split(' ')[2]
                 }));
                 customer_full_info.search[0].details.forEach(detail => {
                     if (detail.infoTypeField.field === "Birthdate") {
                         setOrderInfo(prevstate => ({
                             ...prevstate,
-                            client_date_born: new Date(detail.fieldValue?.split(" ")[0].replace(/(\d{2}).(\d{2}).(\d{4})/, "$2/$1/$3"))
+                            birthdate: new Date(detail.fieldValue?.split(" ")[0].replace(/(\d{2}).(\d{2}).(\d{4})/, "$2/$1/$3"))
                         }));
                     } else if (detail.infoTypeField.field === "City") {
                         get(`http://bpaws01l:8087/api/city/search?name.contains=${detail.fieldValue}`).then(res => {
                             if (res.content.length > 0) {
                                 setOrderInfo(prevstate => ({
                                     ...prevstate,
-                                    client_delivery_city_code: res.context[0].code
+                                    city: {
+                                        code: res.content[0].code,
+                                        name: detail.fieldValue
+                                    }
                                 }));
                             } else {
                                 setOrderInfo(prevstate => ({
@@ -167,7 +204,7 @@ const OrderInfo = (props) => {
                     } else if (detail.infoTypeField.field === "DocumentPin") {
                         setOrderInfo(prevstate => ({
                             ...prevstate,
-                            client_fin_code: detail.fieldValue
+                            finCode: detail.fieldValue
                         }));
                     } else if (detail.infoTypeField.field === "Number") {
                         setOrderInfo(prevstate => ({
@@ -177,39 +214,39 @@ const OrderInfo = (props) => {
                     } else if (detail.infoTypeField.field === "Mobile") {
                         setOrderInfo(prevstate => ({
                             ...prevstate,
-                            client_mobil_phone: detail.fieldValue
+                            mobile_phone: detail.fieldValue
                         }));
                         setOldCustomerInfo(prevstate => ({
                             ...prevstate,
-                            client_mobil_phone: detail.fieldValue
+                            mobile_phone: detail.fieldValue
                         }));
                     } else if (detail.infoTypeField.field === "OtherPhone") {
                         setOrderInfo(prevstate => ({
                             ...prevstate,
-                            client_mobil_phone2: detail.fieldValue
+                            other_phone: detail.fieldValue
                         }));
                         setOldCustomerInfo(prevstate => ({
                             ...prevstate,
-                            client_mobil_phone2: detail.fieldValue
+                            other_phone: detail.fieldValue
                         }));
                     } else if (detail.infoTypeField.field === "Email") {
                         setOrderInfo(prevstate => ({
                             ...prevstate,
-                            client_mail: detail.fieldValue
+                            email: detail.fieldValue
                         }));
                     } else if (detail.infoTypeField.field === "PhysicalAddress") {
                         setOrderInfo(prevstate => ({
                             ...prevstate,
-                            client_delivery_address: detail.fieldValue
+                            address: detail.fieldValue
                         }));
                         setOldCustomerInfo(prevstate => ({
                             ...prevstate,
-                            client_delivery_address: detail.fieldValue
+                            address: detail.fieldValue
                         }));
                     } else if (detail.infoTypeField.field === "Gender") {
                         setOrderInfo(prevstate => ({
                             ...prevstate,
-                            client_gender: detail.fieldValue === "Kişi" ? 1 : 0
+                            gender: detail.fieldValue === "Kişi" ? 1 : 0
                         }));
                     }
                 })
@@ -246,6 +283,26 @@ const OrderInfo = (props) => {
         const products = [];
         let total_price=0;
         let discount_total_price=0;
+        if(resOrderInfo.client_delivery_city_code){
+            get(`http://bpaws01l:8087/api/city/code/${resOrderInfo.client_delivery_city_code}`).then(city => {
+                setOrderInfo(prevstate => ({
+                    ...prevstate,
+                    city: {
+                        code: city.code,
+                        name: city.name
+                    }
+                }));
+            })
+        }else{
+            setOrderInfo(prevstate => ({
+                ...prevstate,
+                city: {
+                    code: '',
+                    name: ''
+                }
+            }));
+        }
+
         resOrderInfo.goods.map(item => {
             total_price += item.product_price * item.product_quantity;
             discount_total_price += item.product_price * item.product_quantity - item.product_quantity * item.product_price * item.product_discount / 100;
@@ -258,7 +315,23 @@ const OrderInfo = (props) => {
                     (a, b) => parseInt(a.id) - parseInt(b.id)
                 );
                 setOrderInfo(prevstate => ({
-                    ...resOrderInfo,
+                    ...prevstate,
+                    id: resOrderInfo.id,
+                    uid: resOrderInfo.client_uid,
+                    name: resOrderInfo.client_name.split(' ')[1],
+                    surname: resOrderInfo.client_name.split(' ')[0],
+                    patronymic: resOrderInfo.client_name.split(' ')[2],
+                    finCode: resOrderInfo.client_fin_code,
+                    identifierNumber: resOrderInfo.client_number_passport,
+                    passport_series: resOrderInfo.client_passport_series ? resOrderInfo.client_passport_series : 'AZE',
+                    birthdate: resOrderInfo.client_date_born,
+                    mobile_phone:  resOrderInfo.client_mobil_phone,
+                    other_phone: resOrderInfo.client_mobil_phone2,
+                    address: resOrderInfo.client_delivery_address,
+                    gender: resOrderInfo.client_gender,
+                    email: resOrderInfo.client_mail,
+                    note: resOrderInfo.comment,
+                    status: resOrderInfo.status,
                     goods: products,
                     totalPrice: total_price,
                     discountPrice: discount_total_price
@@ -280,20 +353,42 @@ const OrderInfo = (props) => {
         } else if (type === "male") {
             alldata = {
                 ...alldata,
-                client_gender: 1
+                gender: 1
             }
         } else if (type === "female") {
             alldata = {
                 ...alldata,
-                client_gender: 0
+                gender: 0
             }
-        } else if (type === "refactor") {
+        }else if (type === 'cash') {
+            alldata = {
+                ...alldata,
+                bank_cash: 0,
+                paymentType: 0
+            }
+        } else if (type === "credit") {
+            alldata = {
+                ...alldata,
+                bank_cash: Math.round((orderInfo.discountPrice * 2 / 100) * 100) / 100,
+                paymentType: 1
+            }
+        } else if (type === 'byStore') {
+            alldata = {
+                ...alldata,
+                deliveryType: 0
+            }
+        } else if (type === "byCustomer") {
+            alldata = {
+                ...alldata,
+                deliveryType: 1
+            }
+        }else if (type === "refactor") {
             if (value) {
                 setIsRefactorDisabled(prevState => ({
                     ...prevState,
-                    client_mobil_phone: false,
-                    client_mobil_phone2: false,
-                    client_delivery_address: false,
+                    mobile_phone: false,
+                    other_phone: false,
+                    address: false,
                 }))
             } else {
                 setIsRefactorDisabled(prevState => ({
@@ -340,9 +435,9 @@ const OrderInfo = (props) => {
         if (handleNameSurnameValidation()) {
             getAvailableCustomer({
                 variables: {
-                    name: `${orderInfo.name}`,
-                    serial: orderInfo.client_number_passport ? orderInfo.client_number_passport : null,
-                    finCode: orderInfo.client_fin_code ? orderInfo.client_fin_code : null
+                    name: `${orderInfo.surname} ${orderInfo.name} ${orderInfo.patronymic}`,
+                    serial: orderInfo.identifierNumber ? orderInfo.identifierNumber : null,
+                    finCode: orderInfo.finCode ? orderInfo.finCode : null
                 }
             });
         }
@@ -368,7 +463,7 @@ const OrderInfo = (props) => {
             ...prevState,
             name: false
         })) : setFormValidation(prevState => ({...prevState, name: true}))
-        !orderInfo.client_delivery_address ? setFormValidation(prevState => ({
+        !orderInfo.address ? setFormValidation(prevState => ({
             ...prevState,
             address: false
         })) : setFormValidation(prevState => ({...prevState, address: true}))
@@ -401,27 +496,78 @@ const OrderInfo = (props) => {
         if (enteredAmount.trim().length === 0 || enteredAmountNumber < 1 || enteredAmountNumber > 12) {
             return;
         } else {
-            const updatedItem = [];
             let updatedGoods = [];
+            let total_price=0;
+            let discount_total_price=0;
             orderInfo.goods.map(good => {
                 good.id === id ? updatedGoods.push({
                     ...good,
                     product_quantity: enteredAmountNumber
                 }) : updatedGoods.push(good);
             })
-            updatedItem.push({
-                ...props.info,
-                goods: updatedGoods
+            updatedGoods.map(item => {
+                total_price += item.product_price * item.product_quantity;
+                discount_total_price += item.product_price * item.product_quantity - item.product_quantity * item.product_price * item.product_discount / 100;
             })
-            setOrderInfo(...updatedItem);
+            setOrderInfo(prevState => ({
+                ...prevState,
+                goods: updatedGoods,
+                totalPrice: total_price,
+                discountPrice: discount_total_price
+            }));
         }
     }
 
     const sendWishListOrder = () => {
+        const order_goods = [];
+        orderInfo.goods.forEach(item => {
+            order_goods.push({
+                product_uid: item.product_uid,
+                product_characteristic_uid: item.product_characteristic_uid,
+                product_quantity: item.product_quantity,
+                product_price: item.product_price,
+                product_discount: item.product_discount,
+                product_total: item.product_quantity * item.product_price
+            })
+        })
         if(handleValidation()){
             setIsSending(true);
-            post(`http://bpaws01l:8087/api/order/update/${orderInfo.id}`, orderInfo).then(res => {
+            const postData = {
+                "bank_cash": orderInfo.bank_cash,
+                "client_date_born": orderInfo.birthdate,
+                "client_delivery_address": orderInfo.address,
+                "client_delivery_city_code": orderInfo.city.code,
+                "client_fin_code": orderInfo.finCode,
+                "client_gender": orderInfo.gender,
+                "client_mail": orderInfo.email,
+                "client_mobil_phone": orderInfo.mobile_phone,
+                "client_mobil_phone2": orderInfo.other_phone,
+                "client_name": `${orderInfo.surname} ${orderInfo.name} ${orderInfo.patronymic}`,
+                "client_new_delivery_address": customerRefactoringInfo.address ?
+                    (oldCustomerInfo.address === customerRefactoringInfo.address ? 0 : 1) : 0,
+                "client_new_phone": customerRefactoringInfo.mobile_phone ?
+                    (oldCustomerInfo.mobile_phone === customerRefactoringInfo.mobile_phone ? 0 : 1) : 0,
+                "client_new_phone2": customerRefactoringInfo.other_phone ?
+                    (oldCustomerInfo.other_phone === customerRefactoringInfo.other_phone ? 0 : 1) : 0,
+                "client_number_passport": orderInfo.identifierNumber,
+                "client_passport_series": orderInfo.passport_series,
+                "client_uid": orderInfo.uid,
+                "comment": orderInfo.note,
+                "createdAt": props.info.createdAt,
+                "creationTime": props.info.creationTime,
+                "delivery_date": deliveryDate,
+                "delivery_type": orderInfo.deliveryType,
+                "goods": orderInfo.goods,
+                "id": orderInfo.id,
+                "payment_date": paymentDate,
+                "payment_method": orderInfo.paymentType,
+                "user_uid": "8f859d20-e5f4-11eb-80d7-2c44fd84f8db"
+            }
+
+            console.log(postData);
+            post(`http://bpaws01l:8087/api/order/update/${orderInfo.id}`, postData).then(res => {
                 setIsSending(false);
+                console.log(res);
             }).catch(err => {
                 setIsSending(false);
                 console.log(err)
@@ -473,14 +619,14 @@ const OrderInfo = (props) => {
                                     <th>Qiymət</th>
                                     <th>Endirim</th>
                                     <th>Son qiymət</th>
-                                    {props.info.status === "SAVED" && <th></th>}
+                                    {orderInfo.status === "SAVED" && <th></th>}
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {orderInfo && orderInfo?.goods?.map(item => (
                                     <tr key={item.id}>
                                         <td><b>{item.product_name}</b></td>
-                                        <td>{props.info.status === "SAVED" ?
+                                        <td>{orderInfo.status === "SAVED" ?
                                             <CountUpdate id={item.id} quantity={item.product_quantity}
                                                          onHandleUpdate={handleCountUpdate}/>
                                             : item.product_quantity}</td>
@@ -493,26 +639,28 @@ const OrderInfo = (props) => {
                                         }}/></td>}
                                     </tr>
                                 ))}
-                                {/*{props.info?.orderStateList ?
-                                    <tr>
-                                        <th colSpan="4">
-                                            <div className="text-end">Sifarişin kodu</div>
-                                        </th>
-                                        {props.info?.orderStateList?.map((info, i) => <th
-                                            key={i}>{info.erpResponseMessage.split(' ')[2]}</th>)}
-                                    </tr> : ''
-                                }*/}
+                                {orderInfo?.status === "ORDERED" &&
+                                    props.info?.orderStateList?.map((info, i) => (
+                                        info.erpResponseHeader === "ERROR" ? <tr key={i}>
+                                            <th>
+                                                <div className="text-end">Uğursuz Sifariş</div>
+                                            </th>
+                                            <th colSpan="4">{info.erpResponseMessage}</th>
+                                        </tr> : <tr key={i}>
+                                            <th>
+                                                <div className="text-end">Sifariş</div>
+                                            </th>
+                                            <th colSpan="4">{info.erpResponseMessage}</th>
+                                        </tr>
+                                    ))
+                                }
                                 <tr>
-                                    <th colSpan="5">
-                                        <div className="text-end">Endirimsiz məbləğ</div>
-                                    </th>
-                                    <th>{orderInfo.totalPrice} AZN</th>
+                                    <th><div className="text-end">Endirimsiz məbləğ</div></th>
+                                    <th colSpan={orderInfo?.status === "ORDERED" ? 4 : 5}>{orderInfo.totalPrice.toFixed(2)} AZN</th>
                                 </tr>
                                 <tr>
-                                    <th colSpan="5">
-                                        <div className="text-end">Ödəniləcək məbləğ</div>
-                                    </th>
-                                    <th>{orderInfo.discountPrice} AZN</th>
+                                    <th><div className="text-end">Ödəniləcək məbləğ</div></th>
+                                    <th colSpan={orderInfo?.status === "ORDERED" ? 4 : 5}>{orderInfo.discountPrice.toFixed(2)} AZN</th>
                                 </tr>
                                 </tbody>
                             </table>
@@ -524,39 +672,39 @@ const OrderInfo = (props) => {
                                 <div className="col-md-4 mb-2">
                                     <label>Ad<span className="text-danger">*</span></label>
                                     <input type="text" className="form-control"
-                                           value={orderInfo && orderInfo?.client_name?.split(' ')[1]}
-                                           onChange={e => handleInputChange("client_name", e.target.value)}/>
+                                           value={orderInfo && orderInfo?.name}
+                                           onChange={e => handleInputChange("name", e.target.value)}/>
                                     {!formValidation.name &&
                                     <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                                 <div className="col-md-4 mb-2">
                                     <label>Soyad<span className="text-danger">*</span></label>
                                     <input type="text" className="form-control"
-                                           value={orderInfo && orderInfo?.client_name?.split(' ')[0]}
-                                           onChange={e => handleInputChange("client_name", e.target.value)}/>
+                                           value={orderInfo && orderInfo?.surname}
+                                           onChange={e => handleInputChange("surname", e.target.value)}/>
                                     {!formValidation.surname &&
                                     <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                                 <div className="col-md-4 mb-2">
                                     <label>Ata adı</label>
                                     <input type="text" className="form-control"
-                                           value={orderInfo && orderInfo?.client_name?.split(' ')[2]}
-                                           onChange={e => handleInputChange("client_name", e.target.value)}/>
+                                           value={orderInfo && orderInfo?.patronymic}
+                                           onChange={e => handleInputChange("patronymic", e.target.value)}/>
                                 </div>
                                 <div className="col-md-4">
                                     <label>ŞV-i Fin Kod</label>
                                     <input type="text" className="form-control"
                                            maxLength="7"
-                                           value={orderInfo && orderInfo?.client_fin_code}
-                                           onChange={e => handleInputChange("client_fin_code", e.target.value)}/>
+                                           value={orderInfo && orderInfo?.finCode}
+                                           onChange={e => handleInputChange("finCode", e.target.value)}/>
                                 </div>
                                 <div className="col-md-5">
                                     <label>Şəxsiyyət vəsiqəsi №-i</label>
                                     <div className="row">
                                         <div className="col-md-4 pe-0">
                                             <select className="form-control"
-                                                    value={orderInfo && orderInfo?.client_passport_series ? orderInfo?.client_passport_series : ''}
-                                                    onChange={e => handleInputChange("client_passport_series", e.target.value)}
+                                                    value={orderInfo && orderInfo?.passport_series ? orderInfo?.passport_series : ''}
+                                                    onChange={e => handleInputChange("passport_series", e.target.value)}
                                                     placeholder='ŞV seriyası'>
                                                 <option value="AZE">AZE</option>
                                                 <option value="AA">AA</option>
@@ -565,8 +713,8 @@ const OrderInfo = (props) => {
                                         <div className="col-md-8">
                                             <input type="number" className="form-control"
                                                    maxLength="8"
-                                                   value={orderInfo && orderInfo?.client_number_passport}
-                                                   onChange={e => handleInputChange("client_number_passport", e.target.value)}/>
+                                                   value={orderInfo && orderInfo?.identifierNumber}
+                                                   onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
                                         </div>
                                     </div>
                                 </div>
@@ -603,6 +751,7 @@ const OrderInfo = (props) => {
                                 <div className="col-md-6">
                                     <label htmlFor='birthdate'>Doğum tarixi</label>
                                     <DatePicker
+                                        selected={orderInfo?.client_date_born ? new Date(orderInfo?.client_date_born) : new Date()}
                                         disabled={isRefactorDisabled.birthdate}
                                         dateFormat="dd.MM.yyyy"
                                         className="form-control"
@@ -653,7 +802,7 @@ const OrderInfo = (props) => {
                                                 </button>
                                             </div>
                                         )}
-                                        onChange={(date) => handleInputChange("client_date_born", date)}
+                                        onChange={(date) => handleInputChange("birthdate", date)}
                                     />
                                 </div>
                                 <div className="col-md-6">
@@ -662,12 +811,12 @@ const OrderInfo = (props) => {
                                         isDisabled={isRefactorDisabled.city}
                                         styles={selectStyles}
                                         options={city}
-                                        value={orderInfo && orderInfo?.client_delivery_city_code ? [{
+                                        value={orderInfo && orderInfo?.city ? [{
                                             value: orderInfo?.city?.code,
                                             label: orderInfo?.city?.name
                                         }] : ''}
                                         components={(props) => NoOptionsMessage(props, 'Şəhər tapılmadı.')}
-                                        onChange={value => handleInputChange("client_delivery_city", value)}
+                                        onChange={value => handleInputChange("select_city", value)}
                                         placeholder='Şəhər seçin...'
                                     />
                                     {!formValidation.city &&
@@ -679,8 +828,8 @@ const OrderInfo = (props) => {
                                     <label htmlFor='address'>Ünvan<span className="text-danger">*</span></label>
                                     <textarea className="form-control"
                                               disabled={isRefactorDisabled.address}
-                                              value={orderInfo && orderInfo?.client_delivery_address}
-                                              onChange={e => handleInputChange("client_delivery_address", e.target.value)}
+                                              value={orderInfo && orderInfo?.address}
+                                              onChange={e => handleInputChange("address", e.target.value)}
                                     />
                                     {!formValidation.address &&
                                     <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
@@ -692,8 +841,8 @@ const OrderInfo = (props) => {
                                     <label>Mobil telefon<span className="text-danger">*</span></label>
                                     <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
                                                disabled={isRefactorDisabled.mobile_phone}
-                                               onChange={e => handleInputChange("client_mobil_phone", e.target.value)}
-                                               value={orderInfo && orderInfo?.client_mobil_phone}/>
+                                               onChange={e => handleInputChange("mobile_phone", e.target.value)}
+                                               value={orderInfo && orderInfo?.mobile_phone}/>
                                     {!formValidation.mobile_phone &&
                                     <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
@@ -701,8 +850,8 @@ const OrderInfo = (props) => {
                                     <label>Digər telefon</label>
                                     <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
                                                disabled={isRefactorDisabled.other_phone}
-                                               onChange={e => handleInputChange("client_mobil_phone2", e.target.value)}
-                                               value={orderInfo && orderInfo?.client_mobil_phone2}/>
+                                               onChange={e => handleInputChange("other_phone", e.target.value)}
+                                               value={orderInfo && orderInfo?.other_phone}/>
                                 </div>
                             </div>
                             <div className="row mb-3">
@@ -710,37 +859,37 @@ const OrderInfo = (props) => {
                                     <label>Email</label>
                                     <input className="form-control"
                                            disabled={isRefactorDisabled.email}
-                                           onChange={e => handleInputChange("client_mail", e.target.value)}
-                                           value={orderInfo && orderInfo?.client_mail}/>
+                                           onChange={e => handleInputChange("email", e.target.value)}
+                                           value={orderInfo && orderInfo?.email}/>
                                 </div>
                             </div>
                             <div className="row mb-3">
                                 <div className="col-12">
                                     <div className="d-flex">
-                                    <span className="form-check">
-                                        <input
-                                            disabled={isRefactorDisabled.gender}
-                                            className="form-check-input"
-                                            type="radio"
-                                            name="gender"
-                                            id="male"
-                                            onChange={e => handleInputChange("male", e.target.checked)}
-                                            checked={!!(orderInfo && orderInfo?.client_gender === 1)}
-                                        />
-                                        <label className="form-check-label" htmlFor="male">Kişi</label>
-                                    </span>
+                                        <span className="form-check">
+                                            <input
+                                                disabled={isRefactorDisabled.gender}
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="gender"
+                                                id="male"
+                                                onChange={e => handleInputChange("male", e.target.checked)}
+                                                checked={!!(orderInfo && orderInfo?.gender === 1)}
+                                            />
+                                            <label className="form-check-label" htmlFor="male">Kişi</label>
+                                        </span>
                                         <span className="form-check ms-3">
-                                        <input
-                                            disabled={isRefactorDisabled.gender}
-                                            className="form-check-input"
-                                            type="radio"
-                                            name="gender"
-                                            id="female"
-                                            onChange={e => handleInputChange("female", e.target.checked)}
-                                            checked={!!(orderInfo && orderInfo?.client_gender === 1)}
-                                        />
-                                        <label className="form-check-label" htmlFor="female">Qadın</label>
-                                    </span>
+                                            <input
+                                                disabled={isRefactorDisabled.gender}
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="gender"
+                                                id="female"
+                                                onChange={e => handleInputChange("female", e.target.checked)}
+                                                checked={!!(orderInfo && orderInfo?.gender === 1)}
+                                            />
+                                            <label className="form-check-label" htmlFor="female">Qadın</label>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
