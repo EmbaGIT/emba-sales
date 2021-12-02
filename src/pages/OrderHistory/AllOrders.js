@@ -91,7 +91,13 @@ const AllOrders = () => {
         if(value.trim().length > 3){
             setIsLoading(true);
             post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&client_name.contains=${value}&page=0&size=10`).then(res => {
-                orderList(res, page);
+                orderList(res, 0);
+                setPageState(res);
+            }).catch(err => console.log(err))
+        }else{
+            setIsLoading(true);
+            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&&page=0&size=10`).then(res => {
+                orderList(res, 0);
                 setPageState(res);
             }).catch(err => console.log(err))
         }
@@ -108,19 +114,13 @@ const AllOrders = () => {
     }
 
     const statusFilter = (value, pageNumber) => {
-        console.log(pageNumber);
-        setPage(+page);
         if(value==="all"){
             post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&size=10&page=${pageNumber}`).then(res => {
-                console.log(res);
-                console.log(page);
                 orderList(res, pageNumber);
                 setPageState(res);
             })
         }else{
             post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&status.equals=${value}&size=10&page=${pageNumber}`).then(res => {
-                console.log(res);
-                console.log(page);
                 orderList(res, pageNumber);
                 setPageState(res);
             })
@@ -129,12 +129,12 @@ const AllOrders = () => {
 
     return (
         <div>
-            <div className="mb-2">
-                <div className="row">
-                    <div className="col-md-6 row">
-                        <div className="col-md-6"><h4 className="fm-poppins flex-1">Satıcı sifarişləri</h4></div>
-                        <div className="col-md-6">
-                            <select className="form-control ms-2" onChange={e => onStatusFilter(e.target.value)}>
+            <div className="mb-2 row">
+                <div className="mt-3 row">
+                    <div className="col-md-4">
+                        <h6 className="fm-poppins flex-1">Filter</h6>
+                        <div className="">
+                            <select className="form-control form-select" onChange={e => onStatusFilter(e.target.value)}>
                                 <option value="all">Bütün sifarişlər</option>
                                 <option value="ORDERED">Tamamlanmış</option>
                                 <option value="ORDER_FAILED">Uğursuz Sifariş</option>
@@ -142,14 +142,15 @@ const AllOrders = () => {
                             </select>
                         </div>
                     </div>
-                    <div className="col-md-6 row">
-                        <div className="col-md-6"></div>
-                        <div className="col-md-6">
-                            <input type="text" placeholder="Müştəri adı ilə axtarış" onChange={(e) => handleNameSearch(e.target.value)} className="form-control"/>
+                    <div className="col-md-4">
+                        <h6 className="fm-poppins flex-1">Müştəri adı ilə axtarış</h6>
+                        <div className="">
+                            <input type="text" placeholder="min 3 simvol" onChange={(e) => handleNameSearch(e.target.value)} className="form-control"/>
                         </div>
                     </div>
                 </div>
                 <div className="mt-3">
+                    <div className=""><h4 className="fm-poppins flex-1">Satıcı sifarişləri</h4></div>
                     {orderState.length ?
                         <div>
                             <div className="table-responsive">
@@ -190,25 +191,28 @@ const AllOrders = () => {
                             </div>
                             {cartIsShown && <OrderInfo onClose={hideCartHandler} info={orderInfo}
                                                    onItemDelete={deleteGoodFromOrder}/>}
-                            <ReactPaginate
-                                previousLabel={'Əvvəlki'}
-                                nextLabel={'Növbəti'}
-                                previousClassName={'page-item'}
-                                nextClassName={'page-item'}
-                                previousLinkClassName={'page-link'}
-                                nextLinkClassName={'page-link'}
-                                breakLabel={'...'}
-                                breakClassName={'break-me'}
-                                pageCount={pageState?.totalPages || 0}
-                                marginPagesDisplayed={2}
-                                pageRangeDisplayed={3}
-                                onPageChange={paginate}
-                                containerClassName={'pagination'}
-                                activeClassName={'active'}
-                                pageClassName={'page-item'}
-                                pageLinkClassName={'page-link'}
-                                initialPage={page}
-                            />
+                            {console.log(page)}
+                            <div className=" d-flex justify-content-end">
+                                <ReactPaginate
+                                    previousLabel={'Əvvəlki'}
+                                    nextLabel={'Növbəti'}
+                                    previousClassName={'page-item'}
+                                    nextClassName={'page-item'}
+                                    previousLinkClassName={'page-link'}
+                                    nextLinkClassName={'page-link'}
+                                    breakLabel={'...'}
+                                    breakClassName={'break-me'}
+                                    pageCount={pageState?.totalPages || 0}
+                                    marginPagesDisplayed={2}
+                                    pageRangeDisplayed={3}
+                                    onPageChange={paginate}
+                                    containerClassName={'pagination'}
+                                    activeClassName={'active'}
+                                    pageClassName={'page-item'}
+                                    pageLinkClassName={'page-link'}
+                                    forcePage={page}
+                                />
+                            </div>
                         </div>
                         : <p className="text-center">Heç bir məlumat tapılmadı.</p>}
                 </div>

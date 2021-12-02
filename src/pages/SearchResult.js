@@ -107,7 +107,7 @@ const SearchProductList = () => {
                     </div>
                 ))}
             </div>
-            <div className="mt-3">
+            <div className="mt-3 d-flex justify-content-end">
                 {!!productList.length &&
                 <ReactPaginate
                     previousLabel={'Əvvəlki'}

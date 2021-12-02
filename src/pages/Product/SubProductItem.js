@@ -77,7 +77,7 @@ const SubProductItem = (props) => {
                 </div>
                 <div className="p-2">
                     {props.characteristics.length ?
-                        <select className="form-control" onChange={e => handleInputChange(e.target.value)}>
+                        <select className="form-control form-select" onChange={e => handleInputChange(e.target.value)}>
                             {props.characteristics.map(characteristic  => (
                                 <option key={characteristic.id} value={`${characteristic.uid},${characteristic.code}, ${characteristic.price ? characteristic.price : 0}`}>{characteristic.name} - ({characteristic.code}) - {characteristic.price}AZN</option>
                             ))}
@@ -87,7 +87,7 @@ const SubProductItem = (props) => {
                 </div>
                 <div className="p-2">
                     {props.stock.length ?
-                        <select className="form-control">
+                        <select className="form-control form-select">
                             {props.stock.map(info  => (<option value="1">{info.warehouse} - {info.quantity}</option>))}
                         </select>
                         : <div>Anbar məlumatı yoxdur</div>

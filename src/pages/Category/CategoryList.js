@@ -20,7 +20,7 @@ const Category = () => {
     useEffect(() => {
         setProductList([]);
         setIsFetchingData(true);
-        get(`parents/byAttributeId/${category_id}?page=${page}&size=16`).then((res) => {
+        get(`parents/byAttributeId/${category_id}?name_contains=page=${page}&size=16`).then((res) => {
             /*if(res.content.length){*/
             setPageInfo(res);
             const productListArr = [];
@@ -135,7 +135,7 @@ const Category = () => {
                     </div>
                 ))}
             </div>
-            <div className="mt-3">
+            <div className="mt-3 d-flex justify-content-end">
                 {!!productList.length &&
                     <ReactPaginate
                         previousLabel={'Əvvəlki'}

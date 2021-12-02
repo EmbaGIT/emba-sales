@@ -268,7 +268,7 @@ const CustomerInfo = () => {
                 </div>
                 {available_customer_loading && <p>Məlumat yüklənir...</p>}
                 {customerSearch && (available_customer?.search.length ?
-                <select className="form-control mb-3" onChange={e => handleFullInfo(e.target.value)}>
+                <select className="form-control form-select mb-3" onChange={e => handleFullInfo(e.target.value)}>
                     <option selected={true} disabled>Mümkün Siyahı</option>
                     {available_customer.search.map(customer => (
                         <option key={customer.uid} value={customer.uid}>{customer.name}</option>

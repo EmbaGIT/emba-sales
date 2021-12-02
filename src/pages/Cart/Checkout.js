@@ -707,7 +707,7 @@ const Checkout = () => {
                                 <label>Şəxsiyyət vəsiqəsi №-i</label>
                                 <div className="row">
                                     <div className="col-md-4 pe-0">
-                                        <select className="form-control"
+                                        <select className="form-control form-select"
                                                 value={customerInfo && customerInfo?.passport_series ? customerInfo?.passport_series : ''}
                                                 onChange={e => handleInputChange("passport_series", e.target.value)}
                                                 placeholder='ŞV seriyası'>
@@ -729,7 +729,7 @@ const Checkout = () => {
                         </div>
                         {available_customer_loading && <p>Məlumat yüklənir...</p>}
                         {customerSearch && (availableCustomer?.length ?
-                            <select className="form-control mb-3"
+                            <select className="form-control form-select mb-3"
                                     defaultValue={'DEFAULT'}
                                     onChange={e => handleFullInfo(e.target.value)}>
                                 <option value='DEFAULT' disabled>Müştəri seçin</option>
