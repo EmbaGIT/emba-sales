@@ -11,6 +11,7 @@ import InputMask from "react-input-mask";
 import {gql, useLazyQuery} from "@apollo/client";
 import {get, post} from "../../api/Api";
 import AuthContext from "../../store/AuthContext";
+import {toast} from "react-toastify";
 
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
@@ -75,8 +76,6 @@ const OrderInfo = (props) => {
         isDisabled: true
     });
     const [customerSearch, setCustomerSearch] = useState(false);
-    const [paymentDate, setPaymentDate] = useState();
-    const [deliveryDate, setDeliveryDate] = useState();
     const [availableCustomer, setAvailableCustomer] = useState([]);
     const [customerRefactoringInfo, setCustomerRefactoringInfo] = useState({
         address: '',
@@ -141,8 +140,6 @@ const OrderInfo = (props) => {
             console.log(err)
         }
     });
-
-    console.log(props.info);
 
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
         context: {headers: {authorization: `Bearer ${authCtx.token}`}},
@@ -280,6 +277,7 @@ const OrderInfo = (props) => {
     }, [props.info])
 
     const handleOrderInfo = (resOrderInfo) => {
+        console.log(resOrderInfo);
         const products = [];
         let total_price=0;
         let discount_total_price=0;
@@ -332,6 +330,7 @@ const OrderInfo = (props) => {
                     email: resOrderInfo.client_mail,
                     note: resOrderInfo.comment,
                     status: resOrderInfo.status,
+                    payment_date: resOrderInfo.payment_date,
                     goods: products,
                     totalPrice: total_price,
                     discountPrice: discount_total_price
@@ -475,11 +474,11 @@ const OrderInfo = (props) => {
             ...prevState,
             other_phone: false
         })) : setFormValidation(prevState => ({...prevState, other_phone: true}))
-        !deliveryDate ? setFormValidation(prevState => ({
+        !orderInfo.delivery_date ? setFormValidation(prevState => ({
             ...prevState,
             delivery_date: false
         })) : setFormValidation(prevState => ({...prevState, delivery_date: true}))
-        !paymentDate ? setFormValidation(prevState => ({
+        !orderInfo.payment_date ? setFormValidation(prevState => ({
             ...prevState,
             payment_date: false
         })) : setFormValidation(prevState => ({...prevState, payment_date: true}))
@@ -488,7 +487,7 @@ const OrderInfo = (props) => {
             city: false
         })) : setFormValidation(prevState => ({...prevState, city: true}))
 
-        return !(!orderInfo.name || !orderInfo.city || !orderInfo.address || !orderInfo.mobile_phone || !deliveryDate || !paymentDate);
+        return !(!orderInfo.name || !orderInfo.city || !orderInfo.address || !orderInfo.mobile_phone || !orderInfo.delivery_date || !orderInfo.payment_date);
     }
 
     const handleCountUpdate = (id, enteredAmount) => {
@@ -518,18 +517,21 @@ const OrderInfo = (props) => {
         }
     }
 
+    const MessageComponent = ({text}) => (
+        <span style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center'}}>
+            <span
+                style={{
+                    fontWeight: 500,
+                    fontSize: 16,
+                    lineHeight: '24px',
+                    color: '#FFEDED',
+                }}>
+              {text}
+            </span>
+        </span>
+    );
+
     const sendWishListOrder = () => {
-        const order_goods = [];
-        orderInfo.goods.forEach(item => {
-            order_goods.push({
-                product_uid: item.product_uid,
-                product_characteristic_uid: item.product_characteristic_uid,
-                product_quantity: item.product_quantity,
-                product_price: item.product_price,
-                product_discount: item.product_discount,
-                product_total: item.product_quantity * item.product_price
-            })
-        })
         if(handleValidation()){
             setIsSending(true);
             const postData = {
@@ -555,22 +557,25 @@ const OrderInfo = (props) => {
                 "comment": orderInfo.note,
                 "createdAt": props.info.createdAt,
                 "creationTime": props.info.creationTime,
-                "delivery_date": deliveryDate,
+                "delivery_date": orderInfo.delivery_date,
                 "delivery_type": orderInfo.deliveryType,
                 "goods": orderInfo.goods,
                 "id": orderInfo.id,
-                "payment_date": paymentDate,
+                "payment_date": orderInfo.payment_date,
                 "payment_method": orderInfo.paymentType,
                 "user_uid": "8f859d20-e5f4-11eb-80d7-2c44fd84f8db"
             }
-
-            console.log(postData);
             post(`http://bpaws01l:8087/api/order/update/${orderInfo.id}`, postData).then(res => {
                 setIsSending(false);
-                console.log(res);
+                props.onClose();
+                toast.success(<MessageComponent text='Sifariş göndərildi!'/>, {
+                    position: toast.POSITION.TOP_LEFT,
+                    toastId: 'success-toast-message',
+                    autoClose: 1500,
+                    closeOnClick: true,
+                });
             }).catch(err => {
                 setIsSending(false);
-                console.log(err)
             });
         }else{
 
@@ -751,9 +756,9 @@ const OrderInfo = (props) => {
                                 <div className="col-md-6">
                                     <label htmlFor='birthdate'>Doğum tarixi</label>
                                     <DatePicker
-                                        selected={orderInfo?.client_date_born ? new Date(orderInfo?.client_date_born) : new Date()}
+                                        selected={orderInfo?.birthdate ? new Date(orderInfo?.birthdate) : ""}
                                         disabled={isRefactorDisabled.birthdate}
-                                        dateFormat="dd.MM.yyyy"
+                                        dateFormat="yyyy-MM-dd"
                                         className="form-control"
                                         renderCustomHeader={({
                                                                  date,
@@ -874,7 +879,7 @@ const OrderInfo = (props) => {
                                                 name="gender"
                                                 id="male"
                                                 onChange={e => handleInputChange("male", e.target.checked)}
-                                                checked={!!(orderInfo && orderInfo?.gender === 1)}
+                                                checked={!!(orderInfo && orderInfo?.gender === 0)}
                                             />
                                             <label className="form-check-label" htmlFor="male">Kişi</label>
                                         </span>
@@ -898,22 +903,24 @@ const OrderInfo = (props) => {
                                     <label>Ödəniş tarixi<span className="text-danger">*</span></label>
                                     <DatePicker
                                         className="form-control"
-                                        selected={paymentDate}
-                                        onChange={(date) => setPaymentDate(date)}
+                                        dateFormat="yyyy-MM-dd"
+                                        selected={orderInfo?.payment_date ? new Date(orderInfo?.payment_date) : ''}
+                                        onChange={(date) => handleInputChange("payment_date", date)}
                                         minDate={new Date()}
                                     />
-                                    {!formValidation.delivery_date &&
+                                    {!formValidation.payment_date &&
                                     <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                                 <div className="col-md-6">
                                     <label>Çatdırılma tarixi<span className="text-danger">*</span></label>
                                     <DatePicker
                                         className="form-control"
-                                        selected={deliveryDate}
-                                        onChange={(date) => setDeliveryDate(date)}
+                                        dateFormat="yyyy-MM-dd"
+                                        selected={orderInfo?.delivery_date ? new Date(orderInfo?.delivery_date) : ''}
+                                        onChange={(date) => handleInputChange("delivery_date", date)}
                                         minDate={new Date()}
                                     />
-                                    {!formValidation.payment_date &&
+                                    {!formValidation.delivery_date &&
                                     <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                             </div>

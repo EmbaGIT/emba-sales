@@ -8,9 +8,9 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const AllOrders = () => {
-    const query = useQuery();
-    const currentPage = query.get("page") || 0;
-    const [page, setPage] = useState(+currentPage);
+    // const query = useQuery();
+    // const currentPage = query.get("page") || 0;
+    const [page, setPage] = useState(0);
     const authCtx = useContext(AuthContext);
     const [rows, setRows] = useState(1);
     const [statusValue, setStatusValue] = useState('all');
@@ -18,6 +18,7 @@ const AllOrders = () => {
     const [pageState, setPageState] = useState({});
     const [orderInfo, setOrderInfo] = useState({});
     const [cartIsShown, setCartIsShown] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const orderList = (list, page) => {
         const orders=[];
@@ -86,6 +87,16 @@ const AllOrders = () => {
         })
     }
 
+    const handleNameSearch = (value) => {
+        if(value.trim().length > 3){
+            setIsLoading(true);
+            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&client_name.contains=${value}&page=0&size=10`).then(res => {
+                orderList(res, page);
+                setPageState(res);
+            }).catch(err => console.log(err))
+        }
+    }
+
     const paginate = (n) => {
         setPage(+n.selected);
         statusFilter(statusValue, n.selected);
@@ -96,16 +107,21 @@ const AllOrders = () => {
         statusFilter(value, 0);
     }
 
-    const statusFilter = (value, currentPage) => {
-        console.log(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&status.equals=${value}&size=10&page=${currentPage}`);
+    const statusFilter = (value, pageNumber) => {
+        console.log(pageNumber);
+        setPage(+page);
         if(value==="all"){
-            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&size=10&page=${currentPage}`).then(res => {
-                orderList(res, currentPage);
+            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&size=10&page=${pageNumber}`).then(res => {
+                console.log(res);
+                console.log(page);
+                orderList(res, pageNumber);
                 setPageState(res);
             })
         }else{
-            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&status.equals=${value}&size=10&page=${currentPage}`).then(res => {
-                orderList(res, currentPage);
+            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&status.equals=${value}&size=10&page=${pageNumber}`).then(res => {
+                console.log(res);
+                console.log(page);
+                orderList(res, pageNumber);
                 setPageState(res);
             })
         }
@@ -124,6 +140,12 @@ const AllOrders = () => {
                                 <option value="ORDER_FAILED">Uğursuz Sifariş</option>
                                 <option value="SAVED">Yadda saxlanılan</option>
                             </select>
+                        </div>
+                    </div>
+                    <div className="col-md-6 row">
+                        <div className="col-md-6"></div>
+                        <div className="col-md-6">
+                            <input type="text" placeholder="Müştəri adı ilə axtarış" onChange={(e) => handleNameSearch(e.target.value)} className="form-control"/>
                         </div>
                     </div>
                 </div>

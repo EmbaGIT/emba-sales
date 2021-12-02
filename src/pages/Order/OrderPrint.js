@@ -37,7 +37,7 @@ const OrderPrint = () => {
     }, [order_id]);
 
     return (
-        <table className="table table-striped table-hover table-bordered">
+        <table className="table table-striped table-hover table-bordered" id="section-to-print">
             <thead>
             <tr>
                 <th>Modelin adı</th>
@@ -58,24 +58,24 @@ const OrderPrint = () => {
                     </tr>
             ))}
             <tr>
-                <th colSpan="4"><div className="text-end">Sifarişçinin adı:</div></th>
-                <th>{orderInfo && orderInfo.client_name}</th>
+                <th colSpan="3"><div className="text-end">Sifarişçinin adı:</div></th>
+                <th colSpan="2">{orderInfo && orderInfo.client_name}</th>
             </tr>
             <tr>
-                <th colSpan="4"><div className="text-end">Telefon:</div></th>
-                <th>{orderInfo && orderInfo.client_mobil_phone}</th>
+                <th colSpan="3"><div className="text-end">Telefon:</div></th>
+                <th colSpan="2">{orderInfo && orderInfo.client_mobil_phone}</th>
             </tr>
             <tr>
-                <th colSpan="4"><div className="text-end">Ünvan</div></th>
-                <th>{orderInfo && orderInfo.client_delivery_address}</th>
+                <th colSpan="3"><div className="text-end">Ünvan</div></th>
+                <th colSpan="3">{orderInfo && orderInfo.client_delivery_address}</th>
             </tr>
             <tr>
-                <th colSpan="4"><div className="text-end">Sifarişin kodu</div></th>
-                {orderInfo?.orderStateList?.map( (info, i) =><th key={i}>{info.erpResponseMessage.split(' ')[2]}</th>)}
+                <th colSpan="3"><div className="text-end">Sifarişin kodu</div></th>
+                {orderInfo?.orderStateList?.map( (info, i) =><th colSpan="2" key={i}>{info.erpResponseMessage.split(' ')[2]}</th>)}
             </tr>
             <tr>
-                <th colSpan="4"><div className="text-end">Endirimsiz məbləğ</div></th>
-                <th>{totalPrice} AZN</th>
+                <th colSpan="3"><div className="text-end">Endirimsiz məbləğ</div></th>
+                <th colSpan="2">{totalPrice} AZN</th>
             </tr>
             <tr>
                 <th colSpan="4"><div className="text-end">Ödəniləcək məbləğ</div></th>

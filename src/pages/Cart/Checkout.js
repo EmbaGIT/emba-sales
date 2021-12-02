@@ -503,7 +503,6 @@ const Checkout = () => {
             goods: order_goods,
             bank_cash: bankCommission
         }
-        console.log(order_data);
         if (status === "ORDERED" && handleValidation()) {
             setIsSending(true);
             post(`http://bpaws01l:8087/api/order/send`, order_data).then(res => {
@@ -534,6 +533,7 @@ const Checkout = () => {
             setIsAddingWishlist(true);
             post(`http://bpaws01l:8087/api/order/wishlist`, order_data).then(res => {
                 setIsAddingWishlist(false);
+                history.push(`/allOrder`);
                 toast.success(<MessageComponent text='Sifariş yadda saxlanıldı!'/>, {
                     position: toast.POSITION.TOP_LEFT,
                     toastId: 'success-toast-message',

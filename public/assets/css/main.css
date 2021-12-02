@@ -92,10 +92,12 @@
 }
 
 .pr-image img {
-    object-fit: cover;
     object-position: center;
     transition: .3s;
     width: 100%;
+    max-width: 450px;
+    max-height: 300px;
+    object-fit: contain;
 }
 
 .image-gallery-left-nav .image-gallery-svg,
@@ -558,6 +560,22 @@ input[type=number] {
 .Modal_modal__1fEdk{
     max-height: 600px;
     overflow-y: scroll;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #section-to-print, #section-to-print * {
+        visibility: visible;
+    }
+
+    #section-to-print {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
 }
 
 @media (max-width: 1440px) {

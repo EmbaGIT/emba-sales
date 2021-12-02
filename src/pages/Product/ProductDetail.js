@@ -65,7 +65,7 @@ const Product = () => {
         const subProductNotIncludedArr = [];
         get(`parents/${parent_id}`).then(productInfo => {
             setProductInfo(productInfo);
-            get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1&attributeId.equals=${productColor}`).then((res) => {
+            get(`products/search?parentId.equals=${parent_id}&size=100&categoryId.equals=1&attributeId.equals=${productColor}`).then((res) => {
                 res.content.map(async item => {
                     setPrice += item.price;
                     const items = [];
@@ -95,7 +95,7 @@ const Product = () => {
                 })
                 setSetPrice(setPrice);
             });
-            get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=4&attributeId.equals=${productColor}`).then((res) => {
+            get(`products/search?parentId.equals=${parent_id}&size=100&categoryId.equals=4&attributeId.equals=${productColor}`).then((res) => {
                  res.content.map(async item => {
                     const items = [];
                     const stock = [];
@@ -123,7 +123,7 @@ const Product = () => {
                         });
                 })
             });
-            get(`products/search?parentId.equals=${parent_id}&size=50&categoryId.equals=1&attributeId.equals=${productColor}`).then(res => {
+            get(`products/search?parentId.equals=${parent_id}&size=100&categoryId.equals=1&attributeId.equals=${productColor}`).then(res => {
                 const images = [];
                 if(productColor){
                     get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&color=${productColor}`).then(files => {
