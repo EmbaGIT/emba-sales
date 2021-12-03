@@ -20,7 +20,7 @@ const Category = () => {
     useEffect(() => {
         setProductList([]);
         setIsFetchingData(true);
-        get(`parents/byAttributeId/${category_id}?name_contains=page=${page}&size=16`).then((res) => {
+        get(`parents/byAttributeId/${category_id}?page=${page}&size=16`).then((res) => {
             /*if(res.content.length){*/
             setPageInfo(res);
             const productListArr = [];

@@ -6,6 +6,8 @@ import ReactPaginate from "react-paginate";
 import OrderInfo from "./OrderInfo";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import DatePicker from "react-datepicker";
+import {formattedDate} from "../../helpers/formattedDate";
 
 const AllOrders = () => {
     // const query = useQuery();
@@ -19,6 +21,10 @@ const AllOrders = () => {
     const [orderInfo, setOrderInfo] = useState({});
     const [cartIsShown, setCartIsShown] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [searchByDate, setSearchByDate] = useState({
+        start_date: '',
+        end_date: ''
+    });
 
     const orderList = (list, page) => {
         const orders=[];
@@ -87,6 +93,24 @@ const AllOrders = () => {
         })
     }
 
+    const handleInputChange = (type, value) => {
+        if(type === "start_date" || type==="end_date"){
+            setSearchByDate(prevState => ({
+                ...prevState,
+                [type]: value
+            }))
+        }
+    }
+
+    const onSearchDate = () => {
+        if(searchByDate.start_date || searchByDate.end_date){
+            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&creationDate.greaterThan=${formattedDate(searchByDate.start_date)}&creationDate.lessThan=${formattedDate(searchByDate.end_date)}&size=10&page=${page}&size=10`).then(res =>{
+                orderList(res, 0);
+                setPageState(res);
+            }).catch(err => console.log(err))
+        }
+    }
+
     const handleNameSearch = (value) => {
         if(value.trim().length > 3){
             setIsLoading(true);
@@ -146,6 +170,28 @@ const AllOrders = () => {
                         <h6 className="fm-poppins flex-1">Müştəri adı ilə axtarış</h6>
                         <div className="">
                             <input type="text" placeholder="min 3 simvol" onChange={(e) => handleNameSearch(e.target.value)} className="form-control"/>
+                        </div>
+                    </div>
+                    <div className="col-md-4">
+                        <h6 className="fm-poppins flex-1">Tarix aralığı üzrə axtarış</h6>
+                        <div className="row">
+                            <div className="col-md-5">
+                                <DatePicker
+                                    className="form-control"
+                                    dateFormat="yyyy-MM-dd"
+                                    selected={searchByDate?.start_date ? new Date(searchByDate?.start_date) : ''}
+                                    onChange={(date) => handleInputChange("start_date", date)}
+                                />
+                            </div>
+                            <div className="col-md-5">
+                                <DatePicker
+                                    className="form-control"
+                                    dateFormat="yyyy-MM-dd"
+                                    selected={searchByDate?.end_date ? new Date(searchByDate?.end_date) : ''}
+                                    onChange={(date) => handleInputChange("end_date", date)}
+                                />
+                            </div>
+                            <div className="col-md-2"><button className="btn btn-success btn-xs" onClick={onSearchDate}>Axtar</button></div>
                         </div>
                     </div>
                 </div>
