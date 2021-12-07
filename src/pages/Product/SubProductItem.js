@@ -1,6 +1,6 @@
 import {useContext, useEffect, useRef, useState} from 'react';
 import noImage from "../../assets/images/no-image.png";
-import CountInput from "../../UI/countInput";
+import CountInput from "../../UI/CountInput";
 import CartContext from "../../store/CartContext";
 import LightGallery from 'lightgallery/react';
 import 'lightgallery/css/lightgallery.css';

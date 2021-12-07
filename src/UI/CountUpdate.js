@@ -1,4 +1,4 @@
-import CountInput from "./countInput";
+import CountInput from "./CountInput";
 import {useRef} from "react";
 
 const CountUpdate = (props) => {

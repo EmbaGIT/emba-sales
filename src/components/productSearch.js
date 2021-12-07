@@ -48,9 +48,11 @@ const ProductSearch = () => {
                         </li>
                     ))}
                 </ul>
-                <div className="result-text">
-                    <Link to={`/search?param=${searchParam}`} className="text-light">Bütün nəticələr ({searchResult.totalElements})</Link>
-                </div>
+                <Link to={`/search?param=${searchParam}`} className="text-light">
+                    <div className="result-text">
+                        Bütün nəticələr ({searchResult.totalElements})
+                    </div>
+                </Link>
             </div>
         </div>
     )

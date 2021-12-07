@@ -116,12 +116,14 @@ const AllOrders = () => {
             setIsLoading(true);
             post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&client_name.contains=${value}&page=0&size=10`).then(res => {
                 orderList(res, 0);
+                setPage(0);
                 setPageState(res);
             }).catch(err => console.log(err))
         }else{
             setIsLoading(true);
             post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&&page=0&size=10`).then(res => {
                 orderList(res, 0);
+                setPage(0);
                 setPageState(res);
             }).catch(err => console.log(err))
         }
@@ -140,13 +142,15 @@ const AllOrders = () => {
     const statusFilter = (value, pageNumber) => {
         if(value==="all"){
             post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&size=10&page=${pageNumber}`).then(res => {
-                orderList(res, pageNumber);
                 setPageState(res);
+                setPage(pageNumber);
+                orderList(res, pageNumber);
             })
         }else{
             post(`http://bpaws01l:8087/api/order/search?user_uid.equals=8f859d20-e5f4-11eb-80d7-2c44fd84f8db&status.equals=${value}&size=10&page=${pageNumber}`).then(res => {
-                orderList(res, pageNumber);
                 setPageState(res);
+                setPage(pageNumber);
+                orderList(res, pageNumber);
             })
         }
     }
@@ -155,7 +159,7 @@ const AllOrders = () => {
         <div>
             <div className="mb-2 row">
                 <div className="mt-3 row">
-                    <div className="col-md-4">
+                    <div className="col-md-3">
                         <h6 className="fm-poppins flex-1">Filter</h6>
                         <div className="">
                             <select className="form-control form-select" onChange={e => onStatusFilter(e.target.value)}>
@@ -172,7 +176,7 @@ const AllOrders = () => {
                             <input type="text" placeholder="min 3 simvol" onChange={(e) => handleNameSearch(e.target.value)} className="form-control"/>
                         </div>
                     </div>
-                    <div className="col-md-4">
+                    <div className="col-md-5">
                         <h6 className="fm-poppins flex-1">Tarix aralığı üzrə axtarış</h6>
                         <div className="row">
                             <div className="col-md-5">
@@ -237,7 +241,7 @@ const AllOrders = () => {
                             </div>
                             {cartIsShown && <OrderInfo onClose={hideCartHandler} info={orderInfo}
                                                    onItemDelete={deleteGoodFromOrder}/>}
-                            {console.log(page)}
+                            {console.log("page", page)}
                             <div className=" d-flex justify-content-end">
                                 <ReactPaginate
                                     previousLabel={'Əvvəlki'}

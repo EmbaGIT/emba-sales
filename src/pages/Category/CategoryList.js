@@ -21,7 +21,6 @@ const Category = () => {
         setProductList([]);
         setIsFetchingData(true);
         get(`parents/byAttributeId/${category_id}?page=${page}&size=16`).then((res) => {
-            /*if(res.content.length){*/
             setPageInfo(res);
             const productListArr = [];
             res.content.forEach(product => {
@@ -107,14 +106,6 @@ const Category = () => {
                     <div className="grid-item" key={index}>
                         <Link to={product.colors.length ? `/product/${product.id}?color=${product.colors[0].id}` : `/product/${product.id}`} className="pr-wrapper product-add">
                             <div className="pr-image">
-                                {/*<div className="product-button">
-                                    <div className="add-to-cart btn-cart">
-                                        <i className="fas fa-cart-arrow-down text-body"/>
-                                    </div>
-                                    <div className="add-wishlist">
-                                        <i className="fas fa-heart text-body"/>
-                                    </div>
-                                </div>*/}
                                 {product.file.length ? product.file.map((file, index) => (
                                     <img src={file.lowQualityImageUrl} alt="" key={index}/>
                                 )) : <img src={noImage} alt=""/>}

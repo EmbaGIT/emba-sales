@@ -1,6 +1,6 @@
 import {useRef, useContext} from 'react';
 import noImage from "../../assets/images/no-image.png";
-import CountInput from "../../UI/countInput";
+import CountInput from "../../UI/CountInput";
 import CartContext from "../../store/CartContext";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
