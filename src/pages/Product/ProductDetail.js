@@ -12,7 +12,9 @@ import AuthContext from "../../store/AuthContext";
 
 const Product = () => {
     const params = useParams();
-    const parent_id = params.id;
+    const brand = params.brand;
+    const category_id = params.category_id;
+    const parent_id = params.parent_id;
     let query = useQuery();
     const authCtx=useContext(AuthContext);
     const currentColor = query.get("color") || '';
@@ -48,7 +50,10 @@ const Product = () => {
     }
 
     function getProductFiles(id) {
-        return gett(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${id}/banner`);
+        if(currentColor){
+            return get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&color=${currentColor}&category=${category_id}&bucket=emba-store-images&parent=${parent_id}&product=${id}&isBanner=true`)
+        }
+        return get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&category=${category_id}&bucket=emba-store-images&parent=${parent_id}&product=${id}&isBanner=true`);
     }
 
     function getCharacteristics(id) {
@@ -60,118 +65,46 @@ const Product = () => {
         setProductColor(currentColor);
         setSubProductsIsIncluded([]);
         setSubProductsNotIncluded([]);
+        const images = [];
         let setPrice = 0;
         const subProductIsIncludedArr = [];
         const subProductNotIncludedArr = [];
-        get(`parents/${parent_id}`).then(productInfo => {
-            setProductInfo(productInfo);
-            get(`products/search?parentId.equals=${parent_id}&size=100&categoryId.equals=1&attributeId.equals=${productColor}`).then((res) => {
-                res.content.map(async item => {
-                    setPrice += item.price;
-                    const items = [];
-                    const stock = [];
-                    const files = [];
-                    const characteristic = [];
-                    await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
-                        .then(function (results) {
-                            items.push(item);
-                            stock.push(...results[0].data[0].stock);
-                            files.push(...results[1].data);
-                            characteristic.push(...results[2].data.characteristics)
-                            subProductIsIncludedArr.push({
-                                id: item.id,
-                                items,
-                                stock,
-                                files,
-                                characteristic
+
+        get(`/v2/parents/colors/category/${category_id}/parent/${parent_id}?brand=${brand}`).then(colors => {
+            setProductInfo(prevstate => ({
+                ...prevstate,
+                colors
+            }));
+            if(colors.length){
+                get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
+                    products.map(async item => {
+                        setPrice += item.price;
+                        const items = [];
+                        const stock = [];
+                        const files = [];
+                        const characteristic = [];
+                        await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
+                            .then(function (results) {
+                                items.push(item);
+                                stock.push(...results[0].data[0].stock);
+                                files.push(...results[1]);
+                                characteristic.push(...results[2].data.characteristics)
+                                subProductIsIncludedArr.push({
+                                    id: item.id,
+                                    items,
+                                    stock,
+                                    files,
+                                    characteristic
+                                });
+                                subProductIsIncludedArr.sort(
+                                    (a, b) => parseInt(a.id) - parseInt(b.id)
+                                );
+                                setSubProductsIsIncluded(prevState => ([
+                                    ...subProductIsIncludedArr
+                                ]));
                             });
-                            subProductIsIncludedArr.sort(
-                                (a, b) => parseInt(a.id) - parseInt(b.id)
-                            );
-                            setSubProductsIsIncluded(prevState => ([
-                                ...subProductIsIncludedArr
-                            ]));
-                        });
-                })
-                setSetPrice(setPrice);
-            });
-            get(`products/search?parentId.equals=${parent_id}&size=100&categoryId.equals=4&attributeId.equals=${productColor}`).then((res) => {
-                 res.content.map(async item => {
-                    const items = [];
-                    const stock = [];
-                    const files = [];
-                    const characteristic = [];
-                    await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
-                        .then(function (results) {
-                            items.push(item);
-                            stock.push(...results[0].data[0].stock);
-                            files.push(...results[1].data);
-                            characteristic.push(...results[2].data.characteristics);
-                            subProductNotIncludedArr.push({
-                                id: item.id,
-                                items,
-                                stock,
-                                files,
-                                characteristic
-                            });
-                            subProductNotIncludedArr.sort(
-                                (a, b) => parseInt(a.id) - parseInt(b.id)
-                            );
-                            setSubProductsNotIncluded(prevState => ([
-                                ...subProductNotIncludedArr
-                            ]));
-                        });
-                })
-            });
-            get(`products/search?parentId.equals=${parent_id}&size=100&categoryId.equals=1&attributeId.equals=${productColor}`).then(res => {
-                const images = [];
-                if(productColor){
-                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&color=${productColor}`).then(files => {
-                        files.map(file => (
-                            images.push({
-                                original: file.originalImageUrl,
-                                thumbnail: file.lowQualityImageUrl,
-                            })
-                        ))
-                    });
-                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}/banner&color=${productColor}`).then(files => {
-                        files.map(file => (
-                            images.push({
-                                original: file.originalImageUrl,
-                                thumbnail: file.lowQualityImageUrl,
-                            })
-                        ))
-                    });
-                    res.content.map(item => (
-                        get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${item.id}/banner`).then(files => {
-                            files.map(file => (
-                                images.push({
-                                    original: file.originalImageUrl,
-                                    thumbnail: file.lowQualityImageUrl,
-                                })
-                            ))
-                        })
-                    ))
-                }else{
-                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}`).then(files => {
-                        files.map(file => (
-                            images.push({
-                                original: file.originalImageUrl,
-                                thumbnail: file.lowQualityImageUrl,
-                            })
-                        ))
-                    });
-                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}/banner`).then(files => {
-                        files.map(file => (
-                            images.push({
-                                original: file.originalImageUrl,
-                                thumbnail: file.lowQualityImageUrl,
-                            })
-                        ))
-                    });
-                }
-                res.content.map(item => (
-                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${parent_id}&product=${item.id}`).then(files => {
+                    })
+                    get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&color=${currentColor}&parent=${parent_id}`).then(files => {
                         files.map(file => (
                             images.push({
                                 original: file.originalImageUrl,
@@ -179,32 +112,132 @@ const Product = () => {
                             })
                         ))
                     })
-                ))
+                    setSetPrice(setPrice);
+                })
+                get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
+                    products.map(async item => {
+                        const items = [];
+                        const stock = [];
+                        const files = [];
+                        const characteristic = [];
+                        await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
+                            .then(function (results) {
+                                items.push(item);
+                                stock.push(...results[0].data[0].stock);
+                                files.push(...results[1]);
+                                characteristic.push(...results[2].data.characteristics);
+                                subProductNotIncludedArr.push({
+                                    id: item.id,
+                                    items,
+                                    stock,
+                                    files,
+                                    characteristic
+                                });
+                                subProductNotIncludedArr.sort(
+                                    (a, b) => parseInt(a.id) - parseInt(b.id)
+                                );
+                                setSubProductsNotIncluded(prevState => ([
+                                    ...subProductNotIncludedArr
+                                ]));
+                            });
+                    })
+                })
                 setProductImages(images);
                 setIsFetchingData(false);
-            })
-        });
+            }else{
+                get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
+                    products.map(async item => {
+                        setPrice += item.price;
+                        const items = [];
+                        const stock = [];
+                        const files = [];
+                        const characteristic = [];
+                        await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
+                            .then(function (results) {
+                                items.push(item);
+                                stock.push(...results[0].data[0].stock);
+                                files.push(...results[1]);
+                                characteristic.push(...results[2].data.characteristics)
+                                subProductIsIncludedArr.push({
+                                    id: item.id,
+                                    items,
+                                    stock,
+                                    files,
+                                    characteristic
+                                });
+                                subProductIsIncludedArr.sort(
+                                    (a, b) => parseInt(a.id) - parseInt(b.id)
+                                );
+                                setSubProductsIsIncluded(prevState => ([
+                                    ...subProductIsIncludedArr
+                                ]));
+                            });
+                    })
+                    get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent_id}`).then(files => {
+                        files.map(file => (
+                            images.push({
+                                original: file.originalImageUrl,
+                                thumbnail: file.lowQualityImageUrl,
+                            })
+                        ))
+                    })
+                    setSetPrice(setPrice);
+                })
+                get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
+                    products.map(async item => {
+                        const items = [];
+                        const stock = [];
+                        const files = [];
+                        const characteristic = [];
+                        await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
+                            .then(function (results) {
+                                items.push(item);
+                                stock.push(...results[0].data[0].stock);
+                                files.push(...results[1]);
+                                characteristic.push(...results[2].data.characteristics);
+                                subProductNotIncludedArr.push({
+                                    id: item.id,
+                                    items,
+                                    stock,
+                                    files,
+                                    characteristic
+                                });
+                                subProductNotIncludedArr.sort(
+                                    (a, b) => parseInt(a.id) - parseInt(b.id)
+                                );
+                                setSubProductsNotIncluded(prevState => ([
+                                    ...subProductNotIncludedArr
+                                ]));
+                            });
+                    })
+                })
+                setIsFetchingData(false);
+                setProductImages(images);
+            }
+        })
     }, [parent_id, productColor]);
 
     const handleModuleInfo = (id) => {
         const images = [];
-        get(`http://bpaws01l:8089/api/image/resource?&bucket=emba-store&parent=${parent_id}&product=${id}`).then(files => {
+        currentColor && get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&category=${category_id}&color=${currentColor}&bucket=emba-store-images&parent=${parent_id}&product=${id}`).then(files => {
             files.map(file => (
                 images.push({
                     original: file.originalImageUrl,
                     thumbnail: file.lowQualityImageUrl,
                 })
             ));
-            get(`http://bpaws01l:8089/api/image/resource?&bucket=emba-store&parent=${parent_id}&product=${id}/banner`).then(banner => {
-                banner.map(file => (
-                    images.push({
-                        original: file.originalImageUrl,
-                        thumbnail: file.lowQualityImageUrl,
-                    })
-                ))
-                setSubProductImages(images);
-                showCartHandler();
-            });
+            setSubProductImages(images);
+            showCartHandler();
+        });
+        !currentColor && get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&category=${category_id}&bucket=emba-store-images&parent=${parent_id}&product=${id}`).then(files => {
+            files.map(file => (
+                images.push({
+                    original: file.originalImageUrl,
+                    thumbnail: file.lowQualityImageUrl,
+                })
+            ));
+            setSubProductImages(images);
+            showCartHandler();
         });
         get(`products/${id}`).then(res => {
             setSubProductInfo(res);
@@ -254,9 +287,9 @@ const Product = () => {
                         {productInfo.colors &&
                         <div className="mt-3">
                             {productInfo.colors.map(color => (
-                                <Link to={`/product/${parent_id}?color=${color.id}`} key={color.id}><span onClick={changeColor.bind(this, color.id)} data-toggle="tooltip" title={color.name}><img
+                                <Link to={`/product/${brand}/${category_id}/${parent_id}?color=${color.id}`} key={color.id}><span onClick={changeColor.bind(this, color.id)} data-toggle="tooltip" title={color.name}><img
                                     className="color-image me-2" alt=""
-                                    src={`../../assets/images/colors/${color.code}.png`}/></span>
+                                    src={`../../../assets/images/colors/${color.code}.png`}/></span>
                                 </Link>
                             ))}
                         </div>
@@ -280,7 +313,6 @@ const Product = () => {
                                     files={item.files}
                                     characteristics={item.characteristic}
                                     defaultValue={1}
-                                    parent={item.items[0].parent.name}
                                     product_uid={item.items[0].uid}
                                     stock={item.stock}
                                     onClickHandle={handleModuleInfo}
@@ -301,7 +333,6 @@ const Product = () => {
                                     files={item.files}
                                     characteristics={item.characteristic}
                                     defaultValue={1}
-                                    parent={item.items[0].parent.name}
                                     product_uid={item.items[0].uid}
                                     stock={item.stock}
                                     onClickHandle={handleModuleInfo}

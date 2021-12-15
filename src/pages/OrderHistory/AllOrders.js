@@ -241,7 +241,6 @@ const AllOrders = () => {
                             </div>
                             {cartIsShown && <OrderInfo onClose={hideCartHandler} info={orderInfo}
                                                    onItemDelete={deleteGoodFromOrder}/>}
-                            {console.log("page", page)}
                             <div className=" d-flex justify-content-end">
                                 <ReactPaginate
                                     previousLabel={'Əvvəlki'}

@@ -7,7 +7,7 @@ const Footer = () => (
         </div>
         <div className="wish-box-wrapper">
             <a href="https://docs.google.com/forms/d/e/1FAIpQLScHrcGmyFuc3yPaEpCIRobO0HBQrIEs0HecjXuJWv-h56i6LA/viewform"
-               target="_blank">
+               target="_blank" rel="noreferrer">
                 <div className="wish-box-mobile">
                     <div>
                         <div className="wish-box">
@@ -23,7 +23,7 @@ const Footer = () => (
             </a>
         </div>
         <div className="wish-box-wrapper position2">
-            <a href="https://bit.ly/3xLtsy8" target="_blank">
+            <a href="https://bit.ly/3xLtsy8" target="_blank" rel="noreferrer">
                 <div className="wish-box-mobile">
                     <div>
                         <div className="wish-box">

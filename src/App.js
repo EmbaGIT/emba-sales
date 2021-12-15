@@ -7,7 +7,6 @@ import {
 import Layout from "./layout/Layout";
 import {get} from "./api/Api";
 import Home from './pages/HomePage';
-import Category from './pages/Category/CategoryList';
 import Product from './pages/Product/ProductDetail';
 import SearchResult from './pages/SearchResult';
 import CartProvider from "./store/CartProvider";
@@ -16,6 +15,7 @@ import Checkout from "./pages/Cart/Checkout";
 import OrderPrint from "./pages/Order/OrderPrint";
 import Login from "./pages/Login";
 import AllOrders from "./pages/OrderHistory/AllOrders";
+import CategoryList from "./pages/Category/CategoryList";
 export const IsAuth = createContext(null);
 
 const App = () => {
@@ -28,7 +28,7 @@ const App = () => {
             get(`/menu/search?sort=menuOrder,desc&size=20`).then(res => {
                 const menuListArr = [];
                 res.content.forEach(menu => {
-                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store-icon&parent=${menu.id}`).then(file => {
+                    get(`http://bpaws01l:8089/api/image/resource?brand=Embawood&category=0&bucket=emba-store-icon&parent=${menu.id}`).then(file => {
                         menuListArr.push({
                             ...menu,
                             file
@@ -58,8 +58,8 @@ const App = () => {
                     <PrivateRoute path='/' exact>
                         <Home menuData={menuList}/>
                     </PrivateRoute>
-                    <PrivateRoute path='/category/:id' component={Category}/>
-                    <PrivateRoute path='/product/:id' component={Product}/>
+                    <PrivateRoute path='/category/:id/:page' component={CategoryList}/>
+                    <PrivateRoute path='/product/:brand/:category_id/:parent_id' component={Product}/>
                     <PrivateRoute path='/search' component={SearchResult}/>
                     <PrivateRoute path='/cart' exact component={Cart}/>
                     <PrivateRoute path='/checkout' exact component={Checkout}/>

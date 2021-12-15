@@ -43,7 +43,7 @@ const Header = (props) => {
                                 aria-labelledby="navbarDropdownMenuLink"
                             >
                                 {props.menuData && props.menuData.map(menu => (
-                                    <li key={menu.id}><Link to={`/category/${menu.attributes.id}`}
+                                    <li key={menu.id}><Link to={`/category/${menu.attributes.id}/0`}
                                                             className="dropdown-item">{menu.nameAz}</Link></li>
                                 ))}
                             </ul>

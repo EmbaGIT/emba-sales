@@ -11,11 +11,11 @@ const Home = (props) => {
             <div className="row py-3">
                 {props.menuData && props.menuData.map((menu, index) => (
                     <div key={index} className="col-lg-3 col-md-4 mb-3">
-                        <Link to={`category/${menu.attributes.id}`}>
+                        <Link to={`category/${menu.attributes.id}/0`}>
                             <div className="category-box">
                                 <div className="category-hover-box">
-                                    {menu.file.map(file => (
-                                        <img src={file.originalImageUrl} className="category-box-image" alt=""/>
+                                    {menu.file.map((file, index) => (
+                                        <img key={index} src={file.originalImageUrl} className="category-box-image" alt=""/>
                                     ))}
                                     <div className="category-name">{menu.nameAz}</div>
                                 </div>

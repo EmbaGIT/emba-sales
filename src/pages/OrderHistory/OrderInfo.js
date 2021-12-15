@@ -277,7 +277,6 @@ const OrderInfo = (props) => {
     }, [props.info])
 
     const handleOrderInfo = (resOrderInfo) => {
-        console.log(resOrderInfo);
         const products = [];
         let total_price=0;
         let discount_total_price=0;

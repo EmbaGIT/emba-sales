@@ -26,7 +26,7 @@ const SearchProductList = () => {
             const productListArr = [];
             res.content.forEach(product => {
                 if(product.colors.length){
-                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${product.parent.id}&product=${product.id}/banner`).then(file => {
+                    get(`http://bpaws01l:8089/api/image/resource?brand=${product.brand}&category=${product.categoryId}&bucket=emba-store-images&parent=${product.parentId}&product=${product.id}&isBanner=true`).then(file => {
                         productListArr.push({
                             ...product,
                             colors: product.colors,
@@ -38,10 +38,9 @@ const SearchProductList = () => {
                         setProductList(prevState => ([
                             ...productListArr
                         ]))
-                        console.log(productList)
                     })
                 }else{
-                    get(`http://bpaws01l:8089/api/image/resource?bucket=emba-store&parent=${product.parent.id}&product=${product.id}/banner`).then(file => {
+                    get(`http://bpaws01l:8089/api/image/resource?brand=${product.brand}&category=${product.categoryId}&bucket=emba-store-images&parent=${product.parentId}&product=${product.id}&isBanner=true`).then(file => {
                         productListArr.push({
                             ...product,
                             file
@@ -85,7 +84,7 @@ const SearchProductList = () => {
             <div className="grid-wrapper">
                 {productList && productList.map((product, index) => (
                     <div className="grid-item" key={index}>
-                        <Link to={product.colors.length ? `/product/${product.parent.id}?color=${product.colors[0].id}` : `/product/${product.parent.id}`} className="pr-wrapper product-add">
+                        <Link to={product.colors.length ? `/product/${product.brand}/${product.categoryId}/${product.parentId}?color=${product.colors[0].id}` : `/product/${product.brand}/${product.categoryId}/${product.parentId}`} className="pr-wrapper product-add">
                             <div className="pr-image">
                                 {product.file.length ? product.file.map(file => (
                                     <img src={file.lowQualityImageUrl} alt=""/>
@@ -93,10 +92,10 @@ const SearchProductList = () => {
                             </div>
                         </Link>
                         <div className="pr-info">
-                            <Link to={product.colors.length ? `/product/${product.parent.id}?color=${product.colors[0].id}` : `/product/${product.parent.id}`} className="pr-wrapper product-add"><div className="model-name">{product.name}</div></Link>
+                            <Link to={product.colors.length ? `/product/${product.brand}/${product.categoryId}/${product.parentId}?color=${product.colors[0].id}` : `/product/${product.brand}/${product.categoryId}/${product.parentId}`} className="pr-wrapper product-add"><div className="model-name">{product.name}</div></Link>
                             <div>
                                 {product.colors.length ? product.colors.map(color => (
-                                    <Link to={`/product/${product.parent.id}?color=${color.id}`} key={color.id}>
+                                    <Link to={`/product/${product.brand}/${product.categoryId}/${product.parentId}?color=${color.id}`} key={color.id}>
                                         <span data-toggle="tooltip" title={color.name}>
                                             <img className="color-image" alt="" src={`../../assets/images/colors/${color.code}.png`}/>
                                         </span>
