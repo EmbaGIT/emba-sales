@@ -2,8 +2,6 @@ import {useState, useEffect, useContext} from "react";
 import Modal from '../../UI/Modal';
 import CountUpdate from "../../UI/CountUpdate";
 import DatePicker from "react-datepicker";
-import getYear from "date-fns/getYear";
-import getMonth from "date-fns/getYear";
 import Select from "react-select";
 import {selectStyles} from "../../helpers/selectStyles";
 import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
@@ -12,6 +10,7 @@ import {gql, useLazyQuery} from "@apollo/client";
 import {get, post} from "../../api/Api";
 import AuthContext from "../../store/AuthContext";
 import {toast} from "react-toastify";
+import BirthDateDatepicker from "../../components/birthDateDatepicker";
 
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
@@ -23,6 +22,7 @@ const CUSTOMER_QUERY = gql`
         name
       }
     }`;
+
 const FULL_INFO_QUERY = gql`
     query fullInfo($uid: String) {
       search(criteria: {
@@ -43,24 +43,6 @@ const FULL_INFO_QUERY = gql`
     }`
 
 const OrderInfo = (props) => {
-    const range = (start, end) => {
-        return new Array(end - start).fill().map((d, i) => i + start);
-    };
-    const years = range(1950, getYear(new Date()) + 1, 1);
-    const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
     const authCtx = useContext(AuthContext);
     const [city, setCity] = useState([]);
     const [isSending, setIsSending] = useState(false);
@@ -339,6 +321,7 @@ const OrderInfo = (props) => {
     }
 
     const handleInputChange = (type, value) => {
+        console.log(type, value);
         let alldata = {...orderInfo};
         if (type === 'select_city') {
             alldata = {
@@ -754,59 +737,10 @@ const OrderInfo = (props) => {
                             <div className="row mb-3">
                                 <div className="col-md-6">
                                     <label htmlFor='birthdate'>Doğum tarixi</label>
-                                    <DatePicker
-                                        selected={orderInfo?.birthdate ? new Date(orderInfo?.birthdate) : ""}
-                                        disabled={isRefactorDisabled.birthdate}
-                                        dateFormat="yyyy-MM-dd"
-                                        className="form-control"
-                                        renderCustomHeader={({
-                                                                 date,
-                                                                 changeYear,
-                                                                 changeMonth,
-                                                                 decreaseMonth,
-                                                                 increaseMonth,
-                                                                 prevMonthButtonDisabled,
-                                                                 nextMonthButtonDisabled,
-                                                             }) => (
-                                            <div
-                                                style={{
-                                                    margin: 10,
-                                                    display: "flex",
-                                                    justifyContent: "center",
-                                                }}
-                                            >
-                                                <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>
-                                                    {"<"}
-                                                </button>
-                                                <select
-                                                    value={getYear(date)}
-                                                    onChange={({target: {value}}) => changeYear(value)}
-                                                >
-                                                    {years.map((option) => (
-                                                        <option key={option} value={option}>
-                                                            {option}
-                                                        </option>
-                                                    ))}
-                                                </select>
-
-                                                <select
-                                                    value={months[getMonth(date)]}
-                                                    onChange={({target: {value}}) =>
-                                                        changeMonth(months.indexOf(value))
-                                                    }>
-                                                    {months.map((option) => (
-                                                        <option key={option} value={option}>
-                                                            {option}
-                                                        </option>
-                                                    ))}
-                                                </select>
-
-                                                <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>
-                                                    {">"}
-                                                </button>
-                                            </div>
-                                        )}
-                                        onChange={(date) => handleInputChange("birthdate", date)}
+                                    <BirthDateDatepicker
+                                        selectedDate={orderInfo?.birthdate ? new Date(orderInfo?.birthdate) : ""}
+                                        isDisabled={isRefactorDisabled.birthdate}
+                                        onDateChange={handleInputChange}
                                     />
                                 </div>
                                 <div className="col-md-6">
