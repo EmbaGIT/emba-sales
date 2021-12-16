@@ -8,6 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import DatePicker from "react-datepicker";
 import {formattedDate} from "../../helpers/formattedDate";
+import axios from "axios";
 
 const AllOrders = () => {
     // const query = useQuery();
@@ -157,26 +158,9 @@ const AllOrders = () => {
 
     return (
         <div>
-            <div className="mb-2 row">
+            <div className="mb-2">
                 <div className="mt-3 row">
-                    <div className="col-md-3">
-                        <h6 className="fm-poppins flex-1">Filter</h6>
-                        <div className="">
-                            <select className="form-control form-select" onChange={e => onStatusFilter(e.target.value)}>
-                                <option value="all">Bütün sifarişlər</option>
-                                <option value="ORDERED">Tamamlanmış</option>
-                                <option value="ORDER_FAILED">Uğursuz Sifariş</option>
-                                <option value="SAVED">Yadda saxlanılan</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="col-md-4">
-                        <h6 className="fm-poppins flex-1">Müştəri adı ilə axtarış</h6>
-                        <div className="">
-                            <input type="text" placeholder="min 3 simvol" onChange={(e) => handleNameSearch(e.target.value)} className="form-control"/>
-                        </div>
-                    </div>
-                    <div className="col-md-5">
+                    <div className="col-md-6">
                         <h6 className="fm-poppins flex-1">Tarix aralığı üzrə axtarış</h6>
                         <div className="row">
                             <div className="col-md-5">
@@ -196,6 +180,25 @@ const AllOrders = () => {
                                 />
                             </div>
                             <div className="col-md-2"><button className="btn btn-success btn-xs" onClick={onSearchDate}>Axtar</button></div>
+                        </div>
+                    </div>
+                </div>
+                <div className="row mt-3">
+                    <div className="col-md-4">
+                        <h6 className="fm-poppins flex-1">Filter</h6>
+                        <div className="">
+                            <select className="form-control form-select" onChange={e => onStatusFilter(e.target.value)}>
+                                <option value="all">Bütün sifarişlər</option>
+                                <option value="ORDERED">Tamamlanmış</option>
+                                <option value="ORDER_FAILED">Uğursuz Sifariş</option>
+                                <option value="SAVED">Yadda saxlanılan</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="col-md-4">
+                        <h6 className="fm-poppins flex-1">Müştəri adı ilə axtarış</h6>
+                        <div className="">
+                            <input type="text" placeholder="min 3 simvol" onChange={(e) => handleNameSearch(e.target.value)} className="form-control"/>
                         </div>
                     </div>
                 </div>
@@ -239,7 +242,7 @@ const AllOrders = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            {cartIsShown && <OrderInfo onClose={hideCartHandler} info={orderInfo}
+                            {cartIsShown && <OrderInfo onCloseModal={hideCartHandler} info={orderInfo}
                                                    onItemDelete={deleteGoodFromOrder}/>}
                             <div className=" d-flex justify-content-end">
                                 <ReactPaginate

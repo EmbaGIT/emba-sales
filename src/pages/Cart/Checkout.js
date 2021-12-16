@@ -466,10 +466,14 @@ const Checkout = () => {
     const sendOrder = (status) => {
         const order_goods = [];
         cartCtx.items.forEach(item => {
+            console.log(item);
             order_goods.push({
                 product_uid: item.uid,
                 product_characteristic_uid: item.characteristic_uid,
                 product_quantity: item.amount,
+                product_name: item.name,
+                category_id: item.category,
+                parent_name: item.parent,
                 product_price: item.price,
                 product_discount: item.discount,
                 product_total: item.amount * item.price

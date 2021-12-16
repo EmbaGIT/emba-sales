@@ -51,6 +51,7 @@ const SubProductItem = (props) => {
                 price: price,
                 discount_price: price,
                 parent : props.parent,
+                category: props.category_id,
                 uid: props.uid,
                 characteristic_uid: charUID,
                 characteristic_code: charCode,

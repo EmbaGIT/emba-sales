@@ -11,6 +11,10 @@ import {get, post} from "../../api/Api";
 import AuthContext from "../../store/AuthContext";
 import {toast} from "react-toastify";
 import BirthDateDatepicker from "../../components/birthDateDatepicker";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import CartContext from "../../store/CartContext";
+import {useHistory} from "react-router-dom";
 
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
@@ -43,7 +47,9 @@ const FULL_INFO_QUERY = gql`
     }`
 
 const OrderInfo = (props) => {
+    console.log(props.info);
     const authCtx = useContext(AuthContext);
+    const cartCtx = useContext(CartContext);
     const [city, setCity] = useState([]);
     const [isSending, setIsSending] = useState(false);
     const [isRefactorDisabled, setIsRefactorDisabled] = useState({
@@ -107,6 +113,7 @@ const OrderInfo = (props) => {
         deliveryType: 0,
         paymentType: 0
     });
+    const history = useHistory();
 
     const [getAvailableCustomer, {
         data: available_customer,
@@ -258,6 +265,28 @@ const OrderInfo = (props) => {
         }).catch((err) => console.log(err));
     }, [props.info])
 
+    const newCartObject = () => {
+        props.onCloseModal();
+        confirmAlert({
+            title: '',
+            message: 'Əvvəlki səbət məlumatları silinəcək!',
+            buttons: [
+                {
+                    label: 'Təsdiqlə',
+                    onClick: () => {
+                        cartCtx.clearBasket();
+                        cartCtx.updateSavedOrder(props.info);
+                        history.push('/cart');
+                    }
+                },
+                {
+                    label: 'Ləğv et',
+                    onClick: () => {}
+                }
+            ]
+        });
+    }
+
     const handleOrderInfo = (resOrderInfo) => {
         const products = [];
         let total_price=0;
@@ -312,6 +341,7 @@ const OrderInfo = (props) => {
                     note: resOrderInfo.comment,
                     status: resOrderInfo.status,
                     payment_date: resOrderInfo.payment_date,
+                    delivery_date: resOrderInfo.delivery_date,
                     goods: products,
                     totalPrice: total_price,
                     discountPrice: discount_total_price
@@ -321,7 +351,6 @@ const OrderInfo = (props) => {
     }
 
     const handleInputChange = (type, value) => {
-        console.log(type, value);
         let alldata = {...orderInfo};
         if (type === 'select_city') {
             alldata = {
@@ -549,7 +578,7 @@ const OrderInfo = (props) => {
             }
             post(`http://bpaws01l:8087/api/order/update/${orderInfo.id}`, postData).then(res => {
                 setIsSending(false);
-                props.onClose();
+                props.onCloseModal();
                 toast.success(<MessageComponent text='Sifariş göndərildi!'/>, {
                     position: toast.POSITION.TOP_LEFT,
                     toastId: 'success-toast-message',
@@ -565,7 +594,7 @@ const OrderInfo = (props) => {
     }
 
     return (
-        <Modal onClose={props.onClose}>
+        <Modal onClose={props.onCloseModal}>
             <div className="row">
                 <div className="col-lg-12">
                     <ul className="nav nav-tabs mb-3" id="ex1" role="tablist">
@@ -613,10 +642,10 @@ const OrderInfo = (props) => {
                                 {orderInfo && orderInfo?.goods?.map(item => (
                                     <tr key={item.id}>
                                         <td><b>{item.product_name}</b></td>
-                                        <td>{orderInfo.status === "SAVED" ?
+                                        <td>{/*{orderInfo.status === "SAVED" ?
                                             <CountUpdate id={item.id} quantity={item.product_quantity}
                                                          onHandleUpdate={handleCountUpdate}/>
-                                            : item.product_quantity}</td>
+                                            : item.product_quantity}*/} {item.product_quantity}</td>
                                         <td>{item.product_price} AZN</td>
                                         <td>{item.product_discount.toFixed(2)} %</td>
                                         <td>{(item.product_price * item.product_quantity - item.product_quantity * item.product_price * item.product_discount / 100).toFixed(2)} AZN</td>
@@ -872,9 +901,12 @@ const OrderInfo = (props) => {
             </div>
             <div className="d-flex justify-content-end mt-2">
                 {props.info.status === "SAVED" &&
-                    <button className="btn btn-success me-2" disabled={isSending} onClick={sendWishListOrder}>{isSending ? "Gözləyin" : "Sifarişi göndər"}</button>
+                    <div>
+                        <button className="btn btn-primary me-2" disabled={isSending} onClick={sendWishListOrder}>{isSending ? "Gözləyin" : "Sifarişi göndər"}</button>
+                        <button className="btn btn-success me-2" disabled={isSending} onClick={newCartObject}>Dəyişiklik et</button>
+                    </div>
                 }
-                <div className="btn btn-primary" onClick={props.onClose}>Bağla</div>
+                <div className="btn btn-primary" onClick={props.onCloseModal}>Bağla</div>
             </div>
         </Modal>
     );

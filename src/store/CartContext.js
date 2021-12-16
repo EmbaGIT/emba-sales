@@ -10,6 +10,7 @@ const CartContext = React.createContext({
     discountHandler: () => {},
     clearBasket: () => {},
     updateItem: () => {},
+    updateSavedOrder: () => {},
 });
 
 export default CartContext;

@@ -4,6 +4,7 @@ import CartContext from "../../store/CartContext";
 import CartItem from "./CartItem";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+
 const Cart = () => {
     const cartCtx = useContext(CartContext);
     const [hasItem, setHasItem] = useState(cartCtx.items.length > 0);

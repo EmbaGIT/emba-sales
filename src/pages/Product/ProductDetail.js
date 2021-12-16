@@ -303,6 +303,7 @@ const Product = () => {
                 <div className="col-12 mb-3">
                     <p className="panel-heading">Dəst Tərkibi</p>
                 </div>
+                {console.log("subProductsIsIncluded", subProductsIsIncluded)}
                 {subProductsIsIncluded && subProductsIsIncluded.map((item) => (
                     <SubProductItem key={item.items[0].id}
                                     key_id={item.items[0].id}
@@ -313,7 +314,8 @@ const Product = () => {
                                     files={item.files}
                                     characteristics={item.characteristic}
                                     defaultValue={1}
-                                    product_uid={item.items[0].uid}
+                                    parent={item.items[0].parentName}
+                                    category_id={category_id}
                                     stock={item.stock}
                                     onClickHandle={handleModuleInfo}
                     />
@@ -333,7 +335,8 @@ const Product = () => {
                                     files={item.files}
                                     characteristics={item.characteristic}
                                     defaultValue={1}
-                                    product_uid={item.items[0].uid}
+                                    parent={item.items[0].parentName}
+                                    category_id={category_id}
                                     stock={item.stock}
                                     onClickHandle={handleModuleInfo}
                     />

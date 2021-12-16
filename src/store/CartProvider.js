@@ -6,23 +6,8 @@ const defaultCartState = localStorage.getItem('cart') ? JSON.parse(localStorage.
     items: [],
     totalAmount: 0,
     discountAmount: 0,
-    totalDiscount: 0
+    totalDiscount: 0,
 };
-
-const MessageComponent = ({text}) => (
-    <span style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center'}}>
-    <span
-        style={{
-            fontWeight: 500,
-            fontSize: 16,
-            lineHeight: '24px',
-            color: '#FFEDED',
-        }}
-    >
-      {text}
-    </span>
-  </span>
-);
 
 const cartReducer = (state, action) => {
     if (action.type === 'ADD') {
@@ -212,6 +197,54 @@ const cartReducer = (state, action) => {
         };
     }
 
+    if(action.type==="SavedOrder"){
+        console.log(action.value);
+        const products = [];
+        action.value.goods.forEach(product => {
+            console.log(product)
+            products.push({
+                amount: product.product_quantity,
+                discount: product.product_discount,
+                files: '',
+                id: product.id,
+                name: product.product_name,
+                price: product.product_price,
+                discount_price: product.product_price - (product.product_price*product.product_discount/100),
+                parent : product.parent_name,
+                category: product.category_id,
+                uid: product.product_uid,
+                characteristic_uid: product.product_characteristic_uid,
+                characteristic_code: '',
+            })
+        })
+
+        let updatedTotalAmount = 0;
+        let updatedDiscountAmount = 0;
+        products.map(item => {
+            updatedTotalAmount += item.price * item.amount
+        })
+
+        products.map(item => {
+            updatedDiscountAmount += item.discount_price * item.amount
+        });
+
+        const totalDiscount = 100 - (updatedDiscountAmount*100/updatedTotalAmount);
+
+        localStorage.setItem('cart', JSON.stringify({
+            items: products,
+            totalAmount: updatedTotalAmount,
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
+        }));
+
+        return {
+            items: products,
+            totalAmount: updatedTotalAmount,
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100
+        };
+    }
+
     return defaultCartState;
 }
 
@@ -247,6 +280,10 @@ const CartProvider = (props) => {
         dispatchCartAction({type: 'PriceChange', value: value});
     }
 
+    const updateSavedOrderHandler = (value) => {
+        dispatchCartAction({type: 'SavedOrder', value: value});
+    }
+
     const cartContext = {
         items: cartState.items,
         totalAmount: cartState.totalAmount,
@@ -257,6 +294,7 @@ const CartProvider = (props) => {
         clearBasket: clearCartHandler,
         discountHandler: discountCartHandler,
         updateItem: updateCartHandler,
+        updateSavedOrder: updateSavedOrderHandler,
         checkoutPriceChange: priceChangeHandler,
     };
 
