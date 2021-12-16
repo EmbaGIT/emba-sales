@@ -39,8 +39,8 @@ const ProductSearch = () => {
                     {searchResult.content?.length && searchResult.content.map(product => (
                         <li className="result-box-wrapper" key={product.id}>
                             <div className="flex-1">
-                                <Link to={product.colors.length ? `/product/${product.brand}/${product.category}/${product.id}/?color=${product.colors[0]?.id}`
-                                    : `/product/${product.brand}/${product.category}/${product.id}`}>
+                                <Link to={product.colors.length ? `/product/${product.brand}/${product.categoryId}/${product.parentId}?color=${product.colors[0]?.id}`
+                                    : `/product/${product.brand}/${product.categoryId}/${product.parentId}`}>
                                     <div className="product-name">{product.name}</div>
                                     <div className="product-price">{product.price} AZN</div>
                                 </Link>

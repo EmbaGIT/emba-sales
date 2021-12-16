@@ -141,7 +141,7 @@ const OrderInfo = (props) => {
         }
     });
 
-    const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
+    const [getFullInfo, {data: customer_full_info}] = useLazyQuery(FULL_INFO_QUERY, {
         context: {headers: {authorization: `Bearer ${authCtx.token}`}},
         onCompleted: () => {
             if (customer_full_info) {
