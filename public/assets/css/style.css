@@ -540,6 +540,10 @@ input[type=number] {
     display: block !important;
 }
 
+.react-datepicker-popper {
+    z-index: 4!important;
+}
+
 .DatePicker__input {
     display: block;
     width: 100%;

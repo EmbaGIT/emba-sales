@@ -4,8 +4,6 @@ import {toast} from "react-toastify";
 import CartContext from "../../store/CartContext";
 import AuthContext from "../../store/AuthContext";
 import DatePicker from "react-datepicker";
-import getYear from "date-fns/getYear";
-import getMonth from "date-fns/getYear";
 import Select from "react-select";
 import {selectStyles} from "../../helpers/selectStyles";
 import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
@@ -15,6 +13,7 @@ import {get, post} from "../../api/Api";
 import Loader from "react-loader-spinner";
 import "react-datepicker/dist/react-datepicker.css";
 import {formattedDate} from "../../helpers/formattedDate";
+import BirthDateDatepicker from "../../components/birthDateDatepicker";
 
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
@@ -60,31 +59,35 @@ const Checkout = () => {
             </span>
         </span>
     );
-    const range = (start, end) => {
-        return new Array(end - start).fill().map((d, i) => i + start);
-    };
-    const years = range(1950, getYear(new Date()) + 1, 1);
-    const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
 
     const cartCtx = useContext(CartContext);
     const authCtx = useContext(AuthContext);
     const [isSending, setIsSending] = useState(false);
     const [isAddingWishlist, setIsAddingWishlist] = useState(false);
     const [checkoutState, setCheckoutState] = useState({
-        items: []
+        items: [],
+        id: '',
+        user_uid: '',
+        customerInfo: {
+            uid: '',
+            name: '',
+            surname: '',
+            patronymic: '',
+            finCode: '',
+            identifierNumber: '',
+            passport_series: 'AZE',
+            birthdate: '',
+            city: {
+                code: '',
+                name: ''
+            },
+            mobile_phone: '',
+            other_phone: '',
+            address: '',
+            gender: '',
+            email: '',
+            note: ''
+        }
     })
     const [paymentType, setPaymentType] = useState(0);
     const [deliveryType, setDeliveryType] = useState(0);
@@ -106,26 +109,6 @@ const Checkout = () => {
     const [paymentDate, setPaymentDate] = useState();
     const [deliveryDate, setDeliveryDate] = useState();
     const [availableCustomer, setAvailableCustomer] = useState([]);
-    const [customerInfo, setCustomerInfo] = useState({
-        uid: '',
-        name: '',
-        surname: '',
-        patronymic: '',
-        finCode: '',
-        identifierNumber: '',
-        passport_series: 'AZE',
-        birthdate: '',
-        city: {
-            code: '',
-            name: ''
-        },
-        mobile_phone: '',
-        other_phone: '',
-        address: '',
-        gender: '',
-        email: '',
-        note: ''
-    });
     const [customerRefactoringInfo, setCustomerRefactoringInfo] = useState({
         address: '',
         mobile_phone: '',
@@ -178,94 +161,136 @@ const Checkout = () => {
                     note: true,
                     isDisabled: false
                 })
-                setCustomerInfo(prevState => ({
+                setCheckoutState(prevState => ({
                     ...prevState,
-                    uid: customer_full_info.search[0].uid
+                    customerInfo: {
+                        ...prevState.customerInfo,
+                        uid: customer_full_info.search[0].uid
+                    }
                 }));
-                setCustomerInfo(prevState => ({
+                setCheckoutState(prevState => ({
                     ...prevState,
-                    name: customer_full_info.search[0].name.split(' ')[1]
+                    customerInfo: {
+                        ...prevState.customerInfo,
+                        name: customer_full_info.search[0].name.split(' ')[1]
+                    }
                 }));
-                setCustomerInfo(prevState => ({
+                setCheckoutState(prevState => ({
                     ...prevState,
-                    surname: customer_full_info.search[0].name.split(' ')[0]
+                    customerInfo: {
+                        ...prevState.customerInfo,
+                        surname: customer_full_info.search[0].name.split(' ')[0]
+                    }
                 }));
-                setCustomerInfo(prevState => ({
+                setCheckoutState(prevState => ({
                     ...prevState,
-                    patronymic: customer_full_info.search[0].name.split(' ')[2]
+                    customerInfo: {
+                        ...prevState.customerInfo,
+                        patronymic: customer_full_info.search[0].name.split(' ')[2]
+                    }
                 }));
                 customer_full_info.search[0].details.forEach(detail => {
                     if (detail.infoTypeField.field === "Birthdate") {
-                        setCustomerInfo(prevstate => ({
-                            ...prevstate,
-                            birthdate: new Date(detail.fieldValue?.split(" ")[0].replace(/(\d{2}).(\d{2}).(\d{4})/, "$2/$1/$3"))
+                        setCheckoutState(prevState => ({
+                            ...prevState,
+                            customerInfo: {
+                                ...prevState.customerInfo,
+                                birthdate: new Date(detail.fieldValue?.split(" ")[0].replace(/(\d{2}).(\d{2}).(\d{4})/, "$2/$1/$3"))
+                            }
                         }));
                     } else if (detail.infoTypeField.field === "City") {
                         get(`http://bpaws01l:8087/api/city/search?name.contains=${detail.fieldValue}`).then(res => {
                             if (res.content.length > 0) {
-                                setCustomerInfo(prevstate => ({
-                                    ...prevstate,
-                                    city: {
-                                        code: res.content[0].code,
-                                        name: detail.fieldValue
+                                setCheckoutState(prevState => ({
+                                    ...prevState,
+                                    customerInfo: {
+                                        ...prevState.customerInfo,
+                                        city: {
+                                            code: res.content[0].code,
+                                            name: detail.fieldValue
+                                        }
                                     }
                                 }));
                             } else {
-                                setCustomerInfo(prevstate => ({
-                                    ...prevstate,
-                                    city: {
-                                        code: "000000079",
-                                        name: "Digər"
+                                setCheckoutState(prevState => ({
+                                    ...prevState,
+                                    customerInfo: {
+                                        ...prevState.customerInfo,
+                                        city: {
+                                            code: "000000079",
+                                            name: "Digər"
+                                        }
                                     }
                                 }));
                             }
                         })
                     } else if (detail.infoTypeField.field === "DocumentPin") {
-                        setCustomerInfo(prevstate => ({
-                            ...prevstate,
-                            finCode: detail.fieldValue
+                        setCheckoutState(prevState => ({
+                            ...prevState,
+                            customerInfo: {
+                                ...prevState.customerInfo,
+                                finCode: detail.fieldValue
+                            }
                         }));
                     } else if (detail.infoTypeField.field === "Number") {
-                        setCustomerInfo(prevstate => ({
-                            ...prevstate,
-                            identifierNumber: detail.fieldValue
+                        setCheckoutState(prevState => ({
+                            ...prevState,
+                            customerInfo: {
+                                ...prevState.customerInfo,
+                                finCode: detail.fieldValue
+                            }
                         }));
                     } else if (detail.infoTypeField.field === "Mobile") {
-                        setCustomerInfo(prevstate => ({
-                            ...prevstate,
-                            mobile_phone: detail.fieldValue
+                        setCheckoutState(prevState => ({
+                            ...prevState,
+                            customerInfo: {
+                                ...prevState.customerInfo,
+                                mobile_phone: detail.fieldValue
+                            }
                         }));
-                        setOldCustomerInfo(prevstate => ({
-                            ...prevstate,
+                        setOldCustomerInfo(prevState => ({
+                            ...prevState,
                             mobile_phone: detail.fieldValue
                         }));
                     } else if (detail.infoTypeField.field === "OtherPhone") {
-                        setCustomerInfo(prevstate => ({
-                            ...prevstate,
-                            other_phone: detail.fieldValue
+                        setCheckoutState(prevState => ({
+                            ...prevState,
+                            customerInfo: {
+                                ...prevState.customerInfo,
+                                other_phone: detail.fieldValue
+                            }
                         }));
-                        setOldCustomerInfo(prevstate => ({
-                            ...prevstate,
+                        setOldCustomerInfo(prevState => ({
+                            ...prevState,
                             other_phone: detail.fieldValue
                         }));
                     } else if (detail.infoTypeField.field === "Email") {
-                        setCustomerInfo(prevstate => ({
-                            ...prevstate,
-                            email: detail.fieldValue
+                        setCheckoutState(prevState => ({
+                            ...prevState,
+                            customerInfo: {
+                                ...prevState.customerInfo,
+                                email: detail.fieldValue
+                            }
                         }));
                     } else if (detail.infoTypeField.field === "PhysicalAddress") {
-                        setCustomerInfo(prevstate => ({
-                            ...prevstate,
-                            address: detail.fieldValue
+                        setCheckoutState(prevState => ({
+                            ...prevState,
+                            customerInfo: {
+                                ...prevState.customerInfo,
+                                address: detail.fieldValue
+                            }
                         }));
-                        setOldCustomerInfo(prevstate => ({
-                            ...prevstate,
+                        setOldCustomerInfo(prevState => ({
+                            ...prevState,
                             address: detail.fieldValue
                         }));
                     } else if (detail.infoTypeField.field === "Gender") {
-                        setCustomerInfo(prevstate => ({
-                            ...prevstate,
-                            gender: detail.fieldValue === "Kişi" ? 1 : 0
+                        setCheckoutState(prevState => ({
+                            ...prevState,
+                            customerInfo: {
+                                ...prevState.customerInfo,
+                                gender: detail.fieldValue === "Kişi" ? 1 : 0
+                            }
                         }));
                     }
                 })
@@ -307,10 +332,38 @@ const Checkout = () => {
                 items: cartCtx.items
             }));
         }
+        if(cartCtx.savedId){
+            post(`http://bpaws01l:8087/api/order/search?id.equals=${cartCtx.savedId}`).then(resOrderInfo => {
+                setCheckoutState(prevState => ({
+                    ...prevState,
+                    id: resOrderInfo.content[0].id,
+                    customerInfo: {
+                        uid: resOrderInfo.content[0].client_uid,
+                        name: resOrderInfo.content[0].client_name.split(' ')[1],
+                        surname: resOrderInfo.content[0].client_name.split(' ')[0],
+                        patronymic: resOrderInfo.content[0].client_name.split(' ')[2],
+                        finCode: resOrderInfo.content[0].client_fin_code,
+                        identifierNumber: resOrderInfo.content[0].client_number_passport,
+                        passport_series: resOrderInfo.content[0].client_passport_series,
+                        birthdate: resOrderInfo.content[0].client_date_born,
+                        city: {
+                            code: resOrderInfo.content[0].client_delivery_city_code,
+                            name: ''
+                        },
+                        mobile_phone: resOrderInfo.content[0].client_mobil_phone,
+                        other_phone: resOrderInfo.content[0].client_mobil_phone2,
+                        address: resOrderInfo.content[0].client_delivery_address,
+                        gender: resOrderInfo.content[0].client_gender,
+                        email: resOrderInfo.content[0].client_mail,
+                        note: resOrderInfo.content[0].comment
+                    }
+                }))
+            })
+        }
     }, [cartCtx]);
 
     const handleInputChange = (type, value) => {
-        let alldata = {...customerInfo};
+        let alldata = {...checkoutState.customerInfo};
         if (type === 'select_city') {
             alldata = {
                 ...alldata,
@@ -365,36 +418,42 @@ const Checkout = () => {
                 [type]: value
             }))
         }
-        setCustomerInfo(alldata);
+        setCheckoutState(prevState => ({
+            ...prevState,
+            customerInfo: alldata
+        }));
     }
     const searchOnDatabase = () => {
         setAvailableCustomer([]);
-        setCustomerInfo(prevstate => ({
+        setCheckoutState(prevstate => ({
             ...prevstate,
-            uid: '',
-            birthdate: '',
-            city: {
-                code: '',
-                name: ''
-            },
+            customerInfo: {
+                ...prevstate.customerInfo,
+                uid: '',
+                birthdate: '',
+                city: {
+                    code: '',
+                    name: ''
+                },
+                mobile_phone: '',
+                other_phone: '',
+                address: '',
+                gender: '',
+                email: '',
+                note: ''
+            }
+        }));
+        setOldCustomerInfo({
             mobile_phone: '',
             other_phone: '',
             address: '',
-            gender: '',
-            email: '',
-            note: ''
-        }));
-        setOldCustomerInfo(prevstate => ({
-            mobile_phone: '',
-            other_phone: '',
-            address: '',
-        }));
+        });
         if (handleNameSurnameValidation()) {
             getAvailableCustomer({
                 variables: {
-                    name: `${customerInfo.surname} ${customerInfo.name} ${customerInfo.patronymic}`,
-                    serial: customerInfo.identifierNumber ? customerInfo.identifierNumber : null,
-                    finCode: customerInfo.finCode ? customerInfo.finCode : null
+                    name: `${checkoutState.customerInfo.surname} ${checkoutState.customerInfo.name} ${checkoutState.customerInfo.patronymic}`,
+                    serial: checkoutState.customerInfo.identifierNumber ? checkoutState.customerInfo.identifierNumber : null,
+                    finCode: checkoutState.customerInfo.finCode ? checkoutState.customerInfo.finCode : null
                 }
             });
         }
@@ -408,35 +467,35 @@ const Checkout = () => {
     }
 
     const handleNameSurnameValidation = () => {
-        !customerInfo.name ? setFormValidation(prevState => ({
+        !checkoutState.customerInfo.name ? setFormValidation(prevState => ({
             ...prevState,
             name: false
         })) : setFormValidation(prevState => ({...prevState, name: true}))
-        !customerInfo.surname ? setFormValidation(prevState => ({
+        !checkoutState.customerInfo.surname ? setFormValidation(prevState => ({
             ...prevState,
             surname: false
         })) : setFormValidation(prevState => ({...prevState, surname: true}))
-        return !(!customerInfo.name || !customerInfo.surname);
+        return !(!checkoutState.customerInfo.name || !checkoutState.customerInfo.surname);
     }
 
     const handleValidation = () => {
-        !customerInfo.name ? setFormValidation(prevState => ({
+        !checkoutState.customerInfo.name ? setFormValidation(prevState => ({
             ...prevState,
             name: false
         })) : setFormValidation(prevState => ({...prevState, name: true}))
-        !customerInfo.surname ? setFormValidation(prevState => ({
+        !checkoutState.customerInfo.surname ? setFormValidation(prevState => ({
             ...prevState,
             surname: false
         })) : setFormValidation(prevState => ({...prevState, surname: true}))
-        !customerInfo.address ? setFormValidation(prevState => ({
+        !checkoutState.customerInfo.address ? setFormValidation(prevState => ({
             ...prevState,
             address: false
         })) : setFormValidation(prevState => ({...prevState, address: true}))
-        !customerInfo.mobile_phone ? setFormValidation(prevState => ({
+        !checkoutState.customerInfo.mobile_phone ? setFormValidation(prevState => ({
             ...prevState,
             mobile_phone: false
         })) : setFormValidation(prevState => ({...prevState, mobile_phone: true}))
-        !customerInfo.other_phone ? setFormValidation(prevState => ({
+        !checkoutState.customerInfo.other_phone ? setFormValidation(prevState => ({
             ...prevState,
             other_phone: false
         })) : setFormValidation(prevState => ({...prevState, other_phone: true}))
@@ -448,12 +507,13 @@ const Checkout = () => {
             ...prevState,
             payment_date: false
         })) : setFormValidation(prevState => ({...prevState, payment_date: true}))
-        !customerInfo.city.code ? setFormValidation(prevState => ({
+        !checkoutState.customerInfo.city.code ? setFormValidation(prevState => ({
             ...prevState,
             city: false
         })) : setFormValidation(prevState => ({...prevState, city: true}))
 
-        return !(!customerInfo.name || !customerInfo.surname || !customerInfo.city || !customerInfo.address || !customerInfo.mobile_phone || !deliveryDate || !paymentDate);
+        return !(!checkoutState.customerInfo.name || !checkoutState.customerInfo.surname || !checkoutState.customerInfo.city || !checkoutState.customerInfo.address ||
+            !checkoutState.customerInfo.mobile_phone || !deliveryDate || !paymentDate);
     }
 
     const onPriceChange = (event) => {
@@ -466,8 +526,7 @@ const Checkout = () => {
     const sendOrder = (status) => {
         const order_goods = [];
         cartCtx.items.forEach(item => {
-            console.log(item);
-            order_goods.push({
+             order_goods.push({
                 product_uid: item.uid,
                 product_characteristic_uid: item.characteristic_uid,
                 product_quantity: item.amount,
@@ -483,29 +542,30 @@ const Checkout = () => {
             user_uid: "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
             payment_date: formattedDate(paymentDate),
             delivery_date: formattedDate(deliveryDate),
-            client_uid: customerInfo.uid,
-            client_name: `${customerInfo.surname} ${customerInfo.name} ${customerInfo.patronymic}`,
-            client_date_born: customerInfo.birthdate ? formattedDate(customerInfo.birthdate) : "0001-01-01",
-            client_gender: customerInfo.gender,
+            client_uid: checkoutState.customerInfo.uid,
+            client_name: `${checkoutState.customerInfo.surname} ${checkoutState.customerInfo.name} ${checkoutState.customerInfo.patronymic}`,
+            client_date_born: checkoutState.customerInfo.birthdate ? formattedDate(checkoutState.customerInfo.birthdate) : "0001-01-01",
+            client_gender: checkoutState.customerInfo.gender,
             client_new_phone: customerRefactoringInfo.mobile_phone ?
                 (oldCustomerInfo.mobile_phone === customerRefactoringInfo.mobile_phone ? 0 : 1) : 0,
-            client_mobil_phone: customerInfo.mobile_phone,
+            client_mobil_phone: checkoutState.customerInfo.mobile_phone,
             client_new_phone2: customerRefactoringInfo.other_phone ?
                 (oldCustomerInfo.other_phone === customerRefactoringInfo.other_phone ? 0 : 1) : 0,
-            client_mobil_phone2: customerInfo.other_phone,
+            client_mobil_phone2: checkoutState.customerInfo.other_phone,
             client_new_delivery_address: customerRefactoringInfo.address ?
                 (oldCustomerInfo.address === customerRefactoringInfo.address ? 0 : 1) : 0,
-            client_delivery_city_code: customerInfo.city.code,
-            client_delivery_address: customerInfo.address,
-            client_mail: customerInfo.email,
-            comment: customerInfo.note,
+            client_delivery_city_code: checkoutState.customerInfo.city.code,
+            client_delivery_address: checkoutState.customerInfo.address,
+            client_mail: checkoutState.customerInfo.email,
+            comment: checkoutState.customerInfo.note,
             delivery_type: deliveryType,
             payment_method: paymentType,
-            client_number_passport: customerInfo.identifierNumber,
-            client_fin_code: customerInfo.finCode,
-            client_passport_series: customerInfo.passport_series,
+            client_number_passport: checkoutState.customerInfo.identifierNumber,
+            client_fin_code: checkoutState.customerInfo.finCode,
+            client_passport_series: checkoutState.customerInfo.passport_series,
             goods: order_goods,
-            bank_cash: bankCommission
+            bank_cash: bankCommission,
+            id: checkoutState.id,
         }
         if (status === "ORDERED" && handleValidation()) {
             setIsSending(true);
@@ -681,7 +741,7 @@ const Checkout = () => {
                             <div className="col-md-4 mb-2">
                                 <label>Ad<span className="text-danger">*</span></label>
                                 <input type="text" className="form-control"
-                                       value={customerInfo && customerInfo?.name}
+                                       value={checkoutState.customerInfo && checkoutState.customerInfo?.name}
                                        onChange={e => handleInputChange("name", e.target.value)}/>
                                 {!formValidation.name &&
                                 <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
@@ -689,7 +749,7 @@ const Checkout = () => {
                             <div className="col-md-4 mb-2">
                                 <label>Soyad<span className="text-danger">*</span></label>
                                 <input type="text" className="form-control"
-                                       value={customerInfo && customerInfo?.surname}
+                                       value={checkoutState.customerInfo && checkoutState.customerInfo?.surname}
                                        onChange={e => handleInputChange("surname", e.target.value)}/>
                                 {!formValidation.surname &&
                                 <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
@@ -697,14 +757,14 @@ const Checkout = () => {
                             <div className="col-md-4 mb-2">
                                 <label>Ata adı</label>
                                 <input type="text" className="form-control"
-                                       value={customerInfo && customerInfo?.patronymic}
+                                       value={checkoutState.customerInfo && checkoutState.customerInfo?.patronymic}
                                        onChange={e => handleInputChange("patronymic", e.target.value)}/>
                             </div>
                             <div className="col-md-4">
                                 <label>ŞV-i Fin Kod</label>
                                 <input type="text" className="form-control"
                                        maxLength="7"
-                                       value={customerInfo && customerInfo?.finCode}
+                                       value={checkoutState.customerInfo && checkoutState.customerInfo?.finCode}
                                        onChange={e => handleInputChange("finCode", e.target.value)}/>
                             </div>
                             <div className="col-md-5">
@@ -712,7 +772,7 @@ const Checkout = () => {
                                 <div className="row">
                                     <div className="col-md-4 pe-0">
                                         <select className="form-control form-select"
-                                                value={customerInfo && customerInfo?.passport_series ? customerInfo?.passport_series : ''}
+                                                value={checkoutState.customerInfo && checkoutState.customerInfo?.passport_series ? checkoutState.customerInfo?.passport_series : ''}
                                                 onChange={e => handleInputChange("passport_series", e.target.value)}
                                                 placeholder='ŞV seriyası'>
                                             <option value="AZE">AZE</option>
@@ -722,7 +782,7 @@ const Checkout = () => {
                                     <div className="col-md-8">
                                         <input type="number" className="form-control"
                                                maxLength="8"
-                                               value={customerInfo && customerInfo?.identifierNumber}
+                                               value={checkoutState.customerInfo && checkoutState.customerInfo?.identifierNumber}
                                                onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
                                     </div>
                                 </div>
@@ -759,60 +819,10 @@ const Checkout = () => {
                         <div className="row mb-3">
                             <div className="col-md-6">
                                 <label htmlFor='birthdate'>Doğum tarixi</label>
-                                <DatePicker
-                                    onChangeRaw={(e) => e.preventDefault()}
-                                    disabled={isRefactorDisabled.birthdate}
-                                    dateFormat="yyyy-MM-dd"
-                                    className="form-control"
-                                    renderCustomHeader={({
-                                                             date,
-                                                             changeYear,
-                                                             changeMonth,
-                                                             decreaseMonth,
-                                                             increaseMonth,
-                                                             prevMonthButtonDisabled,
-                                                             nextMonthButtonDisabled,
-                                                         }) => (
-                                        <div
-                                            style={{
-                                                margin: 10,
-                                                display: "flex",
-                                                justifyContent: "center",
-                                            }}
-                                        >
-                                            <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled}>
-                                                {"<"}
-                                            </button>
-                                            <select
-                                                value={getYear(date)}
-                                                onChange={({target: {value}}) => changeYear(value)}
-                                            >
-                                                {years.map((option) => (
-                                                    <option key={option} value={option}>
-                                                        {option}
-                                                    </option>
-                                                ))}
-                                            </select>
-
-                                            <select
-                                                value={months[getMonth(date)]}
-                                                onChange={({target: {value}}) =>
-                                                    changeMonth(months.indexOf(value))
-                                                }>
-                                                {months.map((option) => (
-                                                    <option key={option} value={option}>
-                                                        {option}
-                                                    </option>
-                                                ))}
-                                            </select>
-
-                                            <button onClick={increaseMonth} disabled={nextMonthButtonDisabled}>
-                                                {">"}
-                                            </button>
-                                        </div>
-                                    )}
-                                    selected={customerInfo.birthdate}
-                                    onChange={(date) => handleInputChange("birthdate", date)}
+                                <BirthDateDatepicker
+                                    selectedDate={checkoutState.customerInfo.birthdate ? new Date(checkoutState.customerInfo.birthdate) : ""}
+                                    isDisabled={isRefactorDisabled.birthdate}
+                                    onDateChange={handleInputChange}
                                 />
                             </div>
                             <div className="col-md-6">
@@ -821,9 +831,9 @@ const Checkout = () => {
                                     isDisabled={isRefactorDisabled.city}
                                     styles={selectStyles}
                                     options={city}
-                                    value={customerInfo && customerInfo?.city ? [{
-                                        value: customerInfo?.city?.code,
-                                        label: customerInfo?.city?.name
+                                    value={checkoutState.customerInfo && checkoutState.customerInfo?.city ? [{
+                                        value: checkoutState.customerInfo?.city?.code,
+                                        label: checkoutState.customerInfo?.city?.name
                                     }] : ''}
                                     components={(props) => NoOptionsMessage(props, 'Şəhər tapılmadı.')}
                                     onChange={value => handleInputChange("select_city", value)}
@@ -838,7 +848,7 @@ const Checkout = () => {
                                 <label htmlFor='address'>Ünvan<span className="text-danger">*</span></label>
                                 <textarea className="form-control"
                                           disabled={isRefactorDisabled.address}
-                                          value={customerInfo && customerInfo.address}
+                                          value={checkoutState.customerInfo && checkoutState.customerInfo.address}
                                           onChange={e => handleInputChange("address", e.target.value)}
                                 />
                                 {!formValidation.address &&
@@ -852,7 +862,7 @@ const Checkout = () => {
                                 <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
                                            disabled={isRefactorDisabled.mobile_phone}
                                            onChange={e => handleInputChange("mobile_phone", e.target.value)}
-                                           value={customerInfo && customerInfo.mobile_phone}/>
+                                           value={checkoutState.customerInfo && checkoutState.customerInfo.mobile_phone}/>
                                 {!formValidation.mobile_phone &&
                                 <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
@@ -861,7 +871,7 @@ const Checkout = () => {
                                 <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
                                            disabled={isRefactorDisabled.other_phone}
                                            onChange={e => handleInputChange("other_phone", e.target.value)}
-                                           value={customerInfo && customerInfo.other_phone}/>
+                                           value={checkoutState.customerInfo && checkoutState.customerInfo.other_phone}/>
                             </div>
                         </div>
                         <div className="row mb-3">
@@ -870,7 +880,7 @@ const Checkout = () => {
                                 <input className="form-control"
                                        disabled={isRefactorDisabled.email}
                                        onChange={e => handleInputChange("email", e.target.value)}
-                                       value={customerInfo && customerInfo.email}/>
+                                       value={checkoutState.customerInfo && checkoutState.customerInfo.email}/>
                             </div>
                         </div>
                         <div className="row mb-3">
@@ -884,7 +894,7 @@ const Checkout = () => {
                                             name="gender"
                                             id="male"
                                             onChange={e => handleInputChange("male", e.target.checked)}
-                                            checked={!!(customerInfo.gender === 1)}
+                                            checked={!!(checkoutState.customerInfo.gender === 1)}
                                         />
                                         <label className="form-check-label" htmlFor="male">Kişi</label>
                                     </span>
@@ -896,7 +906,7 @@ const Checkout = () => {
                                             name="gender"
                                             id="female"
                                             onChange={e => handleInputChange("female", e.target.checked)}
-                                            checked={!!(customerInfo.gender === 0)}
+                                            checked={!!(checkoutState.customerInfo.gender === 0)}
                                         />
                                         <label className="form-check-label" htmlFor="female">Qadın</label>
                                     </span>
@@ -936,16 +946,16 @@ const Checkout = () => {
                                 <label>Şərh</label>
                                 <textarea className="form-control"
                                           onChange={e => handleInputChange("note", e.target.value)}
-                                          value={customerInfo && customerInfo.note}/>
+                                          value={checkoutState.customerInfo && checkoutState.customerInfo.note}/>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="row mt-3">
-                    <div className="col-md-12 d-flex justify-content-between">
+                    <div className="col-md-12 d-flex justify-content-end">
                         <button
                             disabled={isAddingWishlist}
-                            className="btn btn-warning"
+                            className="btn btn-warning me-2"
                             onClick={sendOrder.bind(this, 'SAVED')}>
                             {isAddingWishlist ? "Gözləyin" : "Yadda saxla"}
                         </button>

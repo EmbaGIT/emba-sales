@@ -1,12 +1,12 @@
 import {useReducer} from "react";
 import CartContext from "./CartContext";
-import {toast} from 'react-toastify';
 
 const defaultCartState = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : {
     items: [],
     totalAmount: 0,
     discountAmount: 0,
     totalDiscount: 0,
+    savedId: ''
 };
 
 const cartReducer = (state, action) => {
@@ -45,13 +45,15 @@ const cartReducer = (state, action) => {
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
             totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: state.savedId
         }));
 
         return {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-            totalDiscount: Math.round(totalDiscount * 100) / 100
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: state.savedId
         };
     }
 
@@ -70,13 +72,15 @@ const cartReducer = (state, action) => {
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
             totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: state.savedId
         }));
 
         return {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-            totalDiscount: Math.round(totalDiscount * 100) / 100
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: state.savedId
         };
     }
 
@@ -102,13 +106,15 @@ const cartReducer = (state, action) => {
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
             totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: state.savedId
         }));
 
         return {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-            totalDiscount: Math.round(totalDiscount * 100) / 100
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: state.savedId
         };
     }
 
@@ -146,13 +152,15 @@ const cartReducer = (state, action) => {
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
             totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: state.savedId
         }));
 
         return {
             items: updatedItems,
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-            totalDiscount: Math.round(totalDiscount * 100) / 100
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: state.savedId
         };
     }
 
@@ -175,14 +183,16 @@ const cartReducer = (state, action) => {
                 items: updatedItems,
                 totalAmount: state.totalAmount,
                 discountAmount: updatedDiscountAmount,
-                totalDiscount: state.totalDiscount
+                totalDiscount: state.totalDiscount,
+                savedId: state.savedId
             }));
 
             return {
                 items: updatedItems,
                 totalAmount: state.totalAmount,
                 discountAmount: updatedDiscountAmount,
-                totalDiscount: state.totalDiscount
+                totalDiscount: state.totalDiscount,
+                savedId: state.savedId
             };
         }
     }
@@ -193,27 +203,26 @@ const cartReducer = (state, action) => {
             items: [],
             totalAmount: 0,
             discountAmount: 0,
-            totalDiscount: 0
+            totalDiscount: 0,
+            savedId: ''
         };
     }
 
     if(action.type==="SavedOrder"){
-        console.log(action.value);
         const products = [];
-        action.value.goods.forEach(product => {
-            console.log(product)
+        action.value.goods.forEach(good => {
             products.push({
-                amount: product.product_quantity,
-                discount: product.product_discount,
+                amount: good.product_quantity,
+                discount: good.product_discount,
                 files: '',
-                id: product.id,
-                name: product.product_name,
-                price: product.product_price,
-                discount_price: product.product_price - (product.product_price*product.product_discount/100),
-                parent : product.parent_name,
-                category: product.category_id,
-                uid: product.product_uid,
-                characteristic_uid: product.product_characteristic_uid,
+                id: good.id,
+                name: good.product_name,
+                price: good.product_price,
+                discount_price: good.product_price - (good.product_price*good.product_discount/100),
+                parent : good.parent_name,
+                category: good.category_id,
+                uid: good.product_uid,
+                characteristic_uid: good.product_characteristic_uid,
                 characteristic_code: '',
             })
         })
@@ -235,13 +244,15 @@ const cartReducer = (state, action) => {
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
             totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: action.value.id
         }));
 
         return {
             items: products,
             totalAmount: updatedTotalAmount,
             discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-            totalDiscount: Math.round(totalDiscount * 100) / 100
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: action.value.id
         };
     }
 
@@ -289,6 +300,7 @@ const CartProvider = (props) => {
         totalAmount: cartState.totalAmount,
         discountAmount: cartState.discountAmount,
         totalDiscount: cartState.totalDiscount,
+        savedId: cartState.savedId,
         addItem: addItemToCartHandler,
         removeItem: removeItemFromCartHandler,
         clearBasket: clearCartHandler,

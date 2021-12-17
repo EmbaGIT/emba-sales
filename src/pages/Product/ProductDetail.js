@@ -303,7 +303,6 @@ const Product = () => {
                 <div className="col-12 mb-3">
                     <p className="panel-heading">Dəst Tərkibi</p>
                 </div>
-                {console.log("subProductsIsIncluded", subProductsIsIncluded)}
                 {subProductsIsIncluded && subProductsIsIncluded.map((item) => (
                     <SubProductItem key={item.items[0].id}
                                     key_id={item.items[0].id}

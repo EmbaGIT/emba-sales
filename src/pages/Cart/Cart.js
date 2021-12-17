@@ -26,6 +26,7 @@ const Cart = () => {
                     characteristic_code: cartCtx.items[0].characteristic_code,
                     price: cartCtx.items[0].price,
                     parent: cartCtx.items[0].parent,
+                    category: cartCtx.items[0].category,
                     uid: cartCtx.items[0].uid
                 }],
             });
@@ -50,6 +51,7 @@ const Cart = () => {
                             characteristic_code: item.characteristic_code,
                             price: item.price,
                             parent: item.parent,
+                            category: item.category,
                             uid: item.uid
                         }],
                     })
@@ -115,6 +117,7 @@ const Cart = () => {
                         characteristic_uid: item.characteristic_uid,
                         characteristic_code: item.characteristic_code,
                         parent: item.parent,
+                        category: item.category,
                         files: item.files,
                         uid: item.uid
                     })
@@ -155,7 +158,7 @@ const Cart = () => {
             buttons: [
                 {
                     label: 'Sil',
-                    onClick: () =>  cartCtx.clearBasket()
+                    onClick: () => cartCtx.clearBasket()
                 },
                 {
                     label: 'Ləğv et',

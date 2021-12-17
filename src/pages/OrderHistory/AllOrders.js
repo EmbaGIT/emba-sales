@@ -8,7 +8,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import DatePicker from "react-datepicker";
 import {formattedDate} from "../../helpers/formattedDate";
-import axios from "axios";
 
 const AllOrders = () => {
     // const query = useQuery();

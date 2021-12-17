@@ -24,6 +24,7 @@ const BirthDateDatepicker = (props) => {
 
     return(
         <DatePicker
+            onChangeRaw={(e) => e.preventDefault()}
             selected={props.selectedDate}
             disabled={props.isDisabled}
             dateFormat="yyyy-MM-dd"

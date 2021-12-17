@@ -1,6 +1,5 @@
 import {useState, useEffect, useContext} from "react";
 import Modal from '../../UI/Modal';
-import CountUpdate from "../../UI/CountUpdate";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 import {selectStyles} from "../../helpers/selectStyles";
@@ -392,7 +391,7 @@ const OrderInfo = (props) => {
                 ...alldata,
                 deliveryType: 1
             }
-        }else if (type === "refactor") {
+        } else if (type === "refactor") {
             if (value) {
                 setIsRefactorDisabled(prevState => ({
                     ...prevState,
@@ -499,33 +498,6 @@ const OrderInfo = (props) => {
         })) : setFormValidation(prevState => ({...prevState, city: true}))
 
         return !(!orderInfo.name || !orderInfo.city || !orderInfo.address || !orderInfo.mobile_phone || !orderInfo.delivery_date || !orderInfo.payment_date);
-    }
-
-    const handleCountUpdate = (id, enteredAmount) => {
-        const enteredAmountNumber = +enteredAmount;
-        if (enteredAmount.trim().length === 0 || enteredAmountNumber < 1 || enteredAmountNumber > 12) {
-            return;
-        } else {
-            let updatedGoods = [];
-            let total_price=0;
-            let discount_total_price=0;
-            orderInfo.goods.map(good => {
-                good.id === id ? updatedGoods.push({
-                    ...good,
-                    product_quantity: enteredAmountNumber
-                }) : updatedGoods.push(good);
-            })
-            updatedGoods.map(item => {
-                total_price += item.product_price * item.product_quantity;
-                discount_total_price += item.product_price * item.product_quantity - item.product_quantity * item.product_price * item.product_discount / 100;
-            })
-            setOrderInfo(prevState => ({
-                ...prevState,
-                goods: updatedGoods,
-                totalPrice: total_price,
-                discountPrice: discount_total_price
-            }));
-        }
     }
 
     const MessageComponent = ({text}) => (
@@ -642,10 +614,7 @@ const OrderInfo = (props) => {
                                 {orderInfo && orderInfo?.goods?.map(item => (
                                     <tr key={item.id}>
                                         <td><b>{item.product_name}</b></td>
-                                        <td>{/*{orderInfo.status === "SAVED" ?
-                                            <CountUpdate id={item.id} quantity={item.product_quantity}
-                                                         onHandleUpdate={handleCountUpdate}/>
-                                            : item.product_quantity}*/} {item.product_quantity}</td>
+                                        <td>{item.product_quantity}</td>
                                         <td>{item.product_price} AZN</td>
                                         <td>{item.product_discount.toFixed(2)} %</td>
                                         <td>{(item.product_price * item.product_quantity - item.product_quantity * item.product_price * item.product_discount / 100).toFixed(2)} AZN</td>
@@ -902,8 +871,8 @@ const OrderInfo = (props) => {
             <div className="d-flex justify-content-end mt-2">
                 {props.info.status === "SAVED" &&
                     <div>
-                        <button className="btn btn-primary me-2" disabled={isSending} onClick={sendWishListOrder}>{isSending ? "Gözləyin" : "Sifarişi göndər"}</button>
-                        <button className="btn btn-success me-2" disabled={isSending} onClick={newCartObject}>Dəyişiklik et</button>
+                        <button className="btn btn-info me-2" disabled={isSending} onClick={newCartObject}>Dəyişiklik et</button>
+                        <button className="btn btn-success me-2" disabled={isSending} onClick={sendWishListOrder}>{isSending ? "Gözləyin" : "Sifarişi göndər"}</button>
                     </div>
                 }
                 <div className="btn btn-primary" onClick={props.onCloseModal}>Bağla</div>

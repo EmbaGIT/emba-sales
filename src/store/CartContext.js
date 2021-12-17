@@ -5,6 +5,7 @@ const CartContext = React.createContext({
     totalAmount: 0,
     discountAmount: 0,
     totalDiscount: 0,
+    savedId: '',
     addItem: () => {},
     removeItem: () => {},
     discountHandler: () => {},
