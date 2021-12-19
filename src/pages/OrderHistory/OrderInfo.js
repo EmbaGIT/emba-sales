@@ -652,11 +652,12 @@ const OrderInfo = (props) => {
                         </div>
                         <div className="tab-pane fade" id="customer-info" role="tabpanel"
                              aria-labelledby="customer-info">
-                            <h6>Müştəri bazasında axtarın</h6>
+                            {orderInfo?.status !== "ORDERED" && <h6>Müştəri bazasında axtarın</h6>}
                             <div className="input-group row mb-3">
                                 <div className="col-md-4 mb-2">
                                     <label>Ad<span className="text-danger">*</span></label>
                                     <input type="text" className="form-control"
+                                           disabled={orderInfo?.status === "ORDERED"}
                                            value={orderInfo && orderInfo?.name}
                                            onChange={e => handleInputChange("name", e.target.value)}/>
                                     {!formValidation.name &&
@@ -665,6 +666,7 @@ const OrderInfo = (props) => {
                                 <div className="col-md-4 mb-2">
                                     <label>Soyad<span className="text-danger">*</span></label>
                                     <input type="text" className="form-control"
+                                           disabled={orderInfo?.status === "ORDERED"}
                                            value={orderInfo && orderInfo?.surname}
                                            onChange={e => handleInputChange("surname", e.target.value)}/>
                                     {!formValidation.surname &&
@@ -673,12 +675,14 @@ const OrderInfo = (props) => {
                                 <div className="col-md-4 mb-2">
                                     <label>Ata adı</label>
                                     <input type="text" className="form-control"
+                                           disabled={orderInfo?.status === "ORDERED"}
                                            value={orderInfo && orderInfo?.patronymic}
                                            onChange={e => handleInputChange("patronymic", e.target.value)}/>
                                 </div>
                                 <div className="col-md-4">
                                     <label>ŞV-i Fin Kod</label>
                                     <input type="text" className="form-control"
+                                           disabled={orderInfo?.status === "ORDERED"}
                                            maxLength="7"
                                            value={orderInfo && orderInfo?.finCode}
                                            onChange={e => handleInputChange("finCode", e.target.value)}/>
@@ -688,6 +692,7 @@ const OrderInfo = (props) => {
                                     <div className="row">
                                         <div className="col-md-4 pe-0">
                                             <select className="form-control form-select"
+                                                    disabled={orderInfo?.status === "ORDERED"}
                                                     value={orderInfo && orderInfo?.passport_series ? orderInfo?.passport_series : ''}
                                                     onChange={e => handleInputChange("passport_series", e.target.value)}
                                                     placeholder='ŞV seriyası'>
@@ -696,16 +701,17 @@ const OrderInfo = (props) => {
                                             </select>
                                         </div>
                                         <div className="col-md-8">
-                                            <input type="number" className="form-control"
-                                                   maxLength="8"
-                                                   value={orderInfo && orderInfo?.identifierNumber}
-                                                   onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
+                                            <InputMask mask="99999999"
+                                                       className="form-control"
+                                                       disabled={orderInfo?.status === "ORDERED"}
+                                                       value={orderInfo && orderInfo?.identifierNumber}
+                                                       onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-md-3 d-flex align-items-end">
+                                {orderInfo?.status !== "ORDERED" && <div className="col-md-3 d-flex align-items-end">
                                     <div className="btn btn-primary" onClick={searchOnDatabase}>Axtar</div>
-                                </div>
+                                </div>}
                             </div>
                             {available_customer_loading && <p>Məlumat yüklənir...</p>}
                             {customerSearch && (availableCustomer?.length ?
@@ -724,7 +730,7 @@ const OrderInfo = (props) => {
                                         type="checkbox"
                                         id="refactorInfo"
                                         onChange={e => handleInputChange("refactor", e.target.checked)}
-                                        disabled={isRefactorDisabled.isDisabled}
+                                        disabled={orderInfo?.status === "ORDERED" || isRefactorDisabled.isDisabled}
                                     />
                                     <label className="form-check-label" htmlFor="refactorInfo">
                                         Məlumatları Yenilə
@@ -737,14 +743,14 @@ const OrderInfo = (props) => {
                                     <label htmlFor='birthdate'>Doğum tarixi</label>
                                     <BirthDateDatepicker
                                         selectedDate={orderInfo?.birthdate ? new Date(orderInfo?.birthdate) : ""}
-                                        isDisabled={isRefactorDisabled.birthdate}
+                                        isDisabled={orderInfo?.status === "ORDERED" || isRefactorDisabled.birthdate}
                                         onDateChange={handleInputChange}
                                     />
                                 </div>
                                 <div className="col-md-6">
                                     <label>Şəhər<span className="text-danger">*</span></label>
                                     <Select
-                                        isDisabled={isRefactorDisabled.city}
+                                        isDisabled={orderInfo?.status === "ORDERED" || isRefactorDisabled.city}
                                         styles={selectStyles}
                                         options={city}
                                         value={orderInfo && orderInfo?.city ? [{
@@ -763,7 +769,7 @@ const OrderInfo = (props) => {
                                 <div className="col-12">
                                     <label htmlFor='address'>Ünvan<span className="text-danger">*</span></label>
                                     <textarea className="form-control"
-                                              disabled={isRefactorDisabled.address}
+                                              disabled={orderInfo?.status === "ORDERED" || isRefactorDisabled.address}
                                               value={orderInfo && orderInfo?.address}
                                               onChange={e => handleInputChange("address", e.target.value)}
                                     />
@@ -776,7 +782,7 @@ const OrderInfo = (props) => {
                                 <div className="col-md-6">
                                     <label>Mobil telefon<span className="text-danger">*</span></label>
                                     <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
-                                               disabled={isRefactorDisabled.mobile_phone}
+                                               disabled={orderInfo?.status === "ORDERED" || isRefactorDisabled.mobile_phone}
                                                onChange={e => handleInputChange("mobile_phone", e.target.value)}
                                                value={orderInfo && orderInfo?.mobile_phone}/>
                                     {!formValidation.mobile_phone &&
@@ -785,7 +791,7 @@ const OrderInfo = (props) => {
                                 <div className="col-md-6">
                                     <label>Digər telefon</label>
                                     <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
-                                               disabled={isRefactorDisabled.other_phone}
+                                               disabled={orderInfo?.status === "ORDERED" || isRefactorDisabled.other_phone}
                                                onChange={e => handleInputChange("other_phone", e.target.value)}
                                                value={orderInfo && orderInfo?.other_phone}/>
                                 </div>
@@ -794,7 +800,7 @@ const OrderInfo = (props) => {
                                 <div className="col-md-12">
                                     <label>Email</label>
                                     <input className="form-control"
-                                           disabled={isRefactorDisabled.email}
+                                           disabled={orderInfo?.status === "ORDERED" || isRefactorDisabled.email}
                                            onChange={e => handleInputChange("email", e.target.value)}
                                            value={orderInfo && orderInfo?.email}/>
                                 </div>
@@ -804,25 +810,25 @@ const OrderInfo = (props) => {
                                     <div className="d-flex">
                                         <span className="form-check">
                                             <input
-                                                disabled={isRefactorDisabled.gender}
+                                                disabled={orderInfo?.status === "ORDERED" || isRefactorDisabled.gender}
                                                 className="form-check-input"
                                                 type="radio"
                                                 name="gender"
                                                 id="male"
                                                 onChange={e => handleInputChange("male", e.target.checked)}
-                                                checked={!!(orderInfo && orderInfo?.gender === 0)}
+                                                checked={!!(orderInfo && orderInfo?.gender === 1)}
                                             />
                                             <label className="form-check-label" htmlFor="male">Kişi</label>
                                         </span>
                                         <span className="form-check ms-3">
                                             <input
-                                                disabled={isRefactorDisabled.gender}
+                                                disabled={orderInfo?.status === "ORDERED" || isRefactorDisabled.gender}
                                                 className="form-check-input"
                                                 type="radio"
                                                 name="gender"
                                                 id="female"
                                                 onChange={e => handleInputChange("female", e.target.checked)}
-                                                checked={!!(orderInfo && orderInfo?.gender === 1)}
+                                                checked={!!(orderInfo && orderInfo?.gender === 0)}
                                             />
                                             <label className="form-check-label" htmlFor="female">Qadın</label>
                                         </span>
@@ -833,6 +839,7 @@ const OrderInfo = (props) => {
                                 <div className="col-md-6">
                                     <label>Ödəniş tarixi<span className="text-danger">*</span></label>
                                     <DatePicker
+                                        disabled={orderInfo?.status === "ORDERED"}
                                         className="form-control"
                                         dateFormat="yyyy-MM-dd"
                                         selected={orderInfo?.payment_date ? new Date(orderInfo?.payment_date) : ''}
@@ -845,6 +852,7 @@ const OrderInfo = (props) => {
                                 <div className="col-md-6">
                                     <label>Çatdırılma tarixi<span className="text-danger">*</span></label>
                                     <DatePicker
+                                        disabled={orderInfo?.status === "ORDERED"}
                                         className="form-control"
                                         dateFormat="yyyy-MM-dd"
                                         selected={orderInfo?.delivery_date ? new Date(orderInfo?.delivery_date) : ''}
@@ -859,6 +867,7 @@ const OrderInfo = (props) => {
                                 <div className="col-md-12">
                                     <label>Şərh</label>
                                     <textarea className="form-control"
+                                              disabled={orderInfo?.status === "ORDERED"}
                                               onChange={e => handleInputChange("note", e.target.value)}
                                               value={orderInfo && orderInfo.note}/>
                                 </div>

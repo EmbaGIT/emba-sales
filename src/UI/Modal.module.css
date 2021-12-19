@@ -10,8 +10,8 @@
 
 .modal {
     position: fixed;
-    top: 20vh;
-    max-height: 550px;
+    top: 10vh;
+    max-height: 500px;
     overflow-y: scroll;
     left: 5%;
     width: 90%;

@@ -64,13 +64,14 @@ const SubProductItem = (props) => {
             <div className="sub-item-wrapper">
                 <div className="sub-item-info">
                     <div className="sub-item-image">
-                        {props.files?.length ? props.files.map(file => (
+                        {props.files?.length ?
                             <LightGallery speed={500}>
-                                <a href={file.originalImageUrl}>
+                                {props.files.map((file, index) => (
+                                <a href={file.originalImageUrl} key={index}>
                                     <img alt="" style={img} src={file.lowQualityImageUrl} />
-                                </a>
+                                </a> ))}
                             </LightGallery>
-                        )) : <img src={noImage} alt=""/>}
+                        : <img src={noImage} alt=""/>}
                     </div>
                     <div className="sub-item">
                         <p className="sub-item-name" onClick={props.onClickHandle.bind(null, props.id)}>{props.name}</p>
@@ -89,7 +90,7 @@ const SubProductItem = (props) => {
                 <div className="p-2">
                     {props.stock.length ?
                         <select className="form-control form-select">
-                            {props.stock.map(info  => (<option value="1">{info.warehouse} - {info.quantity}</option>))}
+                            {props.stock.map((info, index)  => (<option key={index} value="1">{info.warehouse} - {info.quantity}</option>))}
                         </select>
                         : <div>Anbar məlumatı yoxdur</div>
                     }

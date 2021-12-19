@@ -86,9 +86,9 @@ const SearchProductList = () => {
                     <div className="grid-item" key={index}>
                         <Link to={product.colors.length ? `/product/${product.brand}/${product.categoryId}/${product.parentId}?color=${product.colors[0].id}` : `/product/${product.brand}/${product.categoryId}/${product.parentId}`} className="pr-wrapper product-add">
                             <div className="pr-image">
-                                {product.file.length ? product.file.map(file => (
-                                    <img src={file.lowQualityImageUrl} alt=""/>
-                                )) : <img src={noImage} alt=""/>}
+                                {product.file.length ?
+                                    <img src={product.file[0].lowQualityImageUrl} alt=""/>
+                                    : <img src={noImage} alt=""/>}
                             </div>
                         </Link>
                         <div className="pr-info">
@@ -125,7 +125,7 @@ const SearchProductList = () => {
                     activeClassName={'active'}
                     pageClassName={'page-item'}
                     pageLinkClassName={'page-link'}
-                    initialPage={page}
+                    forcePage={page}
                 />
                 }
             </div>

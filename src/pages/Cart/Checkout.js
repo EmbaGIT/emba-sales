@@ -334,6 +334,7 @@ const Checkout = () => {
         }
         if(cartCtx.savedId){
             post(`http://bpaws01l:8087/api/order/search?id.equals=${cartCtx.savedId}`).then(resOrderInfo => {
+                console.log(resOrderInfo);
                 setCheckoutState(prevState => ({
                     ...prevState,
                     id: resOrderInfo.content[0].id,
@@ -358,6 +359,11 @@ const Checkout = () => {
                         note: resOrderInfo.content[0].comment
                     }
                 }))
+                setBankCommission(resOrderInfo.content[0].bank_cash);
+                setDeliveryDate(resOrderInfo.content[0].delivery_date);
+                setPaymentDate(resOrderInfo.content[0].payment_date);
+                setPaymentType(resOrderInfo.content[0].payment_method);
+                setDeliveryType(resOrderInfo.content[0].delivery_type);
             })
         }
     }, [cartCtx]);
@@ -564,8 +570,7 @@ const Checkout = () => {
             client_fin_code: checkoutState.customerInfo.finCode,
             client_passport_series: checkoutState.customerInfo.passport_series,
             goods: order_goods,
-            bank_cash: bankCommission,
-            id: checkoutState.id,
+            bank_cash: bankCommission
         }
         if (status === "ORDERED" && handleValidation()) {
             setIsSending(true);
@@ -780,10 +785,10 @@ const Checkout = () => {
                                         </select>
                                     </div>
                                     <div className="col-md-8">
-                                        <input type="number" className="form-control"
-                                               maxLength="8"
-                                               value={checkoutState.customerInfo && checkoutState.customerInfo?.identifierNumber}
-                                               onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
+                                        <InputMask mask="99999999"
+                                                   className="form-control"
+                                                   value={checkoutState.customerInfo && checkoutState.customerInfo?.identifierNumber}
+                                                   onChange={e => handleInputChange("identifierNumber", e.target.value)}/>
                                     </div>
                                 </div>
                             </div>
@@ -894,7 +899,7 @@ const Checkout = () => {
                                             name="gender"
                                             id="male"
                                             onChange={e => handleInputChange("male", e.target.checked)}
-                                            checked={!!(checkoutState.customerInfo.gender === 1)}
+                                            checked={(checkoutState.customerInfo.gender === 1)}
                                         />
                                         <label className="form-check-label" htmlFor="male">Kişi</label>
                                     </span>
@@ -906,7 +911,7 @@ const Checkout = () => {
                                             name="gender"
                                             id="female"
                                             onChange={e => handleInputChange("female", e.target.checked)}
-                                            checked={!!(checkoutState.customerInfo.gender === 0)}
+                                            checked={(checkoutState.customerInfo.gender === 0)}
                                         />
                                         <label className="form-check-label" htmlFor="female">Qadın</label>
                                     </span>
@@ -920,7 +925,7 @@ const Checkout = () => {
                                     onChangeRaw={(e) => e.preventDefault()}
                                     dateFormat="yyyy-MM-dd"
                                     className="form-control"
-                                    selected={paymentDate}
+                                    selected={paymentDate ? new Date(paymentDate) : ''}
                                     onChange={(date) => setPaymentDate(date)}
                                     minDate={new Date()}
                                 />
@@ -933,7 +938,7 @@ const Checkout = () => {
                                     onChangeRaw={(e) => e.preventDefault()}
                                     dateFormat="yyyy-MM-dd"
                                     className="form-control"
-                                    selected={deliveryDate}
+                                    selected={deliveryDate ? new Date(deliveryDate) : ''}
                                     onChange={(date) => setDeliveryDate(date)}
                                     minDate={new Date()}
                                 />

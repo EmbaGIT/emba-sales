@@ -29,6 +29,8 @@ const Product = () => {
     const [subProductInfo, setSubProductInfo] = useState([]);
     const [cartIsShown, setCartIsShown] = useState(false);
 
+    console.log("authCtx", authCtx)
+
     const showCartHandler = () => {
         setCartIsShown(true);
     };
@@ -39,7 +41,7 @@ const Product = () => {
 
     function getProductStock(uid) {
         return postt(`http://bpaws01l:8087/api/inventory`, {
-            "user_uid": authCtx.user_uid,
+            "user_uid": "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
             "goods": [
                 {
                     "product_uid": uid,

@@ -211,6 +211,9 @@ const cartReducer = (state, action) => {
     if(action.type==="SavedOrder"){
         const products = [];
         action.value.goods.forEach(good => {
+            /*get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&category=${category_id}&color=${currentColor}&bucket=emba-store-images&parent=${parent_id}&product=${id}`).then(file => {
+                console.log(file)
+            })*/
             products.push({
                 amount: good.product_quantity,
                 discount: good.product_discount,

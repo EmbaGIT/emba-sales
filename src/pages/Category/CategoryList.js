@@ -126,7 +126,7 @@ const Category = () => {
                         activeClassName={'active'}
                         pageClassName={'page-item'}
                         pageLinkClassName={'page-link'}
-                        initialPage={parseInt(page)}
+                        forcePage={parseInt(page)}
                     />
                 }
             </div>
