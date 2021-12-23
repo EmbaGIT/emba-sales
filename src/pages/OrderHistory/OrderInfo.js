@@ -546,7 +546,7 @@ const OrderInfo = (props) => {
                 "id": orderInfo.id,
                 "payment_date": orderInfo.payment_date,
                 "payment_method": orderInfo.paymentType,
-                "user_uid": "8f859d20-e5f4-11eb-80d7-2c44fd84f8db"
+                "user_uid": authCtx.user_uid
             }
             post(`http://bpaws01l:8087/api/order/update/${orderInfo.id}`, postData).then(res => {
                 setIsSending(false);

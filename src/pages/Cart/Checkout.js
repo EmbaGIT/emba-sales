@@ -84,7 +84,7 @@ const Checkout = () => {
             mobile_phone: '',
             other_phone: '',
             address: '',
-            gender: '',
+            gender: 1,
             email: '',
             note: ''
         }
@@ -332,7 +332,7 @@ const Checkout = () => {
                 items: cartCtx.items
             }));
         }
-        if(cartCtx.savedId){
+        if (cartCtx.savedId) {
             post(`http://bpaws01l:8087/api/order/search?id.equals=${cartCtx.savedId}`).then(resOrderInfo => {
                 console.log(resOrderInfo);
                 setCheckoutState(prevState => ({
@@ -532,7 +532,11 @@ const Checkout = () => {
     const sendOrder = (status) => {
         const order_goods = [];
         cartCtx.items.forEach(item => {
-             order_goods.push({
+            order_goods.push({
+                brand: item.brand,
+                color_id: item.color_id,
+                product_id: item.id,
+                parent_id: item.parent_id,
                 product_uid: item.uid,
                 product_characteristic_uid: item.characteristic_uid,
                 product_quantity: item.amount,
@@ -545,7 +549,7 @@ const Checkout = () => {
             })
         })
         const order_data = {
-            user_uid: "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
+            user_uid: authCtx.user_uid,
             payment_date: formattedDate(paymentDate),
             delivery_date: formattedDate(deliveryDate),
             client_uid: checkoutState.customerInfo.uid,
@@ -586,7 +590,8 @@ const Checkout = () => {
                     });
                     cartCtx.clearBasket();
                 } else if (res.status === "ORDER_FAILED") {
-                    toast.error(<MessageComponent text={`Sifariş göndərilmədi! ${res.orderStateList[0].erpResponseMessage}`}/>, {
+                    toast.error(<MessageComponent
+                        text={`Sifariş göndərilmədi! ${res.orderStateList[0].erpResponseMessage}`}/>, {
                         position: toast.POSITION.TOP_LEFT,
                         toastId: 'success-toast-message',
                         autoClose: 1500,

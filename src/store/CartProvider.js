@@ -1,5 +1,6 @@
 import {useReducer} from "react";
 import CartContext from "./CartContext";
+import {get} from "../api/Api";
 
 const defaultCartState = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : {
     items: [],
@@ -9,10 +10,31 @@ const defaultCartState = localStorage.getItem('cart') ? JSON.parse(localStorage.
     savedId: ''
 };
 
+const totalAmount = (updatedItems) => {
+    let updatedTotalAmount=0;
+    updatedItems.map(item => {
+        updatedTotalAmount += item.price * item.amount
+    })
+    return updatedTotalAmount;
+}
+
+const totalDiscountAmount = (updatedItems) => {
+    let updatedDiscountAmount=0;
+    updatedItems.map(item => {
+        updatedDiscountAmount += item.discount_price * item.amount
+    });
+    return updatedDiscountAmount;
+}
+
+const discount = (totalAmount, discountAmount) => {
+    return 100 - (discountAmount*100/totalAmount)
+};
+
 const cartReducer = (state, action) => {
     if (action.type === 'ADD') {
         let updatedTotalAmount = 0;
         let updatedDiscountAmount = 0;
+        let totalDiscount =0;
         let updatedItems;
         const existingCartItemIndex = state.items.findIndex(
             (item) => item.id === action.item.id && item.characteristic_uid === action.item.characteristic_uid
@@ -30,15 +52,9 @@ const cartReducer = (state, action) => {
         } else {
             updatedItems = state.items.concat(action.item);
         }
-
-        updatedItems.map(item => {
-            updatedTotalAmount += item.price * item.amount
-        })
-
-        updatedItems.map(item => {
-            updatedDiscountAmount += item.discount_price * item.amount
-        });
-        const totalDiscount = 100 - (updatedDiscountAmount*100/updatedTotalAmount);
+        updatedTotalAmount = totalAmount(updatedItems);
+        updatedDiscountAmount = totalDiscountAmount(updatedItems);
+        totalDiscount = discount(updatedTotalAmount, updatedDiscountAmount)
 
         localStorage.setItem('cart', JSON.stringify({
             items: updatedItems,
@@ -87,20 +103,40 @@ const cartReducer = (state, action) => {
     if (action.type === 'DISCOUNT') {
         let updatedTotalAmount = 0;
         let updatedDiscountAmount = 0;
-        const updatedItems=[];
+        let totalDiscount =0;
 
-        action.discount.items.forEach(item => {
-            updatedTotalAmount += item.amount * item.price;
-        })
+        let updatedItems=[];
+        if(action.data.discountType === "all"){
+            state.items.forEach(item => {
+                updatedDiscountAmount += item.amount * item.price - (item.amount * item.price * action.data.discountData.discount / 100);
+                updatedItems.push({
+                    ...item,
+                    discount: action.data.discountData.discount,
+                    discount_price: item.price - (item.price * action.data.discountData.discount / 100)
+                })
+            });
+        }else{
+            const existingCartItemIndex = state.items.findIndex(
+                (item) => item.id === action.data.discountData.id && item.characteristic_uid === action.data.discountData.characteristic_uid
+            );
+            const existingCartItem = state.items[existingCartItemIndex];
+            if (existingCartItem) {
+                const updatedItem = {
+                    ...existingCartItem,
+                    discount: action.data.discountData.discount,
+                    discount_price: existingCartItem.price - (existingCartItem.price * action.data.discountData.discount/100)
+                };
+                updatedItems = [...state.items];
+                updatedItems[existingCartItemIndex] = updatedItem;
+            } else {
+                updatedItems = state.items.concat(action.item);
+            }
+        }
 
-        action.discount.items.forEach(item => {
-            updatedDiscountAmount += item.amount * item.price - (item.amount * item.price * item.discount / 100);
-            updatedItems.push({
-                ...item,
-                discount_price: item.price - (item.price * item.discount / 100)
-            })
-        });
-        const totalDiscount = 100 - (updatedDiscountAmount*100/updatedTotalAmount);
+        updatedTotalAmount = totalAmount(updatedItems);
+        updatedDiscountAmount = totalDiscountAmount(updatedItems);
+        totalDiscount = discount(updatedTotalAmount, updatedDiscountAmount)
+
         localStorage.setItem('cart', JSON.stringify({
             items: updatedItems,
             totalAmount: updatedTotalAmount,
@@ -121,6 +157,7 @@ const cartReducer = (state, action) => {
     if (action.type === 'UPDATE') {
         let updatedTotalAmount = 0;
         let updatedDiscountAmount = 0;
+        let totalDiscount;
         let updatedItems=[];
         const cartItemIndex = state.items.findIndex(
             (item) => item.id === action.id
@@ -137,15 +174,9 @@ const cartReducer = (state, action) => {
             updatedItems[cartItemIndex] = updatedItem;
         }
 
-        updatedItems.map(item => {
-            updatedTotalAmount += item.price * item.amount
-        })
-
-        updatedItems.map(item => {
-            updatedDiscountAmount += item.discount_price * item.amount
-        });
-
-        const totalDiscount = 100 - (updatedDiscountAmount*100/updatedTotalAmount);
+        updatedTotalAmount = totalAmount(updatedItems);
+        updatedDiscountAmount = totalDiscountAmount(updatedItems);
+        totalDiscount = discount(updatedTotalAmount, updatedDiscountAmount)
 
         localStorage.setItem('cart', JSON.stringify({
             items: updatedItems,
@@ -209,56 +240,69 @@ const cartReducer = (state, action) => {
     }
 
     if(action.type==="SavedOrder"){
-        const products = [];
-        action.value.goods.forEach(good => {
-            /*get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&category=${category_id}&color=${currentColor}&bucket=emba-store-images&parent=${parent_id}&product=${id}`).then(file => {
-                console.log(file)
-            })*/
-            products.push({
-                amount: good.product_quantity,
-                discount: good.product_discount,
-                files: '',
-                id: good.id,
-                name: good.product_name,
-                price: good.product_price,
-                discount_price: good.product_price - (good.product_price*good.product_discount/100),
-                parent : good.parent_name,
-                category: good.category_id,
-                uid: good.product_uid,
-                characteristic_uid: good.product_characteristic_uid,
-                characteristic_code: '',
-            })
-        })
-
         let updatedTotalAmount = 0;
         let updatedDiscountAmount = 0;
-        products.map(item => {
-            updatedTotalAmount += item.price * item.amount
-        })
 
-        products.map(item => {
-            updatedDiscountAmount += item.discount_price * item.amount
-        });
-
-        const totalDiscount = 100 - (updatedDiscountAmount*100/updatedTotalAmount);
-
-        localStorage.setItem('cart', JSON.stringify({
-            items: products,
-            totalAmount: updatedTotalAmount,
-            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-            totalDiscount: Math.round(totalDiscount * 100) / 100,
-            savedId: action.value.id
+        const promises = action.value.goods.map(good => new Promise(resolve => {
+            if (good.color_id) {
+                get(`http://bpaws01l:8089/api/image/resource?brand=${good.brand}&color=${good.color_id}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
+                    resolve({
+                        amount: good.product_quantity,
+                        discount: good.product_discount,
+                        files: file,
+                        id: good.id,
+                        name: good.product_name,
+                        price: good.product_price,
+                        discount_price: good.product_price - (good.product_price*good.product_discount/100),
+                        parent : good.parent_name,
+                        category: good.category_id,
+                        uid: good.product_uid,
+                        characteristic_uid: good.product_characteristic_uid,
+                        characteristic_code: '',
+                    })
+                })
+            } else {
+                 get(`http://bpaws01l:8089/api/image/resource?brand=${good.brand}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
+                     resolve({
+                        amount: good.product_quantity,
+                        discount: good.product_discount,
+                        files: file,
+                        id: good.id,
+                        name: good.product_name,
+                        price: good.product_price,
+                        discount_price: good.product_price - (good.product_price*good.product_discount/100),
+                        parent : good.parent_name,
+                        category: good.category_id,
+                        uid: good.product_uid,
+                        characteristic_uid: good.product_characteristic_uid,
+                        characteristic_code: '',
+                    })
+                })
+            }
         }));
 
-        return {
-            items: products,
-            totalAmount: updatedTotalAmount,
-            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-            totalDiscount: Math.round(totalDiscount * 100) / 100,
-            savedId: action.value.id
-        };
-    }
+        Promise.all(promises).then(products => {
+            updatedTotalAmount = totalAmount(products);
+            updatedDiscountAmount = totalDiscountAmount(products);
+            const totalDiscount = discount(updatedTotalAmount, updatedDiscountAmount)
 
+            localStorage.setItem('cart', JSON.stringify({
+                items: products,
+                totalAmount: updatedTotalAmount,
+                discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+                totalDiscount: Math.round(totalDiscount * 100) / 100,
+                savedId: action.value.id
+            }));
+
+            return {
+                items: products,
+                totalAmount: updatedTotalAmount,
+                discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+                totalDiscount: Math.round(totalDiscount * 100) / 100,
+                savedId: action.value.id
+            };
+        });
+    }
     return defaultCartState;
 }
 
@@ -281,8 +325,8 @@ const CartProvider = (props) => {
         dispatchCartAction({type: 'CLEAR'});
     };
 
-    const discountCartHandler = (discount) => {
-        dispatchCartAction({type: 'DISCOUNT', discount: discount});
+    const discountCartHandler = (data) => {
+        dispatchCartAction({type: 'DISCOUNT', data: data});
     };
 
 

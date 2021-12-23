@@ -34,11 +34,10 @@ const CartItem = (props) =>{
     return(
         <div className="cart-product-table pr-wrapper" key={props.product.id}>
             <div className="basket-product-image-row">
-                {props.product.files.length ? props.product.files.map(file => (
-                        <img src={file.originalImageUrl} alt=""
+                {props.product.files.length ?
+                        <img src={props.product.files[0].originalImageUrl} alt=""
                              className="basket-product-image"/>
-                    )) :
-                    <img src={noImage} alt="" className="basket-product-image"/>
+                        :  <img src={noImage} alt="" className="basket-product-image"/>
                 }
             </div>
             <div className="basket-product-name-row">
@@ -59,29 +58,11 @@ const CartItem = (props) =>{
             </div>
             <div className="basket-product-price-row">
                 <input type="text" disabled={props.isDisabled} className="form-control"
-                       onBlur={event => event.target.value.trim() ? props.applyDiscountProduct("single", [{
+                       onBlur={event => event.target.value.trim() && props.applyDiscountProduct("single", {
                            id: props.product.id,
                            discount: parseInt(event.target.value),
-                           amount: props.product.amount,
-                           price: props.product.price,
-                           name: props.product.name,
                            characteristic_uid: props.product.characteristic_uid,
-                           characteristic_code: props.product.characteristic_code,
-                           parent: props.product.parent,
-                           files: props.product.files,
-                           uid: props.product.uid
-                       }]) : props.applyDiscountProduct("single", [{
-                           id: props.product.id,
-                           discount: 0,
-                           amount: props.product.amount,
-                           price: props.product.price,
-                           name: props.product.name,
-                           characteristic_uid: props.product.characteristic_uid,
-                           characteristic_code: props.product.characteristic_code,
-                           parent: props.product.parent,
-                           files: props.product.files,
-                           uid: props.product.uid
-                       }])}
+                       })}
                        onChange={event => props.handleInputChange(props.index, props.pr_index, event.target.value)}
                        value={props.product.discount}
                        style={{width: '80px'}} placeholder="%"/>

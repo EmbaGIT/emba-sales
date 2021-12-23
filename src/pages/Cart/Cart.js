@@ -62,16 +62,10 @@ const Cart = () => {
     }, [cartCtx]);
 
     const clearDiscount = () => {
-        const cartItems = [];
         const cartStateArr = [];
-        cartCtx.items.forEach(item => {
-            cartItems.push({
-                ...item,
-                discount: 0,
-            })
-        })
         cartCtx.discountHandler({
-            items: cartItems
+            discountType: "all",
+            discountData: {discount: 0}
         });
         cartState.forEach(item => {
             const itemArr = [];
@@ -91,41 +85,14 @@ const Cart = () => {
 
     const applyDiscountProduct = (type, param) => {
         if (type === "all") {
-            const cartItems = [];
-            cartCtx.items.forEach(item => {
-                cartItems.push({
-                    ...item,
-                    discount: param,
-                })
-            })
             cartCtx.discountHandler({
-                type: "all",
-                items: cartItems
+                discountType: "all",
+                discountData: {discount: param}
             });
         } else {
-            const cartItems = [];
-            cartCtx.items.forEach(item => {
-                if (item.id === param[0].id) {
-                    cartItems.push(param[0])
-                } else {
-                    cartItems.push({
-                        id: item.id,
-                        discount: item.discount,
-                        amount: item.amount,
-                        price: item.price,
-                        name: item.name,
-                        characteristic_uid: item.characteristic_uid,
-                        characteristic_code: item.characteristic_code,
-                        parent: item.parent,
-                        category: item.category,
-                        files: item.files,
-                        uid: item.uid
-                    })
-                }
-            })
             cartCtx.discountHandler({
-                type: "single",
-                items: cartItems
+                discountType: "single",
+                discountData: param
             })
         }
     }
@@ -184,13 +151,14 @@ const Cart = () => {
                         <div>
                             <div className="basket-product-wrapper card card-table">
                                 {cartState.map((item, index) => (
-                                    <div>
+                                    <div key={index}>
                                         <div
                                             className="list-group-item-primary p-3 d-flex justify-content-between align-content-center">
                                             <span>{item.parent}</span>
                                         </div>
                                         {item.products && item.products.map((product, pr_index) => (
-                                            <CartItem product={product}
+                                            <CartItem key={pr_index}
+                                                      product={product}
                                                       isDisabled={isDisabled}
                                                       index={index}
                                                       pr_index={pr_index}

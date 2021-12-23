@@ -41,7 +41,7 @@ const Product = () => {
 
     function getProductStock(uid) {
         return postt(`http://bpaws01l:8087/api/inventory`, {
-            "user_uid": "8f859d20-e5f4-11eb-80d7-2c44fd84f8db",
+            "user_uid": authCtx.user_uid,
             "goods": [
                 {
                     "product_uid": uid,
@@ -307,7 +307,6 @@ const Product = () => {
                 </div>
                 {subProductsIsIncluded && subProductsIsIncluded.map((item) => (
                     <SubProductItem key={item.items[0].id}
-                                    key_id={item.items[0].id}
                                     id={item.items[0].id}
                                     uid={item.items[0].uid}
                                     name={item.items[0].name}
@@ -316,6 +315,9 @@ const Product = () => {
                                     characteristics={item.characteristic}
                                     defaultValue={1}
                                     parent={item.items[0].parentName}
+                                    parent_id={parent_id}
+                                    color_id={currentColor}
+                                    brand={brand}
                                     category_id={category_id}
                                     stock={item.stock}
                                     onClickHandle={handleModuleInfo}
@@ -328,7 +330,6 @@ const Product = () => {
                 </div>
                 {subProductsNotIncluded && subProductsNotIncluded.map((item) => (
                     <SubProductItem key={item.items[0].id}
-                                    key_id={item.items[0].id}
                                     id={item.items[0].id}
                                     uid={item.items[0].uid}
                                     name={item.items[0].name}
@@ -337,6 +338,9 @@ const Product = () => {
                                     characteristics={item.characteristic}
                                     defaultValue={1}
                                     parent={item.items[0].parentName}
+                                    parent_id={parent_id}
+                                    color_id={currentColor}
+                                    brand={brand}
                                     category_id={category_id}
                                     stock={item.stock}
                                     onClickHandle={handleModuleInfo}
