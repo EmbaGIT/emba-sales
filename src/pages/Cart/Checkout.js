@@ -136,6 +136,7 @@ const Checkout = () => {
         loading: available_customer_loading
     }] = useLazyQuery(CUSTOMER_QUERY, {
         context: {headers: {authorization: `Bearer ${authCtx.token}`}},
+        fetchPolicy: "network-only",
         onCompleted: () => {
             setCustomerSearch(true);
             if (available_customer.search.length) {
@@ -148,6 +149,7 @@ const Checkout = () => {
 
     const [getFullInfo, {data: customer_full_info, loading: customer_full_loading}] = useLazyQuery(FULL_INFO_QUERY, {
         context: {headers: {authorization: `Bearer ${authCtx.token}`}},
+        fetchPolicy: "network-only",
         onCompleted: () => {
             if (customer_full_info) {
                 setIsRefactorDisabled({

@@ -29,8 +29,6 @@ const Product = () => {
     const [subProductInfo, setSubProductInfo] = useState([]);
     const [cartIsShown, setCartIsShown] = useState(false);
 
-    console.log("authCtx", authCtx)
-
     const showCartHandler = () => {
         setCartIsShown(true);
     };

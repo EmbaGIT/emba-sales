@@ -3,6 +3,8 @@ import { toast } from 'react-toastify';
 
 const axiosInstance = axios.create({
     baseURL: 'http://bpaws01l:8083/api',
+    fileURL: 'http://bpaws01l:8089/api',
+    orderURL: 'http://bpaws01l:8087/api'
 });
 
 export const get = (url) => axiosInstance.get(url).then((res) => res.data);
