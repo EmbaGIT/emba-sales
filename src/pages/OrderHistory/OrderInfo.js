@@ -46,7 +46,7 @@ const FULL_INFO_QUERY = gql`
     }`
 
 const OrderInfo = (props) => {
-    console.log(props.info);
+    const [orders, setOrders] = useState(props.info);
     const authCtx = useContext(AuthContext);
     const cartCtx = useContext(CartContext);
     const [city, setCity] = useState([]);
@@ -262,6 +262,8 @@ const OrderInfo = (props) => {
                 label: `${city.name}`,
             })));
         }).catch((err) => console.log(err));
+
+        setOrders(props.info);
     }, [props.info])
 
     const newCartObject = () => {
@@ -611,7 +613,7 @@ const OrderInfo = (props) => {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {orderInfo && orderInfo?.goods?.map(item => (
+                                {orders && orders?.goods?.map(item => (
                                     <tr key={item.id}>
                                         <td><b>{item.product_name}</b></td>
                                         <td>{item.product_quantity}</td>
@@ -619,9 +621,9 @@ const OrderInfo = (props) => {
                                         <td>{item.product_discount.toFixed(2)} %</td>
                                         <td>{(item.product_price * item.product_quantity - item.product_quantity * item.product_price * item.product_discount / 100).toFixed(2)} AZN</td>
                                         {orderInfo.status === "SAVED" &&
-                                        <td><i className="far fa-trash-alt text-danger cursor-pointer" onClick={() => {
-                                            props.onItemDelete(item.id)
-                                        }}/></td>}
+                                            <td><i className="far fa-trash-alt text-danger cursor-pointer" onClick={() => {
+                                                props.onItemDelete(item.id)
+                                            }}/></td>}
                                     </tr>
                                 ))}
                                 {orderInfo?.status === "ORDERED" &&
@@ -661,7 +663,7 @@ const OrderInfo = (props) => {
                                            value={orderInfo && orderInfo?.name}
                                            onChange={e => handleInputChange("name", e.target.value)}/>
                                     {!formValidation.name &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                                 <div className="col-md-4 mb-2">
                                     <label>Soyad<span className="text-danger">*</span></label>
@@ -670,7 +672,7 @@ const OrderInfo = (props) => {
                                            value={orderInfo && orderInfo?.surname}
                                            onChange={e => handleInputChange("surname", e.target.value)}/>
                                     {!formValidation.surname &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                                 <div className="col-md-4 mb-2">
                                     <label>Ata adı</label>
@@ -762,7 +764,7 @@ const OrderInfo = (props) => {
                                         placeholder='Şəhər seçin...'
                                     />
                                     {!formValidation.city &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                             </div>
                             <div className="row mb-3">
@@ -774,7 +776,7 @@ const OrderInfo = (props) => {
                                               onChange={e => handleInputChange("address", e.target.value)}
                                     />
                                     {!formValidation.address &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                             </div>
 
@@ -786,7 +788,7 @@ const OrderInfo = (props) => {
                                                onChange={e => handleInputChange("mobile_phone", e.target.value)}
                                                value={orderInfo && orderInfo?.mobile_phone}/>
                                     {!formValidation.mobile_phone &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                                 <div className="col-md-6">
                                     <label>Digər telefon</label>
@@ -847,7 +849,7 @@ const OrderInfo = (props) => {
                                         minDate={new Date()}
                                     />
                                     {!formValidation.payment_date &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                                 <div className="col-md-6">
                                     <label>Çatdırılma tarixi<span className="text-danger">*</span></label>
@@ -860,7 +862,7 @@ const OrderInfo = (props) => {
                                         minDate={new Date()}
                                     />
                                     {!formValidation.delivery_date &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                             </div>
                             <div className="row mb-3">

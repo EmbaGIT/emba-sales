@@ -16,11 +16,9 @@ ReactDOM.render(
     <Router>
         <ToastContainer/>
         <AuthContextProvider>
-            <React.StrictMode>
-                <ApolloProvider client={client}>
-                    <App/>
-                </ApolloProvider>
-            </React.StrictMode>
+            <ApolloProvider client={client}>
+                <App/>
+            </ApolloProvider>
         </AuthContextProvider>
     </Router>,
     document.getElementById('root')
