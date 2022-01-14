@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Link, useParams} from "react-router-dom";
-import {gett, postt, get} from "../../api/Api";
+import {get, post} from "../../api/Api";
 import noImage from '../../assets/images/no-image.png';
 import Loader from "react-loader-spinner";
 import ImageGallery from 'react-image-gallery';
@@ -38,7 +38,7 @@ const Product = () => {
     };
 
     function getProductStock(uid) {
-        return postt(`http://bpaws01l:8087/api/inventory`, {
+        return post(`http://bpaws01l:8087/api/inventory`, {
             "user_uid": authCtx.user_uid,
             "goods": [
                 {
@@ -57,7 +57,51 @@ const Product = () => {
     }
 
     function getCharacteristics(id) {
-        return gett(`products/${id}`);
+        return get(`products/${id}`);
+    }
+
+    const subProducts = (products, listType) => {
+        const subProductIncludedArr = [];
+        let  totalSetPrice=0;
+
+        const mapProduct = async () => {
+            const promises = products.map(async item => {
+                return listType === "subProductsIsIncluded" && await get(`/v2/products/price/${item.id}`);
+            })
+            const priceList = await Promise.all(promises);
+            priceList.forEach(price => {
+                totalSetPrice += price;
+            })
+            setSetPrice(totalSetPrice);
+        }
+        mapProduct();
+
+        products.map(async item => {
+            const items = [];
+            const stock = [];
+            const files = [];
+            const characteristic = [];
+            await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
+                .then(function (results) {
+                    items.push(item);
+                    stock.push(...results[0]);
+                    files.push(...results[1]);
+                    characteristic.push(...results[2].characteristics)
+                    subProductIncludedArr.push({
+                        id: item.id,
+                        items,
+                        stock,
+                        files,
+                        characteristic
+                    });
+                    subProductIncludedArr.sort(
+                        (a, b) => parseInt(a.id) - parseInt(b.id)
+                    );
+                    listType === "subProductsIsIncluded" ? setSubProductsIsIncluded(prevState => ([
+                        ...subProductIncludedArr
+                    ])) : setSubProductsNotIncluded(prevState => ([...subProductIncludedArr]))
+                });
+        })
     }
 
     useEffect(() => {
@@ -66,9 +110,6 @@ const Product = () => {
         setSubProductsIsIncluded([]);
         setSubProductsNotIncluded([]);
         const images = [];
-        let setPrice = 0;
-        const subProductIsIncludedArr = [];
-        const subProductNotIncludedArr = [];
 
         get(`/v2/parents/colors/category/${category_id}/parent/${parent_id}?brand=${brand}`).then(colors => {
             setProductInfo(prevstate => ({
@@ -77,33 +118,7 @@ const Product = () => {
             }));
             if(colors.length){
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
-                    products.map(async item => {
-                        setPrice += item.price;
-                        const items = [];
-                        const stock = [];
-                        const files = [];
-                        const characteristic = [];
-                        await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
-                            .then(function (results) {
-                                items.push(item);
-                                stock.push(...results[0].data[0].stock);
-                                files.push(...results[1]);
-                                characteristic.push(...results[2].data.characteristics)
-                                subProductIsIncludedArr.push({
-                                    id: item.id,
-                                    items,
-                                    stock,
-                                    files,
-                                    characteristic
-                                });
-                                subProductIsIncludedArr.sort(
-                                    (a, b) => parseInt(a.id) - parseInt(b.id)
-                                );
-                                setSubProductsIsIncluded(prevState => ([
-                                    ...subProductIsIncludedArr
-                                ]));
-                            });
-                    })
+                    subProducts(products, "subProductsIsIncluded");
                     get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&color=${currentColor}&parent=${parent_id}`).then(files => {
                         files.map(file => (
                             images.push({
@@ -112,67 +127,15 @@ const Product = () => {
                             })
                         ))
                     })
-                    setSetPrice(setPrice);
                 })
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
-                    products.map(async item => {
-                        const items = [];
-                        const stock = [];
-                        const files = [];
-                        const characteristic = [];
-                        await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
-                            .then(function (results) {
-                                items.push(item);
-                                stock.push(...results[0].data[0].stock);
-                                files.push(...results[1]);
-                                characteristic.push(...results[2].data.characteristics);
-                                subProductNotIncludedArr.push({
-                                    id: item.id,
-                                    items,
-                                    stock,
-                                    files,
-                                    characteristic
-                                });
-                                subProductNotIncludedArr.sort(
-                                    (a, b) => parseInt(a.id) - parseInt(b.id)
-                                );
-                                setSubProductsNotIncluded(prevState => ([
-                                    ...subProductNotIncludedArr
-                                ]));
-                            });
-                    })
+                    subProducts(products, "subProductsNotIncluded");
                 })
                 setProductImages(images);
                 setIsFetchingData(false);
             }else{
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
-                    products.map(async item => {
-                        setPrice += item.price;
-                        const items = [];
-                        const stock = [];
-                        const files = [];
-                        const characteristic = [];
-                        await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
-                            .then(function (results) {
-                                items.push(item);
-                                stock.push(...results[0].data[0].stock);
-                                files.push(...results[1]);
-                                characteristic.push(...results[2].data.characteristics)
-                                subProductIsIncludedArr.push({
-                                    id: item.id,
-                                    items,
-                                    stock,
-                                    files,
-                                    characteristic
-                                });
-                                subProductIsIncludedArr.sort(
-                                    (a, b) => parseInt(a.id) - parseInt(b.id)
-                                );
-                                setSubProductsIsIncluded(prevState => ([
-                                    ...subProductIsIncludedArr
-                                ]));
-                            });
-                    })
+                    subProducts(products, "subProductsIsIncluded");
                     get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent_id}`).then(files => {
                         files.map(file => (
                             images.push({
@@ -181,35 +144,9 @@ const Product = () => {
                             })
                         ))
                     })
-                    setSetPrice(setPrice);
                 })
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
-                    products.map(async item => {
-                        const items = [];
-                        const stock = [];
-                        const files = [];
-                        const characteristic = [];
-                        await Promise.all([getProductStock(item.uid), getProductFiles(item.id), getCharacteristics(item.id)])
-                            .then(function (results) {
-                                items.push(item);
-                                stock.push(...results[0].data[0].stock);
-                                files.push(...results[1]);
-                                characteristic.push(...results[2].data.characteristics);
-                                subProductNotIncludedArr.push({
-                                    id: item.id,
-                                    items,
-                                    stock,
-                                    files,
-                                    characteristic
-                                });
-                                subProductNotIncludedArr.sort(
-                                    (a, b) => parseInt(a.id) - parseInt(b.id)
-                                );
-                                setSubProductsNotIncluded(prevState => ([
-                                    ...subProductNotIncludedArr
-                                ]));
-                            });
-                    })
+                    subProducts(products, "subProductsNotIncluded");
                 })
                 setIsFetchingData(false);
                 setProductImages(images);
@@ -271,30 +208,30 @@ const Product = () => {
                 </div>
                 <div className="col-lg-5">
                     {productInfo &&
-                    <>
-                        <div className="d-flex">
-                            <h1 className="product-name">{productInfo.name}</h1>
-                        </div>
-                        <div className="product-price-box mt-2">
-                            <div className="d-flex align-items-center product-info-wrapper justify-content-between">
-                                <div className="price-block">
+                        <>
+                            <div className="d-flex">
+                                <h1 className="product-name">{productInfo.name}</h1>
+                            </div>
+                            <div className="product-price-box mt-2">
+                                <div className="d-flex align-items-center product-info-wrapper justify-content-between">
+                                    <div className="price-block">
                                     <span className="product-price-current">
                                         <span className="price">{totalPrice ? totalPrice : 0}</span> AZN
                                     </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        {productInfo.colors &&
-                        <div className="mt-3">
-                            {productInfo.colors.map(color => (
-                                <Link to={`/product/${brand}/${category_id}/${parent_id}?color=${color.id}`} key={color.id}><span onClick={changeColor.bind(this, color.id)} data-toggle="tooltip" title={color.name}><img
-                                    className="color-image me-2" alt=""
-                                    src={`../../../assets/images/colors/${color.code}.png`}/></span>
-                                </Link>
-                            ))}
-                        </div>
-                        }
-                    </>
+                            {productInfo.colors &&
+                                <div className="mt-3">
+                                    {productInfo.colors.map(color => (
+                                        <Link to={`/product/${brand}/${category_id}/${parent_id}?color=${color.id}`} key={color.id}><span onClick={changeColor.bind(this, color.id)} data-toggle="tooltip" title={color.name}><img
+                                            className="color-image me-2" alt=""
+                                            src={`../../../assets/images/colors/${color.code}.png`}/></span>
+                                        </Link>
+                                    ))}
+                                </div>
+                            }
+                        </>
                     }
                 </div>
             </div>
@@ -317,7 +254,7 @@ const Product = () => {
                                     color_id={currentColor}
                                     brand={brand}
                                     category_id={category_id}
-                                    stock={item.stock}
+                                    stock={item.stock[0].stock}
                                     onClickHandle={handleModuleInfo}
                     />
                 ))}
@@ -340,7 +277,7 @@ const Product = () => {
                                     color_id={currentColor}
                                     brand={brand}
                                     category_id={category_id}
-                                    stock={item.stock}
+                                    stock={item.stock[0].stock}
                                     onClickHandle={handleModuleInfo}
                     />
                 ))}
