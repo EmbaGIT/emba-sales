@@ -276,7 +276,50 @@ const OrderInfo = (props) => {
                     label: 'Təsdiqlə',
                     onClick: () => {
                         cartCtx.clearBasket();
-                        cartCtx.updateSavedOrder(props.info);
+                        const { info } = props;
+
+                        const promises = info.goods.map(good => new Promise(resolve => {
+                            if (good.color_id) {
+                                get(`http://bpaws01l:8089/api/image/resource?brand=${good.brand}&color=${good.color_id}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
+                                    resolve({
+                                        amount: good.product_quantity,
+                                        discount: good.product_discount,
+                                        files: file,
+                                        id: good.id,
+                                        name: good.product_name,
+                                        price: good.product_price,
+                                        discount_price: good.product_price - (good.product_price*good.product_discount/100),
+                                        parent : good.parent_name,
+                                        category: good.category_id,
+                                        uid: good.product_uid,
+                                        characteristic_uid: good.product_characteristic_uid,
+                                        characteristic_code: '',
+                                    })
+                                })
+                            } else {
+                                get(`http://bpaws01l:8089/api/image/resource?brand=${good.brand}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
+                                    resolve({
+                                        amount: good.product_quantity,
+                                        discount: good.product_discount,
+                                        files: file,
+                                        id: good.id,
+                                        name: good.product_name,
+                                        price: good.product_price,
+                                        discount_price: good.product_price - (good.product_price*good.product_discount/100),
+                                        parent : good.parent_name,
+                                        category: good.category_id,
+                                        uid: good.product_uid,
+                                        characteristic_uid: good.product_characteristic_uid,
+                                        characteristic_code: '',
+                                    })
+                                })
+                            }
+                        }));
+
+                        Promise.all(promises).then(products => {
+                            cartCtx.updateSavedOrder({ products, id: info.id });
+                        });
+
                         history.push('/cart');
                     }
                 },

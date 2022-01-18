@@ -240,68 +240,27 @@ const cartReducer = (state, action) => {
     }
 
     if(action.type==="SavedOrder"){
-        let updatedTotalAmount = 0;
-        let updatedDiscountAmount = 0;
+        const { products, id } = action.value;
 
-        const promises = action.value.goods.map(good => new Promise(resolve => {
-            if (good.color_id) {
-                get(`http://bpaws01l:8089/api/image/resource?brand=${good.brand}&color=${good.color_id}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
-                    resolve({
-                        amount: good.product_quantity,
-                        discount: good.product_discount,
-                        files: file,
-                        id: good.id,
-                        name: good.product_name,
-                        price: good.product_price,
-                        discount_price: good.product_price - (good.product_price*good.product_discount/100),
-                        parent : good.parent_name,
-                        category: good.category_id,
-                        uid: good.product_uid,
-                        characteristic_uid: good.product_characteristic_uid,
-                        characteristic_code: '',
-                    })
-                })
-            } else {
-                 get(`http://bpaws01l:8089/api/image/resource?brand=${good.brand}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
-                     resolve({
-                        amount: good.product_quantity,
-                        discount: good.product_discount,
-                        files: file,
-                        id: good.id,
-                        name: good.product_name,
-                        price: good.product_price,
-                        discount_price: good.product_price - (good.product_price*good.product_discount/100),
-                        parent : good.parent_name,
-                        category: good.category_id,
-                        uid: good.product_uid,
-                        characteristic_uid: good.product_characteristic_uid,
-                        characteristic_code: '',
-                    })
-                })
-            }
+        let updatedTotalAmount = totalAmount(products);
+        let updatedDiscountAmount = totalDiscountAmount(products);
+        const totalDiscount = discount(updatedTotalAmount, updatedDiscountAmount)
+
+        localStorage.setItem('cart', JSON.stringify({
+            items: products,
+            totalAmount: updatedTotalAmount,
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: id
         }));
 
-        Promise.all(promises).then(products => {
-            updatedTotalAmount = totalAmount(products);
-            updatedDiscountAmount = totalDiscountAmount(products);
-            const totalDiscount = discount(updatedTotalAmount, updatedDiscountAmount)
-
-            localStorage.setItem('cart', JSON.stringify({
-                items: products,
-                totalAmount: updatedTotalAmount,
-                discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-                totalDiscount: Math.round(totalDiscount * 100) / 100,
-                savedId: action.value.id
-            }));
-
-            return {
-                items: products,
-                totalAmount: updatedTotalAmount,
-                discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
-                totalDiscount: Math.round(totalDiscount * 100) / 100,
-                savedId: action.value.id
-            };
-        });
+        return {
+            items: products,
+            totalAmount: updatedTotalAmount,
+            discountAmount: Math.round(updatedDiscountAmount * 100) / 100,
+            totalDiscount: Math.round(totalDiscount * 100) / 100,
+            savedId: id
+        };
     }
     return defaultCartState;
 }
