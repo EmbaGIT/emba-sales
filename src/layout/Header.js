@@ -53,6 +53,14 @@ const Header = (props) => {
                 <div className="col-lg-4 col-md-6 order-lg-3">
                     <div className="d-flex align-items-center justify-content-end">
                         {authCtx.isLoggedIn && (
+                            <Link to="/reports">
+                                <span className="text-reset me-5" role="button">
+                                    <i className="fas fa-file-invoice text-body" style={{fontSize: '20px'}}></i>
+                                </span>
+                            </Link>
+                        )}
+
+                        {authCtx.isLoggedIn && (
                         <div className="position-relative">
                             <Link to="/cart">
                             <span
