@@ -29,7 +29,7 @@ const Warehouse = (props) => {
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`http://bpaws01l:8087/api/warehouse/${user.uid}?page=${params.page}&size=${params.pageSize}`).then((res) => {
+        get(`http://bpaws01l:8091/api/warehouse/${user.uid}?page=${params.page}&size=${params.pageSize}`).then((res) => {
             setWarehouseInfo(res);
             setIsFetching(false);
         }).catch((err) => {
@@ -50,8 +50,8 @@ const Warehouse = (props) => {
     const updateWarehouseInfo = () => {
         const user = getUser();
         setIsFetching(true);
-        remove(`http://bpaws01l:8087/api/warehouse/${user.uid}`).then((res) => {
-            get(`http://bpaws01l:8087/api/warehouse/${user.uid}?page=0&size=10`).then((res) => {
+        remove(`http://bpaws01l:8091/api/warehouse/${user.uid}`).then((res) => {
+            get(`http://bpaws01l:8091/api/warehouse/${user.uid}?page=0&size=10`).then((res) => {
                 setWarehouseInfo(res);
                 setIsFetching(false);
             }).catch((err) => {
