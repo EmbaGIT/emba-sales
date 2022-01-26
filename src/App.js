@@ -17,7 +17,10 @@ import Login from "./pages/Login";
 import AllOrders from "./pages/OrderHistory/AllOrders";
 import CategoryList from "./pages/Category/CategoryList";
 import Reports from "./pages/Reports/Reports";
+import ReportOptions from "./pages/Reports/ReportOptions";
 import Warehouse from "./pages/Reports/Warehouse";
+import Fabric from "./pages/Reports/Fabric";
+import Chair from "./pages/Reports/Chair";
 export const IsAuth = createContext(null);
 
 const App = () => {
@@ -68,7 +71,10 @@ const App = () => {
                     <PrivateRoute path='/orderPrint/:id' exact component={OrderPrint}/>
                     <PrivateRoute path='/allOrder' exact component={AllOrders}/>
                     <PrivateRoute path='/reports' exact component={Reports} />
+                    <PrivateRoute path='/reports/options' exact component={ReportOptions} />
                     <PrivateRoute path='/reports/warehouse/:page/:pageSize' exact component={Warehouse} />
+                    <PrivateRoute path='/reports/fabric/:page/:pageSize' exact component={Fabric} />
+                    <PrivateRoute path='/reports/chair/:page/:pageSize' exact component={Chair} />
                 </Switch>
             </Layout>
         </CartProvider>

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const menuItems = [
     { title: 'Mənim Satışlarım', url: '' },
     { title: 'Qarşılıqlı Hesablaşmalar', url: '' },
-    { title: 'Anbar Qalığı', url: 'warehouse/0/10' },
+    { title: 'Anbar Qalığı', url: 'options' },
 ]
 
 const Reports = () => {

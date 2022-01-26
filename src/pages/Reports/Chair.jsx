@@ -1,69 +1,59 @@
-import React, {useEffect, useState} from "react";
-import { get, remove } from "../../api/Api";
-import jwt from 'jwt-decode';
-import Loader from 'react-loader-spinner';
-import ReactPaginate from "react-paginate";
+import {React, useEffect, useState} from "react";
+import {get} from "../../api/Api";
+import jwt from "jwt-decode";
 import Select from "react-select";
-import {Link, useHistory, useParams} from "react-router-dom";
+import ReactPaginate from "react-paginate";
+import {useParams, useHistory} from "react-router-dom";
+import Loader from "react-loader-spinner";
 
-const Warehouse = (props) => {
-    const history = useHistory();
+const Chair = () => {
     const params = useParams();
-    const [warehouseInfo, setWarehouseInfo] = useState({});
+    const history = useHistory();
     const [isFetching, setIsFetching] = useState(false);
+    const [fabric, setFabric] = useState({});
     const [page, setPage] = useState(Number(params.page));
     const [pageSize, setPageSize] = useState({value: Number(params.pageSize), label: Number(params.pageSize)});
     const sizeOptions = [
-        { value: 10, label: 10 },
-        { value: 20, label: 20 },
-        { value: 50, label: 50 },
-        { value: 100, label: 100 }
+        {value: 10, label: 10},
+        {value: 20, label: 20},
+        {value: 50, label: 50},
+        {value: 100, label: 100}
     ];
+    console.log(params)
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
         return jwt(token);  // decodes user from jwt and returns it
     }
 
+    const paginate = (n) => {
+        setPage(+n.selected);
+        history.push(`/reports/chair/${n.selected}/10`);
+    }
+
+    const onPageSizeChange = (n) => {
+        setPageSize({value: n.value, label: n.value});
+        history.push(`/reports/chair/${page}/${n.value}`);
+    }
+
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`http://bpaws01l:8091/api/warehouse/${user.uid}?page=${params.page}&size=${params.pageSize}`).then((res) => {
-            setWarehouseInfo(res);
+        get(`http://bpaws01l:8091/api/chair?page=${page}&size=${pageSize.value}`).then((res) => {
+            setFabric(res)
             setIsFetching(false);
         }).catch((err) => {
             console.log("err", err);
         });
     }, [page, pageSize]);
 
-    const paginate = (n) => {
-        setPage(+n.selected);
-        history.push(`/reports/warehouse/${n.selected}/${pageSize.value}`);
-    }
-
-    const onPageSizeChange = (n) => {
-        setPageSize({ value: n.value, label: n.value });
-        history.push(`/reports/warehouse/${page}/${n.value}`);
-    }
-
-    const updateWarehouseInfo = () => {
-        const user = getUser();
-        setIsFetching(true);
-        remove(`http://bpaws01l:8091/api/warehouse/${user.uid}`).then((res) => {
-            get(`http://bpaws01l:8091/api/warehouse/${user.uid}?page=0&size=10`).then((res) => {
-                setWarehouseInfo(res);
-                setIsFetching(false);
-            }).catch((err) => {
-                console.log("error in getting goods: ", err);
-            });
-        }).catch(error => console.log("error in cleaning cache: ", error));
-    }
-
     return (
-        <div className='container-fluid row'>
-            <div className="mt-3 position-relative">
+        <div>
+            <div className='mt-3 position-relative'>
                 {isFetching &&
-                    <div className="col-12 d-flex align-items-center justify-content-center w-100 h-100 position-absolute" style={{ backdropFilter: "blur(2px)", zIndex: "100" }}>
+                    <div
+                        className="col-12 d-flex align-items-center justify-content-center w-100 h-100 position-absolute"
+                        style={{backdropFilter: "blur(2px)", zIndex: "100"}}>
                         <Loader
                             type="ThreeDots"
                             color="#00BFFF"
@@ -71,17 +61,17 @@ const Warehouse = (props) => {
                             width={60}/>
                     </div>
                 }
-                {warehouseInfo.goods?.length &&
+                {fabric.items?.length &&
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4 className="fm-poppins flex-1 mb-0">{warehouseInfo.warehouse} mövcud məhsullar</h4>
+                            <h4 className="fm-poppins flex-1 mb-0">Stul qalığı</h4>
                             <div className='me-3'>
-                                <button onClick={updateWarehouseInfo} style={{ backgroundColor: "transparent", border: ".5px solid rgba(0, 0, 0, .5)", padding: ".3rem .75rem", borderRadius: "5px" }}>
-                                    <span className='me-2'>Yenilə</span>
-                                    <span><i className="fas fa-sync-alt"></i></span>
-                                </button>
+                                {/*<button onClick={updateWarehouseInfo} style={{ backgroundColor: "transparent", border: ".5px solid rgba(0, 0, 0, .5)", padding: ".3rem .75rem", borderRadius: "5px" }}>*/}
+                                {/*    <span className='me-2'>Yenilə</span>*/}
+                                {/*    <span><i className="fas fa-sync-alt"></i></span>*/}
+                                {/*</button>*/}
                             </div>
-                            <div style={{ width: "20%" }}>
+                            <div style={{width: "20%"}}>
                                 <Select
                                     className="basic-single"
                                     classNamePrefix="select"
@@ -98,18 +88,18 @@ const Warehouse = (props) => {
                                 <thead>
                                 <tr>
                                     <th scope='col'>#</th>
-                                    <th scope='col'>Məhsul adı</th>
-                                    <th scope='col'>Məhsulun xatakteristikası</th>
-                                    <th scope='col'>Məhsulun sayı</th>
+                                    <th scope='col'>Stullar</th>
+                                    <th scope='col'>Sumqayıt stul material anbarı</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {warehouseInfo.goods?.map((good, i) => (
+                                {fabric.items?.map((good, i) => (
                                     <tr key={i}>
                                         <td>{+i + (Number(page) * Number(pageSize.value)) + 1}</td>
-                                        <td><span className="cursor-pointer text-primary font-weight-bolder">{good.productName}</span></td>
-                                        <td>{good.characteristicName}</td>
-                                        <td>{good.quantity}</td>
+                                        <td><span
+                                            className="cursor-pointer text-primary font-weight-bolder">{good?.chairs}</span>
+                                        </td>
+                                        <td>{good?.chairMaterialStock}</td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -125,7 +115,7 @@ const Warehouse = (props) => {
                                 nextLinkClassName={'page-link'}
                                 breakLabel={'...'}
                                 breakClassName={'break-me'}
-                                pageCount={warehouseInfo?.totalPages + 1 || 0}
+                                pageCount={fabric?.totalPages + 1 || 0}
                                 marginPagesDisplayed={2}
                                 pageRangeDisplayed={3}
                                 onPageChange={paginate}
@@ -138,10 +128,10 @@ const Warehouse = (props) => {
                         </div>
                     </div>
                 }
-                {warehouseInfo.goods?.length === 0 && <p className="text-center">Heç bir məlumat tapılmadı.</p>}
+                {fabric.items?.length === 0 && <p className="text-center">Heç bir məlumat tapılmadı.</p>}
             </div>
         </div>
     )
-};
+}
 
-export default Warehouse;
+export default Chair;
