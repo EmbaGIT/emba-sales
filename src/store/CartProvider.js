@@ -1,6 +1,5 @@
 import {useReducer} from "react";
 import CartContext from "./CartContext";
-import {get} from "../api/Api";
 
 const defaultCartState = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : {
     items: [],

@@ -336,7 +336,6 @@ const Checkout = () => {
         }
         if (cartCtx.savedId) {
             post(`http://bpaws01l:8087/api/order/search?id.equals=${cartCtx.savedId}`).then(resOrderInfo => {
-                console.log(resOrderInfo);
                 setCheckoutState(prevState => ({
                     ...prevState,
                     id: resOrderInfo.content[0].id,
