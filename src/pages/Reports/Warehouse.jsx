@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useContext } from "react";
 import { get, remove } from "../../api/Api";
 import jwt from 'jwt-decode';
 import Loader from 'react-loader-spinner';
 import ReactPaginate from "react-paginate";
 import Select from "react-select";
-import {Link, useHistory, useParams} from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
-const Warehouse = (props) => {
+const Warehouse = () => {
     const history = useHistory();
     const params = useParams();
     const [warehouseInfo, setWarehouseInfo] = useState({});
@@ -22,13 +22,13 @@ const Warehouse = (props) => {
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
-        return jwt(token);  // decodes user from jwt and returns it
+        return token && jwt(token);  // decodes user from jwt and returns it
     }
 
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`http://bpaws01l:8091/api/warehouse/${user.uid}?page=${params.page}&size=${params.pageSize}`).then((res) => {
+        get(`http://bpaws01l:8091/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}`).then((res) => {
             setWarehouseInfo(res);
             setIsFetching(false);
         }).catch((err) => {
@@ -49,8 +49,8 @@ const Warehouse = (props) => {
     const updateWarehouseInfo = () => {
         const user = getUser();
         setIsFetching(true);
-        remove(`http://bpaws01l:8091/api/warehouse/${user.uid}`).then((res) => {
-            get(`http://bpaws01l:8091/api/warehouse/${user.uid}?page=0&size=10`).then((res) => {
+        remove(`http://bpaws01l:8091/api/warehouse/${user?.uid}`).then((res) => {
+            get(`http://bpaws01l:8091/api/warehouse/${user?.uid}?page=0&size=10`).then((res) => {
                 setWarehouseInfo(res);
                 setIsFetching(false);
             }).catch((err) => {
