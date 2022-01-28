@@ -4,9 +4,11 @@ import CartContext from "../../store/CartContext";
 import CartItem from "./CartItem";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import { useLocation } from "react-router-dom";
 
 const Cart = () => {
     const cartCtx = useContext(CartContext);
+    const location = useLocation();
     const [hasItem, setHasItem] = useState(cartCtx.items.length > 0);
     const [totalDiscount, setTotalDiscount] = useState(0);
     const [cartState, setCartState] = useState([]);
@@ -59,7 +61,12 @@ const Cart = () => {
             }
         })
         setCartState(newCartArr);
-    }, [cartCtx]);
+
+        //If there are products in the basket, show "Səbəti təsdiq et" button on the redirect to Cart page using location state
+        if (location.state?.length > 0) {
+            setHasItem(true);
+        }
+    }, [cartCtx, hasItem]);
 
     const clearDiscount = () => {
         const cartStateArr = [];

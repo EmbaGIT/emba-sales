@@ -285,7 +285,7 @@ const OrderInfo = (props) => {
                                         amount: good.product_quantity,
                                         discount: good.product_discount,
                                         files: file,
-                                        id: good.id,
+                                        id: good.product_id,
                                         name: good.product_name,
                                         price: good.product_price,
                                         discount_price: good.product_price - (good.product_price*good.product_discount/100),
@@ -294,6 +294,8 @@ const OrderInfo = (props) => {
                                         uid: good.product_uid,
                                         characteristic_uid: good.product_characteristic_uid,
                                         characteristic_code: '',
+                                        brand: good.brand,
+                                        parent_id: good.parent_id
                                     })
                                 })
                             } else {
@@ -302,7 +304,7 @@ const OrderInfo = (props) => {
                                         amount: good.product_quantity,
                                         discount: good.product_discount,
                                         files: file,
-                                        id: good.id,
+                                        id: good.product_id,
                                         name: good.product_name,
                                         price: good.product_price,
                                         discount_price: good.product_price - (good.product_price*good.product_discount/100),
@@ -311,6 +313,8 @@ const OrderInfo = (props) => {
                                         uid: good.product_uid,
                                         characteristic_uid: good.product_characteristic_uid,
                                         characteristic_code: '',
+                                        brand: good.brand,
+                                        parent_id: good.parent_id
                                     })
                                 })
                             }
@@ -320,7 +324,7 @@ const OrderInfo = (props) => {
                             cartCtx.updateSavedOrder({ products, id: info.id });
                         });
 
-                        history.push('/cart');
+                        history.push('/cart', `${info.goods.length}`);
                     }
                 },
                 {
