@@ -47,7 +47,7 @@ const AllOrders = () => {
             orderList(res, page);
             setPageState(res);
         })
-    }, [page]);
+    }, [page, orderState]);
 
     const handleModuleInfo = (id) => {
         post(`http://bpaws01l:8087/api/order/search?id.equals=${id}`).then(resOrderInfo => {

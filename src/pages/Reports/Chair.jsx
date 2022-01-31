@@ -19,7 +19,6 @@ const Chair = () => {
         {value: 50, label: 50},
         {value: 100, label: 100}
     ];
-    console.log(params)
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
