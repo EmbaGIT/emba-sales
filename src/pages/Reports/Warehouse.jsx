@@ -19,6 +19,7 @@ const Warehouse = () => {
         { value: 50, label: 50 },
         { value: 100, label: 100 }
     ];
+    const [search, setSearch] = useState('');
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
@@ -28,13 +29,13 @@ const Warehouse = () => {
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`http://bpaws01l:8091/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}`).then((res) => {
+        get(`http://bpaws01l:8091/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}&filter=${search}`).then((res) => {
             setWarehouseInfo(res);
             setIsFetching(false);
         }).catch((err) => {
             console.log("err", err);
         });
-    }, [page, pageSize]);
+    }, [page, pageSize, search]);
 
     const paginate = (n) => {
         setPage(+n.selected);
@@ -50,7 +51,7 @@ const Warehouse = () => {
         const user = getUser();
         setIsFetching(true);
         remove(`http://bpaws01l:8091/api/warehouse/${user?.uid}`).then((res) => {
-            get(`http://bpaws01l:8091/api/warehouse/${user?.uid}?page=0&size=10`).then((res) => {
+            get(`http://bpaws01l:8091/api/warehouse/${user?.uid}?page=0&size=10&filter=${search}`).then((res) => {
                 setWarehouseInfo(res);
                 setIsFetching(false);
             }).catch((err) => {
@@ -78,6 +79,9 @@ const Warehouse = () => {
                         </div>
                     </div>
                 </Link>
+            </div>
+            <div className='col-6 mb-3'>
+                <input className='form-control h-100 w-100' type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder='Axtarış' />
             </div>
 
             <div className="mt-3 position-relative">

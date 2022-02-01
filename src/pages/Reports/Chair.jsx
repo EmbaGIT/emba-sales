@@ -19,6 +19,7 @@ const Chair = () => {
         {value: 50, label: 50},
         {value: 100, label: 100}
     ];
+    const [search, setSearch] = useState('');
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
@@ -38,13 +39,13 @@ const Chair = () => {
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`http://bpaws01l:8091/api/chair?page=${page}&size=${pageSize.value}`).then((res) => {
+        get(`http://bpaws01l:8091/api/chair?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
             setFabric(res)
             setIsFetching(false);
         }).catch((err) => {
             console.log("err", err);
         });
-    }, [page, pageSize]);
+    }, [page, pageSize, search]);
 
     return (
         <div className='container-fluid row'>
@@ -65,6 +66,9 @@ const Chair = () => {
                         </div>
                     </div>
                 </Link>
+            </div>
+            <div className='col-6 mb-3'>
+                <input className='form-control h-100 w-100' type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder='Axtarış' />
             </div>
 
             <div className='mt-3 position-relative'>
