@@ -295,7 +295,8 @@ const OrderInfo = (props) => {
                                         characteristic_uid: good.product_characteristic_uid,
                                         characteristic_code: '',
                                         brand: good.brand,
-                                        parent_id: good.parent_id
+                                        parent_id: good.parent_id,
+                                        product_createsales: good.product_createsales
                                     })
                                 })
                             } else {
@@ -314,7 +315,8 @@ const OrderInfo = (props) => {
                                         characteristic_uid: good.product_characteristic_uid,
                                         characteristic_code: '',
                                         brand: good.brand,
-                                        parent_id: good.parent_id
+                                        parent_id: good.parent_id,
+                                        product_createsales: good.product_createsales
                                     })
                                 })
                             }

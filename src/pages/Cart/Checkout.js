@@ -389,6 +389,9 @@ const Checkout = () => {
                 ...alldata,
                 gender: 0
             }
+        } else if (type === `product_createsales${value.id}`) {
+            // SHUOLD BE IMMUTABLE STATE CHANGE, BUT MUTABLE DONE INSTEAD
+            checkoutState.items.find(item => item.id === value.id).product_createsales = value.checked;
         } else if (type === 'cash') {
             setPaymentType(0);
             setBankCommission(0);
@@ -546,7 +549,8 @@ const Checkout = () => {
                 parent_name: item.parent,
                 product_price: item.price,
                 product_discount: item.discount,
-                product_total: item.amount * item.price
+                product_total: item.amount * item.price,
+                product_createsales: item.product_createsales
             })
         })
         const order_data = {
@@ -646,6 +650,7 @@ const Checkout = () => {
                             <table className="table text-start">
                                 <thead className="">
                                 <tr>
+                                    <th style={{width: '110px'}}>Distribütora göndərilsin</th>
                                     <th>Modelin adı</th>
                                     <th style={{width: '110px'}}>Qiyməti</th>
                                     <th style={{width: '110px'}}>Son qiyməti</th>
@@ -654,6 +659,17 @@ const Checkout = () => {
                                 <tbody className="">
                                 {checkoutState.items?.map(product => (
                                     <tr key={product.id}>
+                                        <td>
+                                            <input
+                                                className="form-check-input me-2"
+                                                type="checkbox"
+                                                name={`product_createsales${product.id}`}
+                                                id={`product_createsales${product.id}`}
+                                                onChange={e => handleInputChange(`product_createsales${product.id}`, { id: product.id, checked: e.target.checked })}
+                                                checked={product.product_createsales}
+                                            />
+                                            <label className="form-check-label" htmlFor={`product_createsales${product.id}`}>{product.product_createsales ? 'Bəli' : 'Xeyr'}</label>
+                                        </td>
                                         <td>
                                             {product.name}
                                             <div className="text-success font-weight-bold">Sayı: {product.amount}</div>
