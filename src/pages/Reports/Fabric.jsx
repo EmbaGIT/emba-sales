@@ -1,9 +1,9 @@
-import {React, useEffect, useState} from "react";
-import {get} from "../../api/Api";
+import { React, useEffect, useState } from "react";
+import { get } from "../../api/Api";
 import jwt from "jwt-decode";
 import Select from "react-select";
 import ReactPaginate from "react-paginate";
-import {useParams, useHistory} from "react-router-dom";
+import { useParams, useHistory, Link } from "react-router-dom";
 import Loader from "react-loader-spinner";
 
 const Fabric = () => {
@@ -48,7 +48,26 @@ const Fabric = () => {
     }, [page, pageSize]);
 
     return (
-        <div>
+        <div className='container-fluid row'>
+            <div className="col-lg-3 col-md-4 mb-3">
+                <Link to='/reports/warehouse/0/10'>
+                    <div className='category-box'>
+                        <div className="category-hover-box">
+                            <span className='category-name'>Anbar qalığı</span>
+                        </div>
+                    </div>
+                </Link>
+            </div>
+            <div className="col-lg-3 col-md-4 mb-3">
+                <Link to='/reports/chair/0/10'>
+                    <div className='category-box'>
+                        <div className="category-hover-box">
+                            <span className='category-name'>Stul qalığı</span>
+                        </div>
+                    </div>
+                </Link>
+            </div>
+
             <div className='mt-3 position-relative'>
                 {isFetching &&
                     <div
