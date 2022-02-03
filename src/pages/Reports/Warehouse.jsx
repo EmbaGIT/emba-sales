@@ -62,7 +62,7 @@ const Warehouse = () => {
 
     return (
         <div className='container-fluid row'>
-            <div className="col-lg-3 col-md-4 mb-3">
+            <div className="col-lg-3 col-md-6 mb-3">
                 <Link to='/reports/fabric/0/10'>
                     <div className='category-box'>
                         <div className="category-hover-box">
@@ -71,7 +71,7 @@ const Warehouse = () => {
                     </div>
                 </Link>
             </div>
-            <div className="col-lg-3 col-md-4 mb-3">
+            <div className="col-lg-3 col-md-6 mb-3">
                 <Link to='/reports/chair/0/10'>
                     <div className='category-box'>
                         <div className="category-hover-box">
@@ -80,7 +80,7 @@ const Warehouse = () => {
                     </div>
                 </Link>
             </div>
-            <div className='col-6 mb-3'>
+            <div className='col-6 col-md-12 mb-3 report-search'>
                 <input className='form-control h-100 w-100' type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder='Axtarış' />
             </div>
 

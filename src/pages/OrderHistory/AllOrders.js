@@ -47,7 +47,7 @@ const AllOrders = () => {
             orderList(res, page);
             setPageState(res);
         })
-    }, [page, orderState]);
+    }, [page]);  // adding orderState in here makes problem, as there is infinite render in this case
 
     const handleModuleInfo = (id) => {
         post(`http://bpaws01l:8087/api/order/search?id.equals=${id}`).then(resOrderInfo => {

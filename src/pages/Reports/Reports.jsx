@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const menuItems = [
-    { title: 'Mənim Satışlarım', url: '' },
+    { title: 'Mənim Satışlarım', url: 'sales' },
     { title: 'Qarşılıqlı Hesablaşmalar', url: '' },
     { title: 'Anbar Qalığı', url: 'options' },
 ]

@@ -21,6 +21,7 @@ import ReportOptions from "./pages/Reports/ReportOptions";
 import Warehouse from "./pages/Reports/Warehouse";
 import Fabric from "./pages/Reports/Fabric";
 import Chair from "./pages/Reports/Chair";
+import Sales from "./pages/Reports/Sales";
 export const IsAuth = createContext(null);
 
 const App = () => {
@@ -77,6 +78,7 @@ const App = () => {
                     <PrivateRoute path='/reports/warehouse/:page/:pageSize' exact component={Warehouse} />
                     <PrivateRoute path='/reports/fabric/:page/:pageSize' exact component={Fabric} />
                     <PrivateRoute path='/reports/chair/:page/:pageSize' exact component={Chair} />
+                    <PrivateRoute path='/reports/sales' exact component={Sales} />
                 </Switch>
             </Layout>
         </CartProvider>

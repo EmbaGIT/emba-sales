@@ -561,6 +561,48 @@ input[type=number] {
     text-align: left !important;
 }
 
+/* Calendar */
+.Calendar {
+    width: 100% !important;
+    font-size: .75rem !important;
+}
+
+.Calendar__section.-hiddenPrevious {
+    transform: translateX(-100%) !important;
+}
+.Calendar__section.-hiddenNext {
+    transform: translateX(100%) !important;
+}
+
+.Calendar__day {
+    border-radius: 0 !important;
+}
+.Calendar__day.-ltr.-selectedStart {
+    border-radius: 40px 0 0 40px !important;
+}
+.Calendar__day.-ltr.-selectedEnd {
+    border-radius: 0 40px 40px 0 !important;
+}
+
+@media (min-width: 768px) and (max-width: 800px) and (orientation: portrait) {
+    .Calendar {
+        font-size: 1rem !important;
+    }
+
+    .calendar-result {
+        font-size: 1.1rem !important;
+    }
+
+    .calendar-result thead th {
+        white-space: nowrap !important;
+    }
+
+    /* Search bar styles in the reports page */
+    .report-search {
+        height: 2.75rem;
+    }
+}
+
 @media print {
     body * {
         visibility: hidden;
