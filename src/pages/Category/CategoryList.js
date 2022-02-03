@@ -15,6 +15,7 @@ const Category = () => {
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [productList, setProductList] = useState([]);
     const history = useHistory();
+    const [isEmpty, setIsEmpty] = useState(false);
 
     useEffect(() => {
         getParentList(brand, pageNumber);
@@ -27,6 +28,14 @@ const Category = () => {
             get(`/v2/parents/category/${category_id}?brand=${brand}&pageNumber=${page}&pageSize=16`).then(res => {
                 setPageInfo(res);
                 const productListArr = [];
+
+                if (!res.content.length) {
+                    setIsFetchingData(false);
+                    setIsEmpty(true);
+                    return;
+                }
+
+                setIsEmpty(false);
                 res.content.forEach(parent => {
                     get(`/v2/parents/colors/category/${category_id}/parent/${parent.id}?brand=${brand}`).then(colors => {
                         if (colors?.length) {
@@ -106,7 +115,8 @@ const Category = () => {
                         width={60}/>
                 </div>
             }
-            <ModelListItem productList={productList} brand={brand} category={category_id}/>
+            { !isEmpty && <ModelListItem productList={productList} brand={brand} category={category_id}/> }
+            { isEmpty && !isFetchingData && <h5>Bu kateqoriyada heç bir məhsul tapılmadı.</h5> }
             <div className="mt-3 d-flex justify-content-end">
                 {!!productList.length &&
                     <ReactPaginate
