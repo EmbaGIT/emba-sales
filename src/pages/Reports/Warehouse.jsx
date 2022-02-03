@@ -80,7 +80,7 @@ const Warehouse = () => {
                     </div>
                 </Link>
             </div>
-            <div className='col-6 col-md-12 mb-3 report-search'>
+            <div className='col-lg-6 col-md-12 mb-3 report-search'>
                 <input className='form-control h-100 w-100' type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder='Axtarış' />
             </div>
 

@@ -67,7 +67,7 @@ const Fabric = () => {
                     </div>
                 </Link>
             </div>
-            <div className='col-6 col-md-12 mb-3 report-search'>
+            <div className='col-lg-6 col-md-12 mb-3 report-search'>
                 <input className='form-control h-100 w-100' type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder='Axtarış' />
             </div>
 
@@ -87,12 +87,6 @@ const Fabric = () => {
                     <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center mb-4">
                             <h4 className="fm-poppins flex-1 mb-0">Parça qalığı</h4>
-                            <div className='me-3'>
-                                {/*<button onClick={updateWarehouseInfo} style={{ backgroundColor: "transparent", border: ".5px solid rgba(0, 0, 0, .5)", padding: ".3rem .75rem", borderRadius: "5px" }}>*/}
-                                {/*    <span className='me-2'>Yenilə</span>*/}
-                                {/*    <span><i className="fas fa-sync-alt"></i></span>*/}
-                                {/*</button>*/}
-                            </div>
                             <div style={{width: "20%"}}>
                                 <Select
                                     className="basic-single"

@@ -25,6 +25,7 @@ const AllOrders = () => {
         start_date: '',
         end_date: ''
     });
+    const [rerender, setRerender] = useState(false);
 
     const orderList = (list, page) => {
         const orders=[];
@@ -47,7 +48,7 @@ const AllOrders = () => {
             orderList(res, page);
             setPageState(res);
         })
-    }, [page]);  // adding orderState in here makes problem, as there is infinite render in this case
+    }, [page, rerender]);
 
     const handleModuleInfo = (id) => {
         post(`http://bpaws01l:8087/api/order/search?id.equals=${id}`).then(resOrderInfo => {
@@ -76,6 +77,7 @@ const AllOrders = () => {
                         remove(`http://bpaws01l:8087/api/order/${id}`).then(res => {
                             const newList = orderState.filter(item => item.id !== id);
                             setOrderState(newList);
+                            setRerender(!rerender);
                         })
                     }
                 },
