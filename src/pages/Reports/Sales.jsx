@@ -102,8 +102,8 @@ const Sales = () => {
                 <div className="table-responsive">
                     {isFetching
                             ? <div
-                                className="col-12 d-flex justify-content-center w-100 position-absolute"
-                                style={{backdropFilter: "blur(2px)", zIndex: "100"}}>
+                                className="col-12 d-flex justify-content-center w-100"
+                                style={{backdropFilter: "blur(2px)", zIndex: "100" }}>
                                 <Loader
                                     type="ThreeDots"
                                     color="#00BFFF"
