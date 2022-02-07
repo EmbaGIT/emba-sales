@@ -19,8 +19,7 @@ import CategoryList from "./pages/Category/CategoryList";
 import Reports from "./pages/Reports/Reports";
 import ReportOptions from "./pages/Reports/ReportOptions";
 import Warehouse from "./pages/Reports/Warehouse";
-import Fabric from "./pages/Reports/Fabric";
-import Chair from "./pages/Reports/Chair";
+import Stock from "./pages/Reports/Stock";
 import Sales from "./pages/Reports/Sales";
 export const IsAuth = createContext(null);
 
@@ -79,8 +78,12 @@ const App = () => {
                     <PrivateRoute path='/reports' exact component={Reports} />
                     <PrivateRoute path='/reports/options' exact component={ReportOptions} />
                     <PrivateRoute path='/reports/warehouse/:page/:pageSize' exact component={Warehouse} />
-                    <PrivateRoute path='/reports/fabric/:page/:pageSize' exact component={Fabric} />
-                    <PrivateRoute path='/reports/chair/:page/:pageSize' exact component={Chair} />
+                    <PrivateRoute path='/reports/fabric/:page/:pageSize' exact>
+                        <Stock stock={{ key: 'fabric' }}/>
+                    </PrivateRoute>
+                    <PrivateRoute path='/reports/chair/:page/:pageSize' exact>
+                        <Stock stock={{ key: 'chair' }} />
+                    </PrivateRoute>
                     <PrivateRoute path='/reports/sales' exact component={Sales} />
                 </Switch>
             </Layout>
