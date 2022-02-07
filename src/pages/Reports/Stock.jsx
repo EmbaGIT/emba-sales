@@ -112,8 +112,8 @@ const Stock = ({ stock }) => {
                     </div>
                 }
 
-                {stockGoods.items?.length &&
-                    <div className="col-12">
+                {stockGoods.items?.length
+                    ? <div className="col-12">
                         <div className="d-flex justify-content-between align-items-center mb-4">
                             <h4 className="fm-poppins flex-1 mb-0">{stock.title}</h4>
                             <div style={{width: "20%"}}>
@@ -174,6 +174,7 @@ const Stock = ({ stock }) => {
                             />
                         </div></>}
                     </div>
+                    : <h5 className='text-center mt-5'>Məhsul tapılmadı.</h5>
                 }
             </div>
         </div>
