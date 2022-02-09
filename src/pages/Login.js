@@ -17,7 +17,8 @@ const Login = () => {
         const enteredPassword = passwordInputRef.current.value;
 
         if (enteredPassword.trim().length && enteredName.trim().length) {
-            post('http://bpaws01l:8081/api/auth/login', { username: enteredName, password: enteredPassword })
+            const host = window.location.host.includes('emba') ? 'emba.store' : 'bpaws01l';
+            post(`http://${host}:8081/api/auth/login`, { username: enteredName, password: enteredPassword })
                 .then((res) => {
                     setIsFetching(false);
                     localStorage.setItem('jwt_token', res.token);
