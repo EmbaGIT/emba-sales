@@ -7,7 +7,8 @@ const Login = () => {
     const passwordInputRef = useRef();
     const usernameInputRef = useRef();
     const [errMessage, setErrorMessage] = useState('');
-
+    console.log("is emba store: ", window.location.host.includes('emba'))
+    console.log("host: ", window.location.host)
     const authCtx = useContext(AuthContext);
 
     const handleForm = (event) => {
@@ -17,8 +18,8 @@ const Login = () => {
         const enteredPassword = passwordInputRef.current.value;
 
         if (enteredPassword.trim().length && enteredName.trim().length) {
-            const host = window.location.host.includes('emba') ? 'emba.store' : 'bpaws01l';
-            post(`http://${host}:8081/api/auth/login`, { username: enteredName, password: enteredPassword })
+            const host = window.location.host.includes('emba') ? 'emba.store' : 'bpaws01l:8081';
+            post(`http://${host}/api/auth/login`, { username: enteredName, password: enteredPassword })
                 .then((res) => {
                     setIsFetching(false);
                     localStorage.setItem('jwt_token', res.token);
