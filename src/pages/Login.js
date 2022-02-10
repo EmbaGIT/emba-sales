@@ -16,7 +16,7 @@ const Login = () => {
         const enteredPassword = passwordInputRef.current.value;
 
         if (enteredPassword.trim().length && enteredName.trim().length) {
-            const host = window.location.host.includes('emba') ? 'emba.store:8081' : 'bpaws01l:8081';
+            const host = window.location.host.includes('emba') ? 'user.emba.store' : 'bpaws01l:8081';
             post(`http://${host}/api/auth/login`, { username: enteredName, password: enteredPassword })
                 .then((res) => {
                     setIsFetching(false);
