@@ -5,6 +5,7 @@ import Loader from 'react-loader-spinner';
 import ReactPaginate from "react-paginate";
 import Select from "react-select";
 import { Link, useHistory, useParams } from "react-router-dom";
+import { getHost } from "../../helpers/host";
 
 const Warehouse = () => {
     const history = useHistory();
@@ -29,7 +30,7 @@ const Warehouse = () => {
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`http://bpaws01l:8091/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}&filter=${search}`).then((res) => {
+        get(`${getHost('report', 8091)}/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}&filter=${search}`).then((res) => {
             setWarehouseInfo(res);
             setIsFetching(false);
         }).catch((err) => {
@@ -50,8 +51,8 @@ const Warehouse = () => {
     const updateWarehouseInfo = () => {
         const user = getUser();
         setIsFetching(true);
-        remove(`http://bpaws01l:8091/api/warehouse/${user?.uid}`).then((res) => {
-            get(`http://bpaws01l:8091/api/warehouse/${user?.uid}?page=0&size=10&filter=${search}`).then((res) => {
+        remove(`${getHost('report', 8091)}/api/warehouse/${user?.uid}`).then((res) => {
+            get(`${getHost('report', 8091)}/api/warehouse/${user?.uid}?page=0&size=10&filter=${search}`).then((res) => {
                 setWarehouseInfo(res);
                 setIsFetching(false);
             }).catch((err) => {

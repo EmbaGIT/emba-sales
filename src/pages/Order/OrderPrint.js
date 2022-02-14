@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {get, post} from "../../api/Api";
+import { getHost } from "../../helpers/host";
 
 const OrderPrint = () => {
     const params = useParams();
@@ -10,7 +11,7 @@ const OrderPrint = () => {
     const [discountTotalPrice, setDiscountTotalPrice] = useState();
 
     useEffect(() => {
-        post(`http://bpaws01l:8087/api/order/search?id.equals=${order_id}`,).then(resOrderInfo => {
+        post(`${getHost('sales', 8087)}/api/order/search?id.equals=${order_id}`,).then(resOrderInfo => {
             const products = [];
             let total_price=0;
             let discount_total_price=0;

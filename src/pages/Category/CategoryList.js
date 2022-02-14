@@ -4,6 +4,7 @@ import Loader from 'react-loader-spinner';
 import {get} from "../../api/Api";
 import ModelListItem from "./ModelListItem";
 import ReactPaginate from "react-paginate";
+import { getHost } from "../../helpers/host";
 
 const Category = () => {
     const params = useParams();
@@ -39,7 +40,7 @@ const Category = () => {
                 res.content.forEach(parent => {
                     get(`/v2/parents/colors/category/${category_id}/parent/${parent.id}?brand=${brand}`).then(colors => {
                         if (colors?.length) {
-                            get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent.id}&color=${colors[0].id}&isBanner=true`).then(file => {
+                            get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent.id}&color=${colors[0].id}&isBanner=true`).then(file => {
                                 productListArr.push({
                                     ...parent,
                                     colors: colors,
@@ -53,7 +54,7 @@ const Category = () => {
                                 ]))
                             })
                         } else {
-                            get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent.id}&isBanner=true`).then(file => {
+                            get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent.id}&isBanner=true`).then(file => {
                                 productListArr.push({
                                     ...parent,
                                     colors: [],

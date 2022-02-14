@@ -21,6 +21,8 @@ import ReportOptions from "./pages/Reports/ReportOptions";
 import Warehouse from "./pages/Reports/Warehouse";
 import Stock from "./pages/Reports/Stock";
 import Sales from "./pages/Reports/Sales";
+import { getHost } from "./helpers/host";
+
 export const IsAuth = createContext(null);
 
 const App = () => {
@@ -33,7 +35,7 @@ const App = () => {
             get(`/menu/search?sort=menuOrder,desc&size=20`).then(res => {
                 const menuListArr = [];
                 res.content.forEach((menu, i) => {
-                    get(`http://bpaws01l:8089/api/logo?bucket=emba-store-icon`).then(file => {
+                    get(`${getHost('files', 8089)}/api/logo?bucket=emba-store-icon`).then(file => {
                         const menuFile = file.filter(f => f.categoryId === menu.id);
 
                         menuListArr.push({

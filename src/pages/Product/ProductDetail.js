@@ -9,6 +9,7 @@ import SubProductItem from "./SubProductItem";
 import SubProductInfo from "./SubProductInfo";
 import {useQuery} from "../../hooks/useQuery";
 import AuthContext from "../../store/AuthContext";
+import { getHost } from "../../helpers/host";
 
 const Product = () => {
     const params = useParams();
@@ -38,7 +39,7 @@ const Product = () => {
     };
 
     function getProductStock(uid) {
-        return post(`http://bpaws01l:8087/api/inventory`, {
+        return post(`${getHost('sales', 8087)}/api/inventory`, {
             "user_uid": authCtx.user_uid,
             "goods": [
                 {
@@ -51,9 +52,9 @@ const Product = () => {
 
     function getProductFiles(id) {
         if(currentColor){
-            return get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&color=${currentColor}&category=${category_id}&bucket=emba-store-images&parent=${parent_id}&product=${id}&isBanner=true`)
+            return get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&color=${currentColor}&category=${category_id}&bucket=emba-store-images&parent=${parent_id}&product=${id}&isBanner=true`)
         }
-        return get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&category=${category_id}&bucket=emba-store-images&parent=${parent_id}&product=${id}&isBanner=true`);
+        return get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&category=${category_id}&bucket=emba-store-images&parent=${parent_id}&product=${id}&isBanner=true`);
     }
 
     function getCharacteristics(id) {
@@ -119,7 +120,7 @@ const Product = () => {
             if(colors.length){
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
-                    get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&color=${currentColor}&parent=${parent_id}`).then(files => {
+                    get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&color=${currentColor}&parent=${parent_id}`).then(files => {
                         files.map(file => (
                             images.push({
                                 original: file.originalImageUrl,
@@ -136,7 +137,7 @@ const Product = () => {
             }else{
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
-                    get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent_id}`).then(files => {
+                    get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent_id}`).then(files => {
                         files.map(file => (
                             images.push({
                                 original: file.originalImageUrl,
@@ -156,7 +157,7 @@ const Product = () => {
 
     const handleModuleInfo = (id) => {
         const images = [];
-        currentColor && get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&category=${category_id}&color=${currentColor}&bucket=emba-store-images&parent=${parent_id}&product=${id}`).then(files => {
+        currentColor && get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&category=${category_id}&color=${currentColor}&bucket=emba-store-images&parent=${parent_id}&product=${id}`).then(files => {
             files.map(file => (
                 images.push({
                     original: file.originalImageUrl,
@@ -166,7 +167,7 @@ const Product = () => {
             setSubProductImages(images);
             showCartHandler();
         });
-        !currentColor && get(`http://bpaws01l:8089/api/image/resource?brand=${brand}&category=${category_id}&bucket=emba-store-images&parent=${parent_id}&product=${id}`).then(files => {
+        !currentColor && get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&category=${category_id}&bucket=emba-store-images&parent=${parent_id}&product=${id}`).then(files => {
             files.map(file => (
                 images.push({
                     original: file.originalImageUrl,

@@ -4,6 +4,7 @@ import Select from "react-select";
 import { useParams, useHistory, Link } from "react-router-dom";
 import Loader from "react-loader-spinner";
 import ReactPaginate from "react-paginate";
+import { getHost } from "../../helpers/host";
 
 const buttons = [
     { title: 'Parça qalığı', key: 'fabric' },
@@ -52,7 +53,7 @@ const Stock = ({ stock }) => {
         const { key } = stock;
         setPage(Number(params.page));
 
-        get(`http://bpaws01l:8091/api/${key}?page=0&size=${pageSize.value}&filter=${search}`).then((res) => {
+        get(`${getHost('report', 8091)}/api/${key}?page=0&size=${pageSize.value}&filter=${search}`).then((res) => {
             setStockGoods(res);
             setIsFetching(false);
         }).catch((err) => {
@@ -64,7 +65,7 @@ const Stock = ({ stock }) => {
         setIsFetching(true);
         const { key } = stock;
 
-        get(`http://bpaws01l:8091/api/${key}?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
+        get(`${getHost('report', 8091)}/api/${key}?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
             setStockGoods(res);
             setIsFetching(false);
         }).catch((err) => {

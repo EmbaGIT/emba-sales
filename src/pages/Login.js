@@ -1,6 +1,7 @@
 import {useState, useRef, useContext} from 'react';
 import { post } from '../api/Api';
 import AuthContext from "../store/AuthContext";
+import { getHost } from "../helpers/host";
 
 const Login = () => {
     const [isFetching, setIsFetching] = useState(false);
@@ -16,8 +17,7 @@ const Login = () => {
         const enteredPassword = passwordInputRef.current.value;
 
         if (enteredPassword.trim().length && enteredName.trim().length) {
-            const host = window.location.host.includes('emba') ? 'user.emba.store' : 'bpaws01l:8081';
-            post(`http://${host}/api/auth/login`, { username: enteredName, password: enteredPassword })
+            post(`${getHost('user', 8081)}/api/auth/login`, { username: enteredName, password: enteredPassword })
                 .then((res) => {
                     setIsFetching(false);
                     localStorage.setItem('jwt_token', res.token);

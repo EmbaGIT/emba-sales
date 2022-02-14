@@ -5,6 +5,7 @@ import Select from "react-select";
 import ReactPaginate from "react-paginate";
 import { useParams, useHistory, Link } from "react-router-dom";
 import Loader from "react-loader-spinner";
+import { getHost } from "../../helpers/host";
 
 const Chair = () => {
     const params = useParams();
@@ -39,7 +40,7 @@ const Chair = () => {
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`http://bpaws01l:8091/api/chair?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
+        get(`${getHost('report', 8091)}/api/chair?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
             setFabric(res)
             setIsFetching(false);
         }).catch((err) => {

@@ -14,6 +14,7 @@ import Loader from "react-loader-spinner";
 import "react-datepicker/dist/react-datepicker.css";
 import {formattedDate} from "../../helpers/formattedDate";
 import BirthDateDatepicker from "../../components/birthDateDatepicker";
+import { getHost } from "../../helpers/host";
 
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
@@ -201,7 +202,7 @@ const Checkout = () => {
                             }
                         }));
                     } else if (detail.infoTypeField.field === "City") {
-                        get(`http://bpaws01l:8087/api/city/search?name.contains=${detail.fieldValue}`).then(res => {
+                        get(`${getHost('sales', 8087)}/api/city/search?name.contains=${detail.fieldValue}`).then(res => {
                             if (res.content.length > 0) {
                                 setCheckoutState(prevState => ({
                                     ...prevState,
@@ -316,7 +317,7 @@ const Checkout = () => {
     })
 
     useEffect(() => {
-        get('http://bpaws01l:8087/api/city/table?page=0&size=100').then((res) => {
+        get(`${getHost('sales', 8087)}/api/city/table?page=0&size=100`).then((res) => {
             setIsFetchingData(false);
             setCity(res?.content?.map((city) => ({
                 value: city.code,
@@ -335,7 +336,7 @@ const Checkout = () => {
             }));
         }
         if (cartCtx.savedId) {
-            post(`http://bpaws01l:8087/api/order/search?id.equals=${cartCtx.savedId}`).then(resOrderInfo => {
+            post(`${getHost('sales', 8087)}/api/order/search?id.equals=${cartCtx.savedId}`).then(resOrderInfo => {
                 setCheckoutState(prevState => ({
                     ...prevState,
                     id: resOrderInfo.content[0].id,
@@ -583,7 +584,7 @@ const Checkout = () => {
         }
         if (status === "ORDERED" && handleValidation()) {
             setIsSending(true);
-            post(`http://bpaws01l:8087/api/order/send`, order_data).then(res => {
+            post(`${getHost('sales', 8087)}/api/order/send`, order_data).then(res => {
                 setIsSending(false);
                 if (res.status === "ORDERED") {
                     history.push(`/orderPrint/${res.id}`);
@@ -610,7 +611,7 @@ const Checkout = () => {
         }
         if (status === "SAVED" && handleNameSurnameValidation()) {
             setIsAddingWishlist(true);
-            post(`http://bpaws01l:8087/api/order/wishlist`, order_data).then(res => {
+            post(`${getHost('sales', 8087)}/api/order/wishlist`, order_data).then(res => {
                 setIsAddingWishlist(false);
                 history.push(`/allOrder`);
                 toast.success(<MessageComponent text='Sifariş yadda saxlanıldı!'/>, {

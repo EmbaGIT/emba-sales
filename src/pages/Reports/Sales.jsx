@@ -6,6 +6,7 @@ import "react-modern-calendar-datepicker/lib/DatePicker.css";
 import { Calendar } from "react-modern-calendar-datepicker";
 import { calendarLocaleAZ } from "../../locales/calendar-locale";
 import Loader from "react-loader-spinner";
+import { getHost } from "../../helpers/host";
 
 const Sales = () => {
     const [sale, setSale] = useState({});
@@ -74,7 +75,7 @@ const Sales = () => {
         const { start, end } = stringDateState;
 
         setIsFetching(true);
-        post(`http://bpaws01l:8091/api/sales/report`, { databegin: start, dataend: end, uid: user.uid })
+        post(`${getHost('report', 8091)}/api/sales/report`, { databegin: start, dataend: end, uid: user.uid })
             .then((res) => {
                 setSale(res);
                 setIsFetching(false);

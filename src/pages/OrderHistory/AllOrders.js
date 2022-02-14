@@ -8,6 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import DatePicker from "react-datepicker";
 import {formattedDate} from "../../helpers/formattedDate";
+import { getHost } from "../../helpers/host";
 
 const AllOrders = () => {
     // const query = useQuery();
@@ -44,14 +45,14 @@ const AllOrders = () => {
     }
 
     useEffect(() => {
-        post(`http://bpaws01l:8087/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}&size=10`).then(res => {
+        post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}&size=10`).then(res => {
             orderList(res, page);
             setPageState(res);
         })
     }, [page, rerender]);
 
     const handleModuleInfo = (id) => {
-        post(`http://bpaws01l:8087/api/order/search?id.equals=${id}`).then(resOrderInfo => {
+        post(`${getHost('sales', 8087)}/api/order/search?id.equals=${id}`).then(resOrderInfo => {
             setOrderInfo(resOrderInfo.content[0])
             showCartHandler();
         })
@@ -74,7 +75,7 @@ const AllOrders = () => {
                 {
                     label: 'Sil',
                     onClick: () => {
-                        remove(`http://bpaws01l:8087/api/order/${id}`).then(res => {
+                        remove(`${getHost('sales', 8087)}/api/order/${id}`).then(res => {
                             const newList = orderState.filter(item => item.id !== id);
                             setOrderState(newList);
                             setRerender(!rerender);
@@ -90,7 +91,7 @@ const AllOrders = () => {
     }
 
     const deleteGoodFromOrder = (id) => {
-        remove(`http://bpaws01l:8087/api/order/goods/${id}`).then(res => {
+        remove(`${getHost('sales', 8087)}/api/order/goods/${id}`).then(res => {
             setOrderInfo(res)
         })
     }
@@ -106,7 +107,7 @@ const AllOrders = () => {
 
     const onSearchDate = () => {
         if(searchByDate.start_date || searchByDate.end_date){
-            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=${authCtx.user_uid}&creationDate.greaterThan=${formattedDate(searchByDate.start_date)}&creationDate.lessThan=${formattedDate(searchByDate.end_date)}&size=10&page=${page}&size=10`).then(res =>{
+            post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&creationDate.greaterThan=${formattedDate(searchByDate.start_date)}&creationDate.lessThan=${formattedDate(searchByDate.end_date)}&size=10&page=${page}&size=10`).then(res =>{
                 orderList(res, 0);
                 setPageState(res);
             }).catch(err => console.log(err))
@@ -116,14 +117,14 @@ const AllOrders = () => {
     const handleNameSearch = (value) => {
         if(value.trim().length > 3){
             setIsLoading(true);
-            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=${authCtx.user_uid}&client_name.contains=${value}&page=0&size=10`).then(res => {
+            post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&client_name.contains=${value}&page=0&size=10`).then(res => {
                 orderList(res, 0);
                 setPage(0);
                 setPageState(res);
             }).catch(err => console.log(err))
         }else{
             setIsLoading(true);
-            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=${authCtx.user_uid}&&page=0&size=10`).then(res => {
+            post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&&page=0&size=10`).then(res => {
                 orderList(res, 0);
                 setPage(0);
                 setPageState(res);
@@ -143,13 +144,13 @@ const AllOrders = () => {
 
     const statusFilter = (value, pageNumber) => {
         if(value==="all"){
-            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${pageNumber}`).then(res => {
+            post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${pageNumber}`).then(res => {
                 setPageState(res);
                 setPage(pageNumber);
                 orderList(res, pageNumber);
             })
         }else{
-            post(`http://bpaws01l:8087/api/order/search?user_uid.equals=${authCtx.user_uid}&status.equals=${value}&size=10&page=${pageNumber}`).then(res => {
+            post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&status.equals=${value}&size=10&page=${pageNumber}`).then(res => {
                 setPageState(res);
                 setPage(pageNumber);
                 orderList(res, pageNumber);

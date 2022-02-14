@@ -14,6 +14,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import CartContext from "../../store/CartContext";
 import {useHistory} from "react-router-dom";
+import { getHost } from "../../helpers/host";
 
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
@@ -167,7 +168,7 @@ const OrderInfo = (props) => {
                             birthdate: new Date(detail.fieldValue?.split(" ")[0].replace(/(\d{2}).(\d{2}).(\d{4})/, "$2/$1/$3"))
                         }));
                     } else if (detail.infoTypeField.field === "City") {
-                        get(`http://bpaws01l:8087/api/city/search?name.contains=${detail.fieldValue}`).then(res => {
+                        get(`${getHost('sales', 8087)}/api/city/search?name.contains=${detail.fieldValue}`).then(res => {
                             if (res.content.length > 0) {
                                 setOrderInfo(prevstate => ({
                                     ...prevstate,
@@ -256,7 +257,7 @@ const OrderInfo = (props) => {
 
     useEffect(() => {
         handleOrderInfo(props.info);
-        get('http://bpaws01l:8087/api/city/table?page=0&size=100').then((res) => {
+        get(`${getHost('sales', 8087)}/api/city/table?page=0&size=100`).then((res) => {
             setCity(res?.content?.map((city) => ({
                 value: city.code,
                 label: `${city.name}`,
@@ -280,7 +281,7 @@ const OrderInfo = (props) => {
 
                         const promises = info.goods.map(good => new Promise(resolve => {
                             if (good.color_id) {
-                                get(`http://bpaws01l:8089/api/image/resource?brand=${good.brand}&color=${good.color_id}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
+                                get(`${getHost('files', 8089)}/api/image/resource?brand=${good.brand}&color=${good.color_id}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
                                     resolve({
                                         amount: good.product_quantity,
                                         discount: good.product_discount,
@@ -300,7 +301,7 @@ const OrderInfo = (props) => {
                                     })
                                 })
                             } else {
-                                get(`http://bpaws01l:8089/api/image/resource?brand=${good.brand}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
+                                get(`${getHost('files', 8089)}/api/image/resource?brand=${good.brand}&category=${good.category_id}&bucket=emba-store-images&parent=${good.parent_id}&product=${good.product_id}&isBanner=true`).then(file => {
                                     resolve({
                                         amount: good.product_quantity,
                                         discount: good.product_discount,
@@ -342,7 +343,7 @@ const OrderInfo = (props) => {
         let total_price=0;
         let discount_total_price=0;
         if(resOrderInfo.client_delivery_city_code){
-            get(`http://bpaws01l:8087/api/city/code/${resOrderInfo.client_delivery_city_code}`).then(city => {
+            get(`${getHost('sales', 8087)}/api/city/code/${resOrderInfo.client_delivery_city_code}`).then(city => {
                 setOrderInfo(prevstate => ({
                     ...prevstate,
                     city: {
@@ -599,7 +600,7 @@ const OrderInfo = (props) => {
                 "payment_method": orderInfo.paymentType,
                 "user_uid": authCtx.user_uid
             }
-            post(`http://bpaws01l:8087/api/order/update/${orderInfo.id}`, postData).then(res => {
+            post(`${getHost('sales', 8087)}/api/order/update/${orderInfo.id}`, postData).then(res => {
                 setIsSending(false);
                 props.onCloseModal();
                 toast.success(<MessageComponent text='Sifariş göndərildi!'/>, {

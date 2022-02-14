@@ -10,6 +10,7 @@ import getYear from "date-fns/getYear";
 import getMonth from "date-fns/getYear";
 import "react-datepicker/dist/react-datepicker.css";
 import {get} from "../../api/Api";
+import { getHost } from "../../helpers/host";
 
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
@@ -155,7 +156,7 @@ const CustomerInfo = () => {
 
 
     useEffect(() => {
-        get('http://bpaws01l:8087/api/city/table?page=0&size=100').then((res) => {
+        get(`${getHost('sales', 8087)}/api/city/table?page=0&size=100`).then((res) => {
             setIsFetchingData(false);
             setCity(res?.content?.map((city) => ({
                 value: city.id,
