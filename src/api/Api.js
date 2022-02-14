@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { getHost } from "../helpers/host";
 
 const axiosInstance = axios.create({
-    baseURL: getHost('web', '8083/api'),
+    baseURL: getHost('web', '8083'),
     fileURL: getHost('files', '8089/api'),
     orderURL: getHost('sales', '8087/api')
 });
