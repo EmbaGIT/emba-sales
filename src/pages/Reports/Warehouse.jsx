@@ -30,7 +30,7 @@ const Warehouse = () => {
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`${getHost('report', 8091)}/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}&filter=${search}`).then((res) => {
+        get(`${getHost('erp.report', 8091)}/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}&filter=${search}`).then((res) => {
             setWarehouseInfo(res);
             setIsFetching(false);
         }).catch((err) => {
@@ -51,8 +51,8 @@ const Warehouse = () => {
     const updateWarehouseInfo = () => {
         const user = getUser();
         setIsFetching(true);
-        remove(`${getHost('report', 8091)}/api/warehouse/${user?.uid}`).then((res) => {
-            get(`${getHost('report', 8091)}/api/warehouse/${user?.uid}?page=0&size=10&filter=${search}`).then((res) => {
+        remove(`${getHost('erp.report', 8091)}/api/warehouse/${user?.uid}`).then((res) => {
+            get(`${getHost('erp.report', 8091)}/api/warehouse/${user?.uid}?page=0&size=10&filter=${search}`).then((res) => {
                 setWarehouseInfo(res);
                 setIsFetching(false);
             }).catch((err) => {

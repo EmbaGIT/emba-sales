@@ -75,7 +75,7 @@ const Sales = () => {
         const { start, end } = stringDateState;
 
         setIsFetching(true);
-        post(`${getHost('report', 8091)}/api/sales/report`, { databegin: start, dataend: end, uid: user.uid })
+        post(`${getHost('erp.report', 8091)}/api/sales/report`, { databegin: start, dataend: end, uid: user.uid })
             .then((res) => {
                 setSale(res);
                 setIsFetching(false);
