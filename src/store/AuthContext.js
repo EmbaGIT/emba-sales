@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import jwt_decode from 'jwt-decode';
+import { useHistory } from "react-router-dom";
 
 const AuthContext = React.createContext({
     token: '',
@@ -10,6 +11,7 @@ const AuthContext = React.createContext({
 });
 
 export const AuthContextProvider = (props) => {
+    const history = useHistory();
     const [token, setToken] = useState(!!localStorage.getItem('jwt_token'));
     const isLoggedIn = !!token;
     const decoded = token && jwt_decode(localStorage.getItem('jwt_token'));
@@ -25,7 +27,7 @@ export const AuthContextProvider = (props) => {
         setToken(null);
         localStorage.removeItem("jwt_token");
         localStorage.removeItem("cart");
-        window.location.href = '/login';
+        history.push('/login');
     };
 
     const loginHandler = (token) => {

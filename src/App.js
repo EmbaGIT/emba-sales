@@ -1,4 +1,4 @@
-import {useEffect, useState, createContext} from "react";
+import {useEffect, useState, createContext, useContext} from "react";
 import PrivateRoute from "./helpers/PrivateRoute";
 import {
     Switch,
@@ -22,13 +22,19 @@ import Warehouse from "./pages/Reports/Warehouse";
 import Stock from "./pages/Reports/Stock";
 import Sales from "./pages/Reports/Sales";
 import { getHost } from "./helpers/host";
+import authContext from "./store/AuthContext";
 
 export const IsAuth = createContext(null);
 
 const App = () => {
-    const [isUserAuth, setIsUserAuth] = useState(!!localStorage.getItem('jwt_token'));
+    const authCtx = useContext(authContext)
+    const [isUserAuth, setIsUserAuth] = useState(authCtx.token);
     const [menuList, setMenuList] = useState([]);
     const [isFetchingData, setIsFetchingData] = useState(true);
+
+    useEffect(() => {
+        setIsUserAuth(authCtx.token)
+    }, [authCtx])
 
     useEffect(() => {
         if(isUserAuth){
