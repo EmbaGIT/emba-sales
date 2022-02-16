@@ -1,4 +1,4 @@
-import {useState, useRef, useContext} from 'react';
+import {useState, useRef, useContext, useEffect} from 'react';
 import { post } from '../api/Api';
 import AuthContext from "../store/AuthContext";
 import { getHost } from "../helpers/host";
@@ -31,6 +31,12 @@ const Login = () => {
 
         }
     };
+
+    useEffect(() => {
+        return () => {
+            setIsFetching(false);
+        }
+    }, [])
 
     return (
         <div className="container">

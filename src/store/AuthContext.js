@@ -33,7 +33,7 @@ export const AuthContextProvider = (props) => {
     const loginHandler = (token) => {
         setToken(token);
         localStorage.setItem("jwt_token", token);
-        window.location.href = '/';
+        history.push('/');
     };
 
     const contextValue = {

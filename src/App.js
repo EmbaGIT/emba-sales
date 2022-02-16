@@ -33,7 +33,7 @@ const App = () => {
     const [isFetchingData, setIsFetchingData] = useState(true);
 
     useEffect(() => {
-        setIsUserAuth(authCtx.token)
+        setIsUserAuth(authCtx.token);
     }, [authCtx])
 
     useEffect(() => {
@@ -62,7 +62,7 @@ const App = () => {
                 })
             }).catch(err => console.log(err));
         }
-    }, [])
+    }, [isUserAuth])
 
     return (
         <CartProvider>
