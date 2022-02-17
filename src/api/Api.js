@@ -3,9 +3,9 @@ import { toast } from 'react-toastify';
 import { getHost } from "../helpers/host";
 
 const axiosInstance = axios.create({
-    baseURL: `${getHost('web', '8083')}/api`,
-    fileURL: getHost('files', '8089/api'),
-    orderURL: getHost('sales', '8087/api')
+    baseURL: `${getHost('web', '8083')}`,
+    fileURL: getHost('files', '8089'),
+    orderURL: getHost('sales', '8087')
 });
 
 export const get = (url) => axiosInstance.get(url).then((res) => res.data);
@@ -38,12 +38,12 @@ axiosInstance.interceptors.request.use((config) => {
             Authorization: `Bearer ${jwt}`,
         };
     }
-    if (config.url.includes(`${getHost('files', 8089)}/api/image`)) {
+    if (config.url.includes(`${getHost('files', 8089)}/image`)) {
         config.headers = {
             ...config.headers,
             'Content-Type': 'multipart/form-data;',
         };
-    }else if(config.url.includes(`${getHost('sales', 8087)}/api`)) {
+    }else if(config.url.includes(`${getHost('sales', 8087)}`)) {
         config.headers = {
             ...config.headers,
             'Content-Type': 'application/json;',
@@ -53,7 +53,7 @@ axiosInstance.interceptors.request.use((config) => {
 }, (error) => Promise.reject(error));
 
 axiosInstance.interceptors.response.use((res) => {
-    if ((res.status === 201 || res.status === 200) && (res.config.method === 'post' && res.config.url!==`${getHost('sales', 8087)}/api/inventory`) && res.config.method === 'put') {
+    if ((res.status === 201 || res.status === 200) && (res.config.method === 'post' && res.config.url!==`${getHost('sales', 8087)}/inventory`) && res.config.method === 'put') {
         toast.success(<MessageComponent text='Uğurlu Əməliyyat!' />, {
             position: toast.POSITION.TOP_LEFT,
             toastId: 'success-toast-message',

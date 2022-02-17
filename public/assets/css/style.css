@@ -584,6 +584,11 @@ input[type=number] {
     border-radius: 0 40px 40px 0 !important;
 }
 
+/*react modal style*/
+.react-confirm-alert-overlay {
+    z-index: 2000 !important;
+}
+
 @media (min-width: 768px) and (max-width: 800px) and (orientation: portrait) {
     .Calendar {
         font-size: 1rem !important;
