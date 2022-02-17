@@ -17,7 +17,7 @@ const Login = () => {
         const enteredPassword = passwordInputRef.current.value;
 
         if (enteredPassword.trim().length && enteredName.trim().length) {
-            post(`${getHost('user', 8081)}/auth/login`, { username: enteredName, password: enteredPassword })
+            post(`${getHost('user', 8081)}/api/auth/login`, { username: enteredName, password: enteredPassword })
                 .then((res) => {
                     setIsFetching(false);
                     localStorage.setItem('jwt_token', res.token);
