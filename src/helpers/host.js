@@ -1,2 +1,2 @@
 // using url for external requests. and port for internal requests
-export const getHost = (url, port) => window.location.host.includes('emba') ? `http://emba.store/api/${url}` : `http://bpaws01l:${port}/api`
+export const getHost = (url, port) => window.location.host.includes('emba') ? `http://api.emba.store/es/${url}` : `http://bpaws01l:${port}/api`
