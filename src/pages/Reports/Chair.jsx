@@ -40,7 +40,7 @@ const Chair = () => {
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`${getHost('erp.report', 8091)}/api/chair?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
+        get(`${getHost('erp/report', 8091)}/api/chair?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
             setFabric(res)
             setIsFetching(false);
         }).catch((err) => {

@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { getHost } from "./helpers/host";
 
 const client = new ApolloClient({
-    uri: `${getHost('search.customer', 8088)}/graphql`,
+    uri: `${getHost('search/customer', 8088)}/graphql`,
     cache: new InMemoryCache(),
 });
 

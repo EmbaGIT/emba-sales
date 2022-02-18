@@ -53,7 +53,7 @@ const Stock = ({ stock }) => {
         const { key } = stock;
         setPage(Number(params.page));
 
-        get(`${getHost('erp.report', 8091)}/api/${key}?page=0&size=${pageSize.value}&filter=${search}`).then((res) => {
+        get(`${getHost('erp/report', 8091)}/api/${key}?page=0&size=${pageSize.value}&filter=${search}`).then((res) => {
             setStockGoods(res);
             setIsFetching(false);
         }).catch((err) => {
@@ -65,7 +65,7 @@ const Stock = ({ stock }) => {
         setIsFetching(true);
         const { key } = stock;
 
-        get(`${getHost('erp.report', 8091)}/api/${key}?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
+        get(`${getHost('erp/report', 8091)}/api/${key}?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
             setStockGoods(res);
             setIsFetching(false);
         }).catch((err) => {
