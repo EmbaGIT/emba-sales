@@ -136,9 +136,6 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
-                setTimeout(() => {
-                    console.log(images)
-                }, 1500)
                 setProductImages(images);
                 setIsFetchingData(false);
             }else{
@@ -159,9 +156,6 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
-                setTimeout(() => {
-                    console.log(images)
-                }, 1500)
                 setProductImages(images);
                 setIsFetchingData(false);
             }
