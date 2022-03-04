@@ -12,7 +12,6 @@ import AuthContext from "../../store/AuthContext";
 import { getHost } from "../../helpers/host";
 
 const Product = () => {
-    console.log('PRODUCT DETAILS RENDERED!!!')
     const params = useParams();
     const brand = params.brand;
     const category_id = params.category_id;
@@ -30,7 +29,6 @@ const Product = () => {
     const [subProductsNotIncluded, setSubProductsNotIncluded] = useState();
     const [subProductInfo, setSubProductInfo] = useState([]);
     const [cartIsShown, setCartIsShown] = useState(false);
-    const [count, setCount] = useState(productImages?.length)
 
     const showCartHandler = () => {
         setCartIsShown(true);
@@ -108,7 +106,6 @@ const Product = () => {
     }
 
     useEffect(() => {
-        console.log('Effect executed')
         setIsFetchingData(true);
         setProductColor(currentColor);
         setSubProductsIsIncluded([]);
@@ -124,15 +121,12 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&color=${currentColor}&parent=${parent_id}`).then(files => {
-                        console.log(files)
-                        files.map(file => {
-                            return (
-                                images.push({
-                                    original: file.originalImageUrl,
-                                    thumbnail: file.lowQualityImageUrl,
-                                })
-                            )
-                        })
+                        files.map(file => (
+                            images.push({
+                                original: file.originalImageUrl,
+                                thumbnail: file.lowQualityImageUrl,
+                            })
+                        ))
                     })
                 })
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
@@ -142,21 +136,17 @@ const Product = () => {
                     console.log(images)
                 }, 1500)
                 setProductImages(images);
-                setCount(images?.length)
                 setIsFetchingData(false);
             }else{
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent_id}`).then(files => {
-                        console.log(files)
-                        files.map(file => {
-                            return (
-                                images.push({
-                                    original: file.originalImageUrl,
-                                    thumbnail: file.lowQualityImageUrl,
-                                })
-                            )
-                        })
+                        files.map(file => (
+                            images.push({
+                                original: file.originalImageUrl,
+                                thumbnail: file.lowQualityImageUrl,
+                            })
+                        ))
                     })
                 })
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
@@ -166,11 +156,10 @@ const Product = () => {
                     console.log(images)
                 }, 1500)
                 setProductImages(images);
-                setCount(images?.length)
                 setIsFetchingData(false);
             }
         })
-    }, [parent_id, productColor, count]);
+    }, [parent_id, productColor]);
 
     const handleModuleInfo = (id) => {
         const images = [];
