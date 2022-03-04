@@ -121,6 +121,7 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&color=${currentColor}&parent=${parent_id}`).then(files => {
+                        console.log("files: ", files)
                         files.map(file => (
                             images.push({
                                 original: file.originalImageUrl,
@@ -141,6 +142,7 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent_id}`).then(files => {
+                        console.log("files: ", files)
                         files.map(file => (
                             images.push({
                                 original: file.originalImageUrl,
@@ -152,9 +154,6 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
-                setTimeout(() => {
-                    console.log(images)
-                }, 1500)
                 setProductImages(images);
                 setIsFetchingData(false);
             }
