@@ -209,7 +209,10 @@ const Product = () => {
             <div className="row">
                 <div className="col-lg-7">
                     {productImages?.length ?
-                        <ImageGallery items={productImages}/>
+                        <div>
+                            <ImageGallery items={productImages}/>
+                            <img src={productImages[0].original} />
+                        </div>
                         : <img src={noImage} className="w-100" alt=""/>
                     }
                 </div>
