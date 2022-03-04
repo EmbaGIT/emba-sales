@@ -112,13 +112,13 @@ const Product = () => {
         setSubProductsNotIncluded([]);
         const images = [];
 
-        get(`/v2/parents/colors/category/${category_id}/parent/${parent_id}?brand=${brand}`).then(async colors => {
+        get(`/v2/parents/colors/category/${category_id}/parent/${parent_id}?brand=${brand}`).then(colors => {
             setProductInfo(prevstate => ({
                 ...prevstate,
                 colors
             }));
             if(colors.length){
-                await get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
+                get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&color=${currentColor}&parent=${parent_id}`).then(files => {
                         files.map(file => {
@@ -129,15 +129,16 @@ const Product = () => {
                                 })
                             )
                         })
+                        setProductImages(images);
                     })
                 })
-                await get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
+                get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
-                setProductImages(images);
+
                 setIsFetchingData(false);
             }else{
-                await get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
+                get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent_id}`).then(files => {
                         files.map(file => {
@@ -148,16 +149,21 @@ const Product = () => {
                                 })
                             )
                         })
+                        setProductImages(images);
                     })
                 })
-                await get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
+                get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
-                setProductImages(images);
+
                 setIsFetchingData(false);
             }
         })
     }, [parent_id, productColor]);
+
+    console.log(productImages)
+    console.log("product images length: ", productImages?.length)
+    console.log("first element product images: ", productImages[0])
 
     const handleModuleInfo = (id) => {
         const images = [];
