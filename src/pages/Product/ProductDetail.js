@@ -12,6 +12,7 @@ import AuthContext from "../../store/AuthContext";
 import { getHost } from "../../helpers/host";
 
 const Product = () => {
+    console.log('PRODUCT DETAILS RENDERED!!!')
     const params = useParams();
     const brand = params.brand;
     const category_id = params.category_id;
@@ -23,7 +24,7 @@ const Product = () => {
     const [productColor, setProductColor] = useState(currentColor);
     const [productInfo, setProductInfo] = useState([]);
     const [totalPrice, setSetPrice] = useState(0);
-    const [productImages, setProductImages] = useState();
+    const [productImages, setProductImages] = useState([]);
     const [subProductImages, setSubProductImages] = useState();
     const [subProductsIsIncluded, setSubProductsIsIncluded] = useState();
     const [subProductsNotIncluded, setSubProductsNotIncluded] = useState();
@@ -121,13 +122,15 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&color=${currentColor}&parent=${parent_id}`).then(files => {
-                        console.log("files: ", files)
-                        files.map(file => (
-                            images.push({
-                                original: file.originalImageUrl,
-                                thumbnail: file.lowQualityImageUrl,
-                            })
-                        ))
+                        console.log(files)
+                        files.map(file => {
+                            return (
+                                images.push({
+                                    original: file.originalImageUrl,
+                                    thumbnail: file.lowQualityImageUrl,
+                                })
+                            )
+                        })
                     })
                 })
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
@@ -142,18 +145,23 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent_id}`).then(files => {
-                        console.log("files: ", files)
-                        files.map(file => (
-                            images.push({
-                                original: file.originalImageUrl,
-                                thumbnail: file.lowQualityImageUrl,
-                            })
-                        ))
+                        console.log(files)
+                        files.map(file => {
+                            return (
+                                images.push({
+                                    original: file.originalImageUrl,
+                                    thumbnail: file.lowQualityImageUrl,
+                                })
+                            )
+                        })
                     })
                 })
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
+                setTimeout(() => {
+                    console.log(images)
+                }, 1500)
                 setProductImages(images);
                 setIsFetchingData(false);
             }
@@ -211,7 +219,6 @@ const Product = () => {
                         <ImageGallery items={productImages}/>
                         : <img src={noImage} className="w-100" alt=""/>
                     }
-                    <img src={productImages[0]?.original} />
                 </div>
                 <div className="col-lg-5">
                     {productInfo &&
