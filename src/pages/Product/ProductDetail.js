@@ -118,7 +118,7 @@ const Product = () => {
                 colors
             }));
             if(colors.length){
-                get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
+                await get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&color=${currentColor}&parent=${parent_id}`).then(files => {
                         files.map(file => {
@@ -131,13 +131,13 @@ const Product = () => {
                         })
                     })
                 })
-                get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
+                await get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
                 setProductImages(images);
                 setIsFetchingData(false);
             }else{
-                get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
+                await get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
                     subProducts(products, "subProductsIsIncluded");
                     get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category_id}&parent=${parent_id}`).then(files => {
                         files.map(file => {
@@ -150,7 +150,7 @@ const Product = () => {
                         })
                     })
                 })
-                get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
+                await get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
                 setProductImages(images);
