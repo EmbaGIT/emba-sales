@@ -135,7 +135,6 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}/color/${currentColor}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
-
                 setIsFetchingData(false);
             }else{
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxildir`).then(products => {
@@ -155,15 +154,10 @@ const Product = () => {
                 get(`/v2/products/state/category/${category_id}/parent/${parent_id}?brand=${brand}&state=Deste_Daxil_Deyil`).then(products => {
                     subProducts(products, "subProductsNotIncluded");
                 })
-
                 setIsFetchingData(false);
             }
         })
     }, [parent_id, productColor]);
-
-    console.log(productImages)
-    console.log("product images length: ", productImages?.length)
-    console.log("first element product images: ", productImages[0])
 
     const handleModuleInfo = (id) => {
         const images = [];
