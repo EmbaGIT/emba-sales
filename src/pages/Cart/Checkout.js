@@ -132,6 +132,13 @@ const Checkout = () => {
         payment_date: true
     })
 
+    const [creditPercent, setCreditPercent] = useState(2);
+
+    const handlePercentChange = e => {
+        const { value } = e.target;
+        setCreditPercent(value);
+    }
+
     const [getAvailableCustomer, {
         data: available_customer,
         loading: available_customer_loading
@@ -398,7 +405,7 @@ const Checkout = () => {
             setBankCommission(0);
         } else if (type === "credit") {
             setPaymentType(1);
-            setBankCommission(Math.round((cartCtx.discountAmount * 2 / 100) * 100) / 100)
+            setBankCommission(Math.round((cartCtx.discountAmount * creditPercent / 100) * 100) / 100)
         } else if (type === 'byStore') {
             setDeliveryType(0);
         } else if (type === "byCustomer") {
@@ -434,6 +441,13 @@ const Checkout = () => {
             customerInfo: alldata
         }));
     }
+
+    useEffect(() => {
+        if (paymentType === 1) {
+            setBankCommission(Math.round((cartCtx.discountAmount * creditPercent / 100) * 100) / 100)
+        }
+    }, [creditPercent]);
+
     const searchOnDatabase = () => {
         setAvailableCustomer([]);
         setCheckoutState(prevstate => ({
@@ -709,6 +723,15 @@ const Checkout = () => {
                                 </span>
                             </div>
                         </div>
+                        {
+                            paymentType === 1 ? <div className="mt-3">
+                                <h6>Kredit faizi</h6>
+                                <input
+                                    value={creditPercent}
+                                    onChange={handlePercentChange}
+                                />
+                            </div> : null
+                        }
                         <div className="mt-3">
                             <h6>Çatdırılma</h6>
                             <div className="d-flex">
