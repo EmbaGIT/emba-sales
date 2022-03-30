@@ -724,9 +724,10 @@ const Checkout = () => {
                             </div>
                         </div>
                         {
-                            paymentType === 1 ? <div className="mt-3">
+                            paymentType === 1 ? <div className="w-50 mt-3">
                                 <h6>Kredit faizi</h6>
                                 <input
+                                    className="form-control"
                                     value={creditPercent}
                                     onChange={handlePercentChange}
                                 />

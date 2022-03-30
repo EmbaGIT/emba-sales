@@ -55,14 +55,15 @@ const ProductSearch = () => {
                         </li>
                     ))}
                 </ul>
-                <Link
-                    to={searchResult?.content?.filter(item => item.brand === brand).length
-                        ? `/search?param=${searchParam}` : ''} className="text-light"
-                >
-                    <div className="result-text">
-                        Bütün nəticələr ({searchResult?.content?.filter(item => item.brand === brand).length})
-                    </div>
-                </Link>
+                {
+                    searchResult?.totalElements > 5 && searchResult?.content?.filter(item => item.brand === brand).length ? <Link
+                        to={`/search?param=${searchParam}`} className="text-light"
+                    >
+                        <div className="result-text">
+                            Bütün nəticələr ({searchResult?.totalElements})
+                        </div>
+                    </Link> : null
+                }
             </div>
         </div>
     )
