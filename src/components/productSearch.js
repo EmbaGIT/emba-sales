@@ -28,7 +28,7 @@ const ProductSearch = () => {
 
     const handleSearch = (value) => {
         setSearchParam(value);
-        if(value.trim().length > 3){
+        if(value.trim().length >= 3){
             get(`products/search?name.contains=${value}&page=0&size=5`).then(res => {
                 setSearchResult(res);
                 setSearchDisplay('block');

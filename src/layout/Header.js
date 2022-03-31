@@ -1,5 +1,5 @@
 import {useContext} from "react";
-import logo from '../assets/images/logo.png';
+import logo from '../assets/images/embastore.png';
 import CartContext from "../store/CartContext";
 import AuthContext from "../store/AuthContext";
 import {Link, NavLink} from "react-router-dom";
