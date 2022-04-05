@@ -400,6 +400,9 @@ const Checkout = () => {
         } else if (type === `product_createsales${value.id}`) {
             // SHUOLD BE IMMUTABLE STATE CHANGE, BUT MUTABLE DONE INSTEAD
             checkoutState.items.find(item => item.id === value.id).product_createsales = value.checked;
+        } else if (type === `product_reserve${value.id}`) {
+            // SHUOLD BE IMMUTABLE STATE CHANGE, BUT MUTABLE DONE INSTEAD
+            checkoutState.items.find(item => item.id === value.id).product_reserve = value.checked;
         } else if (type === 'cash') {
             setPaymentType(0);
             setBankCommission(0);
@@ -565,7 +568,8 @@ const Checkout = () => {
                 product_price: item.price,
                 product_discount: item.discount,
                 product_total: item.amount * item.price,
-                product_createsales: item.product_createsales
+                product_createsales: item.product_createsales,
+                product_reserve: item.product_reserve
             })
         })
         const order_data = {
@@ -666,6 +670,7 @@ const Checkout = () => {
                                 <thead className="">
                                 <tr>
                                     <th style={{width: '110px'}}>Distribütora göndərilsin</th>
+                                    <th style={{width: '110px'}}>Rezerv olunsun</th>
                                     <th>Modelin adı</th>
                                     <th style={{width: '110px'}}>Qiyməti</th>
                                     <th style={{width: '110px'}}>Son qiyməti</th>
@@ -685,6 +690,20 @@ const Checkout = () => {
                                             />
                                             <label className="form-check-label" htmlFor={`product_createsales${product.id}`}>{product.product_createsales ? 'Bəli' : 'Xeyr'}</label>
                                         </td>
+
+                                        <td>
+                                            <input
+                                                className="form-check-input me-2"
+                                                type="checkbox"
+                                                name={`product_reserve${product.id}`}
+                                                id={`product_reserve${product.id}`}
+                                                onChange={e => handleInputChange(`product_reserve${product.id}`, { id: product.id, checked: e.target.checked })}
+                                                checked={product.product_reserve}
+                                                disabled={!product.product_createsales}
+                                            />
+                                            <label className="form-check-label" htmlFor={`product_reserve${product.id}`}>{product.product_reserve ? 'Bəli' : 'Xeyr'}</label>
+                                        </td>
+
                                         <td>
                                             {product.name}
                                             <div className="text-success font-weight-bold">Sayı: {product.amount}</div>

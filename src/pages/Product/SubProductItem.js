@@ -58,7 +58,8 @@ const SubProductItem = (props) => {
                 uid: props.uid,
                 characteristic_uid: charUID,
                 characteristic_code: charCode,
-                product_createsales: false
+                product_createsales: false,
+                product_reserve: false
             });
         }
     }
