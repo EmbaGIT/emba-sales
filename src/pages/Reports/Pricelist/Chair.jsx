@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {get} from "../../../api/Api";
+import { getHost } from "../../helpers/host";
 
 const Chair = () => {
     const [chairs, setChairs] = useState([]);
 
     useEffect(() => {
-        get("http://bpaws01l:8092/api/chair-type").then(chairs => setChairs(chairs))
+        get(`${getHost('pricing/panel', 8092)}/api/chair-type`).then(chairs => setChairs(chairs))
     }, [])
 
     const getListItems = selectedList => {

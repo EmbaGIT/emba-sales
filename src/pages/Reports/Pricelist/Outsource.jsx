@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {get} from "../../../api/Api";
+import { getHost } from "../../helpers/host";
 
 const Outsource = () => {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        get("http://bpaws01l:8092/api/outsource").then(products => setProducts(products))
+        get(`${getHost('pricing/panel', 8092)}/api/outsource`).then(products => setProducts(products))
     }, [])
 
     return (

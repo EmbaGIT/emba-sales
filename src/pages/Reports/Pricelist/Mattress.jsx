@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {get} from "../../../api/Api";
+import { getHost } from "../../helpers/host";
 
 const Mattress = () => {
     const [mattresses, setMattresses] = useState([]);
 
     useEffect(() => {
-        get("http://bpaws01l:8092/api/mattress-type").then(mattresses => setMattresses(mattresses))
+        get(`${getHost('pricing/panel', 8092)}/api/mattress-type`).then(mattresses => setMattresses(mattresses))
     }, [])
 
     const getListItems = selectedList => {

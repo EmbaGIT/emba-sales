@@ -1,19 +1,20 @@
 import React, {useEffect, useState} from "react";
 import {get} from "../../../api/Api";
+import { getHost } from "../../helpers/host";
 
 const Portfolio = () => {
     const [collections, setCollections] = useState([]);
 
     useEffect(() => {
-        get("http://bpaws01l:8092/api/types").then(types => {
+        get(`${getHost('pricing/panel', 8092)}/api/types`).then(types => {
             Promise.all(types.map(t => {
-                return get(`http://bpaws01l:8092/api/types/${t.id}/collections/`);
+                return get(`${getHost('pricing/panel', 8092)}/api/types/${t.id}/collections/`);
             })).then(collections => setCollections(collections));
         })
     }, [])
 
     const getListItems = selectedList => {
-        get(`http://bpaws01l:8092/api/collections/${selectedList.id}/items`).then(items => {
+        get(`${getHost('pricing/panel', 8092)}/api/collections/${selectedList.id}/items`).then(items => {
             setCollections([
                 ...collections.map(collection => ({
                     ...collection,

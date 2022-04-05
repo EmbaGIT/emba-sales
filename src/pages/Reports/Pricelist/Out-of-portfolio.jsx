@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {get} from "../../../api/Api";
+import { getHost } from "../../helpers/host";
 
 const OutOfPortfolio = () => {
     const [types, setTypes] = useState([]);
 
     useEffect(() => {
-        get("http://bpaws01l:8092/api/portfolio-types").then(types => setTypes(types))
+        get(`${getHost('pricing/panel', 8092)}/api/portfolio-types`).then(types => setTypes(types))
     }, [])
 
     const getListItems = selectedList => {
-        get(`http://bpaws01l:8092/api/portfolio-types/${selectedList.id}/portfolios`).then(p => {
+        get(`${getHost('pricing/panel', 8092)}/api/portfolio-types/${selectedList.id}/portfolios`).then(p => {
             setTypes([
                 ...types.map(type => {
                     if (selectedList.id === type.id) {

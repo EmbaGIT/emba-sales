@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {get} from "../../../api/Api";
+import { getHost } from "../../helpers/host";
 
 const Tables = () => {
     const [tables, setTables] = useState([]);
 
     useEffect(() => {
-        get("http://bpaws01l:8092/api/coffee-table").then(tables => setTables(tables))
+        get(`${getHost('pricing/panel', 8092)}/api/coffee-table`).then(tables => setTables(tables))
     }, [])
 
     return (
