@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {get} from "../../../api/Api";
-import { getHost } from "../../helpers/host";
+import { getHost } from "./../../../helpers/host";
 
 const Tables = () => {
     const [tables, setTables] = useState([]);
