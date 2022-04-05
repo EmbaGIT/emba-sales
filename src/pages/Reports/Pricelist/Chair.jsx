@@ -10,7 +10,7 @@ const Chair = () => {
     }, [])
 
     const getListItems = selectedList => {
-        get(`http://bpaws01l:8092/api/chair-type/${selectedList.id}/chairs`).then(c => {
+        get(`${getHost('pricing/panel', 8092)}/api/chair-type/${selectedList.id}/chairs`).then(c => {
             setChairs([
                 ...chairs.map(chair => {
                     if (selectedList.id === chair.id) {
