@@ -10,7 +10,7 @@ const Mattress = () => {
     }, [])
 
     const getListItems = selectedList => {
-        get(`http://bpaws01l:8092/api/mattress-type/${selectedList.id}/mattresses`).then(m => {
+        get(`${getHost('pricing/panel', 8092)}/api/mattress-type/${selectedList.id}/mattresses`).then(m => {
             setMattresses([
                 ...mattresses.map(mattress => {
                     if (selectedList.id === mattress.id) {
