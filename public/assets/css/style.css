@@ -589,6 +589,16 @@ input[type=number] {
     z-index: 2000 !important;
 }
 
+.react-datepicker__day--today {
+    border-radius: 0.3rem;
+    background-color: red;
+    color: #fff !important;
+}
+
+.react-datepicker__day--today:hover {
+    color: #000 !important;
+}
+
 @media (min-width: 768px) and (max-width: 800px) and (orientation: portrait) {
     .Calendar {
         font-size: 1rem !important;
