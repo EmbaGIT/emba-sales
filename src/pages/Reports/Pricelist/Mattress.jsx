@@ -1,13 +1,21 @@
 import React, {useEffect, useState} from "react";
 import {get} from "../../../api/Api";
 import { getHost } from "./../../../helpers/host";
+import latinize from "latinize";
 
 const Mattress = () => {
     const [mattresses, setMattresses] = useState([]);
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
         get(`${getHost('pricing/panel', 8092)}/api/mattress-type`).then(mattresses => setMattresses(mattresses))
     }, [])
+
+    useEffect(() => {
+        get(`${getHost('pricing/panel', 8092)}/api/mattress-type/search?name.contains=${latinize(search).toLowerCase()}&size=1000`).then(mattresses => {
+            setMattresses(mattresses.content);
+        })
+    }, [search])
 
     const getListItems = selectedList => {
         get(`${getHost('pricing/panel', 8092)}/api/mattress-type/${selectedList.id}/mattresses`).then(m => {
@@ -30,6 +38,9 @@ const Mattress = () => {
     return (
         <div>
             <div className='mt-3 row'>
+                <div className='col-lg-12 col-md-12 mb-3'>
+                    <input className='form-control' type="text" placeholder='Axtarış' value={search} onChange={(e) => setSearch(e.target.value)} />
+                </div>
                 <div className="col-12">
                     <div className="table-responsive">
                         <table className="table table-hover bordered striped">

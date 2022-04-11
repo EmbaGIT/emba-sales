@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {get} from "../../../api/Api";
 import { getHost } from "./../../../helpers/host";
+import latinize from "latinize";
 
 const Portfolio = () => {
     const [collections, setCollections] = useState([]);
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
         get(`${getHost('pricing/panel', 8092)}/api/types`).then(types => {
@@ -12,6 +14,35 @@ const Portfolio = () => {
             })).then(collections => setCollections(collections));
         })
     }, [])
+
+    useEffect(() => {
+        get(`${getHost('pricing/panel', 8092)}/api/collections/search?name.contains=${latinize(search).toLowerCase()}&size=1000`).then(res => {
+            setCollections(prev => prev.map(collection => ({
+                ...collection, collectionList: []
+            })))
+
+            const result = res.content
+                .map(item => item.type)
+                .reduce((acc, item) => {
+                    if (item && acc.find(elm => elm?.id === item?.id) === undefined) {
+                        acc.push(item)
+                    }
+                    return acc
+                }, [])
+
+            res.content.forEach(content => {
+                const resultTarget = result.find(elm => elm.id === content?.type?.id);
+                if (resultTarget) {
+                    if (!resultTarget.collectionList) {
+                        resultTarget.collectionList = []
+                    }
+                    resultTarget.collectionList.push(content)
+                }
+            })
+
+            setCollections(result)
+        })
+    }, [search])
 
     const getListItems = selectedList => {
         get(`${getHost('pricing/panel', 8092)}/api/collections/${selectedList.id}/items`).then(items => {
@@ -36,6 +67,9 @@ const Portfolio = () => {
     return (
         <div>
             <div className='mt-3 row'>
+                <div className='col-lg-12 col-md-12 mb-3'>
+                    <input className='form-control' type="text" placeholder='Axtarış' value={search} onChange={(e) => setSearch(e.target.value)} />
+                </div>
                 <div className="col-12">
                     <div className="table-responsive">
                         <table className="table table-hover bordered striped">
@@ -54,7 +88,7 @@ const Portfolio = () => {
                                     <React.Fragment key={collection.id}>
                                         <tr className='text-center' style={{ backgroundColor: "blue", color: "#fff" }}>
                                             <td colSpan={4}>
-                                                <h6 style={{ fontWeight: 600 }} className='mb-0'>{collection.name}</h6>
+                                                <h6 style={{ fontWeight: 600 }} className='mb-0'>{collection.name || 'no name'}</h6>
                                             </td>
                                         </tr>
                                         <tr>
