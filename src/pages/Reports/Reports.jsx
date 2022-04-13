@@ -26,11 +26,11 @@ const Reports = () => {
             <div className="row">
                 {
                     menuItems.map((item, i) => (
-                        <>
+                        <React.Fragment key={i}>
                             {
                                 (brand === "Madeyra" && item.title === "Price List")
                                     ? null
-                                    : <div key={i} className="col-lg-3 col-md-4 mb-3">
+                                    : <div className="col-lg-3 col-md-4 mb-3">
                                         <Link to={`/reports/${item.url}`}>
                                             <div className='category-box'>
                                                 <div className="category-hover-box">
@@ -40,7 +40,7 @@ const Reports = () => {
                                         </Link>
                                     </div>
                             }
-                        </>
+                        </React.Fragment>
                     ))
                 }
             </div>
