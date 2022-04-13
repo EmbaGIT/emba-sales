@@ -28,9 +28,10 @@ const Tables = () => {
                         <table className="table table-hover bordered striped">
                             <thead>
                             <tr style={{backgroundColor: "blue", color: "#fff"}}>
-                                <th style={{width: "60%"}}>Номенклатура</th>
-                                <th style={{width: "20%"}}>Mağaza Alış</th>
-                                <th style={{width: "20%"}}>Mağaza Satış</th>
+                                <th style={{width: "55%"}}>Номенклатура</th>
+                                <th style={{width: "15%"}}>Mağaza Alış</th>
+                                <th style={{width: "15%"}}>Mağaza Satış</th>
+                                <th style={{width: "15%"}}>Endirimli Qiymət</th>
                             </tr>
                             </thead>
 
@@ -38,9 +39,10 @@ const Tables = () => {
                             {
                                 tables?.map(table => (
                                     <tr key={table.id}>
-                                        <td style={{width: "60%"}}>{table.name}</td>
-                                        <td style={{width: "20%"}}>{table.purchasingPrice}</td>
-                                        <td style={{width: "20%"}}>{table.sellingPrice}</td>
+                                        <td style={{width: "55%"}}>{table.name}</td>
+                                        <td style={{width: "15%"}}>{table.purchasingPrice}</td>
+                                        <td style={{width: "15%"}}>{table.sellingPrice}</td>
+                                        <td style={{width: "15%"}}>{table.discountPrice}</td>
                                     </tr>
                                 ))
                             }

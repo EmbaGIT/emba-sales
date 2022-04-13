@@ -29,7 +29,7 @@ import Chair from "./pages/Reports/Pricelist/Chair";
 import Mattress from "./pages/Reports/Pricelist/Mattress";
 import Outsource from "./pages/Reports/Pricelist/Outsource";
 import Tables from "./pages/Reports/Pricelist/Tables";
-import OutOfPortfolio from "./pages/Reports/Pricelist/Out-of-portfolio";
+// import OutOfPortfolio from "./pages/Reports/Pricelist/Out-of-portfolio";
 
 export const IsAuth = createContext(null);
 
@@ -106,7 +106,7 @@ const App = () => {
                     <PrivateRoute path='/reports/pricelist/mattress' exact component={Mattress} />
                     <PrivateRoute path='/reports/pricelist/outsource' exact component={Outsource} />
                     <PrivateRoute path='/reports/pricelist/tables' exact component={Tables} />
-                    <PrivateRoute path='/reports/pricelist/out-of-portfolio' exact component={OutOfPortfolio} />
+                    {/*<PrivateRoute path='/reports/pricelist/out-of-portfolio' exact component={OutOfPortfolio} />*/}
                 </Switch>
             </Layout>
         </CartProvider>

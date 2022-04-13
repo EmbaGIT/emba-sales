@@ -28,9 +28,10 @@ const Outsource = () => {
                         <table className="table table-hover bordered striped">
                             <thead>
                             <tr style={{backgroundColor: "blue", color: "#fff"}}>
-                                <th style={{width: "60%"}}>Номенклатура</th>
-                                <th style={{width: "20%"}}>Mağaza Alış</th>
-                                <th style={{width: "20%"}}>Mağaza Satış</th>
+                                <th style={{width: "55%"}}>Номенклатура</th>
+                                <th style={{width: "15%"}}>Mağaza Alış</th>
+                                <th style={{width: "15%"}}>Mağaza Satış</th>
+                                <th style={{width: "15%"}}>Endirimli Qiymət</th>
                             </tr>
                             </thead>
 
@@ -38,9 +39,10 @@ const Outsource = () => {
                             {
                                 products?.map(product => (
                                     <tr key={product.id}>
-                                        <td style={{width: "60%"}}>{product.name}</td>
-                                        <td style={{width: "20%"}}>{product.purchasingPrice}</td>
-                                        <td style={{width: "20%"}}>{product.sellingPrice}</td>
+                                        <td style={{width: "55%"}}>{product.name}</td>
+                                        <td style={{width: "15%"}}>{product.purchasingPrice}</td>
+                                        <td style={{width: "15%"}}>{product.sellingPrice}</td>
+                                        <td style={{width: "15%"}}>{product.discountPrice}</td>
                                     </tr>
                                 ))
                             }

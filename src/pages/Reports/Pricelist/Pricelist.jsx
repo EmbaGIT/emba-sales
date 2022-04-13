@@ -7,7 +7,7 @@ const priceListItems = [
     { title: 'Matrasslar-1C', url: 'pricelist/mattress' },
     { title: 'Outsource', url: 'pricelist/outsource' },
     { title: 'JM', url: 'pricelist/tables' },
-    { title: 'Portfeldən çıxanlar', url: 'pricelist/out-of-portfolio' },
+    // { title: 'Portfeldən çıxanlar', url: 'pricelist/out-of-portfolio' },
 ]
 
 const Pricelist = () => {

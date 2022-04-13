@@ -46,9 +46,10 @@ const Mattress = () => {
                         <table className="table table-hover bordered striped">
                             <thead>
                             <tr style={{backgroundColor: "blue", color: "#fff"}}>
-                                <th style={{width: "60%"}}>Matrasslar</th>
-                                <th style={{width: "20%"}}>Mağaza Alış</th>
-                                <th style={{width: "20%"}}>Mağaza Satış</th>
+                                <th style={{width: "55%"}}>Matrasslar</th>
+                                <th style={{width: "15%"}}>Mağaza Alış</th>
+                                <th style={{width: "15%"}}>Mağaza Satış</th>
+                                <th style={{width: "15%"}}>Endirimli Qiymət</th>
                             </tr>
                             </thead>
 
@@ -58,13 +59,13 @@ const Mattress = () => {
                                     <React.Fragment key={mattress.id}>
                                         <tr style={{backgroundColor: "darkblue", color: "#fff"}}
                                             onClick={() => getListItems(mattress)}>
-                                            <td colSpan={3}>
+                                            <td colSpan={4}>
                                                 <h6 style={{fontWeight: 600}} className='mb-0'>{mattress.name}</h6>
                                             </td>
                                         </tr>
                                         {
                                             mattress.mattresses ? <tr>
-                                                <td colSpan={3} className='p-0'>
+                                                <td colSpan={4} className='p-0'>
                                                     <div className="table-responsive">
                                                         <table className="table table-hover bordered striped mb-0">
                                                             <tbody>
@@ -72,9 +73,10 @@ const Mattress = () => {
                                                                 mattress.mattresses?.map(list => (
                                                                     <React.Fragment key={list.id}>
                                                                         <tr>
-                                                                            <td style={{width: "60%"}}>{list.name}</td>
-                                                                            <td style={{width: "20%"}}>{list.purchasingPrice}</td>
-                                                                            <td style={{width: "20%"}}>{list.sellingPrice}</td>
+                                                                            <td style={{width: "55%"}}>{list.name}</td>
+                                                                            <td style={{width: "15%"}}>{list.purchasingPrice}</td>
+                                                                            <td style={{width: "15%"}}>{list.sellingPrice}</td>
+                                                                            <td style={{width: "15%"}}>{list.discountPrice}</td>
                                                                         </tr>
                                                                     </React.Fragment>
                                                                 ))
