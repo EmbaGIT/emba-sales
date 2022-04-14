@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { getHost } from "../helpers/host";
+import jwt from "jwt-decode";
 
 const axiosInstance = axios.create({
     baseURL: `${getHost('web', '8083')}/api`,
@@ -31,11 +32,14 @@ const MessageComponent = ({ text }) => (
 );
 
 axiosInstance.interceptors.request.use((config) => {
-    const jwt = localStorage.getItem('jwt_token');
-    if (jwt) {
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+        const decodedToken = jwt(token);
+
         config.headers = {
             ...config.headers,
-            Authorization: `Bearer ${jwt}`,
+            Authorization: `Bearer ${token}`,
+            'Brand': decodedToken.brand
         };
     }
     if (config.url.includes(`${getHost('files', 8089)}/api/image`)) {
