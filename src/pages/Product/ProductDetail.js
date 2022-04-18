@@ -10,6 +10,7 @@ import SubProductInfo from "./SubProductInfo";
 import {useQuery} from "../../hooks/useQuery";
 import AuthContext from "../../store/AuthContext";
 import { getHost } from "../../helpers/host";
+import {Multiselect} from "multiselect-react-dropdown";
 
 const Product = () => {
     const params = useParams();
@@ -29,6 +30,8 @@ const Product = () => {
     const [subProductsNotIncluded, setSubProductsNotIncluded] = useState();
     const [subProductInfo, setSubProductInfo] = useState([]);
     const [cartIsShown, setCartIsShown] = useState(false);
+    const [allOptions, setAllOptions] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState([])
 
     const showCartHandler = () => {
         setCartIsShown(true);
@@ -159,6 +162,43 @@ const Product = () => {
         })
     }, [parent_id, productColor]);
 
+    useEffect(() => {
+        Promise
+            .all([
+                get(`/v2/products/state/category/168/parent/209?brand=NONbrand&state=Deste_Daxildir`),
+                get(`/v2/products/state/category/168/parent/209?brand=NONbrand&state=Deste_Daxil_Deyil`)
+            ])
+            .then(promises => {
+                promises.map((promise, i) => {
+                    return promise.map(p => {
+                        Promise.all([
+                            get(`/products/${p.id}`), getProductStock(p.uid)
+                        ]).then(res => {
+                            setAllOptions(prev => [
+                                ...prev,
+                                {
+                                    cat: i === 0 ? 'Dəstə Daxildir' : 'Dəstə Daxil Deyil',
+                                    ...res[0],
+                                    ...res[1],
+                                    ...p,
+                                    key: p.name
+                                }
+                            ])
+                        })
+                    })
+                })
+            })
+            .catch(err => console.log(err));
+    }, [])
+
+    const optionSelected = (options, selectedItem) => {
+        setSelectedOptions(prev => [...prev, selectedItem]);
+    }
+
+    const removeSelectedItem = (keptItems) => {
+        setSelectedOptions([...keptItems]);
+    }
+
     const handleModuleInfo = (id) => {
         const images = [];
         currentColor && get(`${getHost('files', 8089)}/api/image/resource?brand=${brand}&category=${category_id}&color=${currentColor}&bucket=emba-store-images&parent=${parent_id}&product=${id}`).then(files => {
@@ -236,6 +276,48 @@ const Product = () => {
                                     ))}
                                 </div>
                             }
+                            {parseInt(category_id) === 168 ? <div>
+                                <div>
+                                    <Multiselect
+                                        displayValue="key"
+                                        groupBy="cat"
+                                        onKeyPressFn={function noRefCheck() {
+                                        }}
+                                        onSearch={function noRefCheck() {
+                                        }}
+                                        onRemove={function noRefCheck(keptItems) {
+                                            removeSelectedItem(keptItems);
+                                        }}
+                                        onSelect={function noRefCheck(options, selectedItem) {
+                                            optionSelected(options, selectedItem);
+                                        }}
+                                        options={allOptions}
+                                        showCheckbox
+                                    />
+                                </div>
+
+                                {selectedOptions.length ? <div className='selected-options'>
+                                    {selectedOptions.map(item => (
+                                        <SubProductItem
+                                            key={item.id}
+                                            id={item.id}
+                                            uid={item.uid}
+                                            name={item.name}
+                                            price={item.price}
+                                            files={item.files || []}
+                                            characteristics={item.characteristics}
+                                            defaultValue={1}
+                                            parent={item.parentName}
+                                            parent_id={209}
+                                            color_id={currentColor}
+                                            brand={'NONbrand'}
+                                            category_id={category_id}
+                                            stock={item[0].stock}
+                                            onClickHandle={handleModuleInfo}
+                                            fw={true}
+                                        />
+                                    ))}</div> : <p className='mt-4'>Yataq içi seçilməyib</p>}
+                            </div> : null}
                         </>
                     }
                 </div>
@@ -246,21 +328,22 @@ const Product = () => {
                     <p className="panel-heading">Dəst Tərkibi</p>
                 </div>
                 {subProductsIsIncluded && subProductsIsIncluded.map((item) => (
-                    <SubProductItem key={item.items[0].id}
-                                    id={item.items[0].id}
-                                    uid={item.items[0].uid}
-                                    name={item.items[0].name}
-                                    price={item.items[0].price}
-                                    files={item.files}
-                                    characteristics={item.characteristic}
-                                    defaultValue={1}
-                                    parent={item.items[0].parentName}
-                                    parent_id={parent_id}
-                                    color_id={currentColor}
-                                    brand={brand}
-                                    category_id={category_id}
-                                    stock={item.stock[0].stock}
-                                    onClickHandle={handleModuleInfo}
+                    <SubProductItem
+                        key={item.items[0].id}
+                        id={item.items[0].id}
+                        uid={item.items[0].uid}
+                        name={item.items[0].name}
+                        price={item.items[0].price}
+                        files={item.files}
+                        characteristics={item.characteristic}
+                        defaultValue={1}
+                        parent={item.items[0].parentName}
+                        parent_id={parent_id}
+                        color_id={currentColor}
+                        brand={brand}
+                        category_id={category_id}
+                        stock={item.stock[0].stock}
+                        onClickHandle={handleModuleInfo}
                     />
                 ))}
             </div>

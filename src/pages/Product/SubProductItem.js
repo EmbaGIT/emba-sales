@@ -65,7 +65,7 @@ const SubProductItem = (props) => {
     }
 
     return (
-        <div className="col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-3">
+        <div className={props.fw ? 'col-12 mt-3' : 'col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-3'}>
             <div className="sub-item-wrapper">
                 <div className="sub-item-info">
                     <div className="sub-item-image">
