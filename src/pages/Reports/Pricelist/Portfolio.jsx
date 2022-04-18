@@ -65,7 +65,7 @@ const Portfolio = () => {
     }
 
     return (
-        <div>
+        <div className='price-list'>
             <div className='mt-3 row'>
                 <div className='col-lg-12 col-md-12 mb-3'>
                     <input className='form-control' type="text" placeholder='Axtarış' value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -74,7 +74,7 @@ const Portfolio = () => {
                     <div className="table-responsive">
                         <table className="table table-hover bordered striped">
                             <thead>
-                                <tr style={{ backgroundColor: "blue", color: "#fff" }}>
+                                <tr className='t-header'>
                                     <th style={{ width: "40%" }}>Model</th>
                                     <th style={{ width: "15%" }}>Xarakteristika</th>
                                     <th style={{ width: "15%" }}>Mağaza Alış</th>
@@ -87,7 +87,7 @@ const Portfolio = () => {
                             {
                                 collections?.map(collection => (
                                     <React.Fragment key={collection.id}>
-                                        <tr className='text-center' style={{ backgroundColor: "blue", color: "#fff" }}>
+                                        <tr className='text-center'>
                                             <td colSpan={5}>
                                                 <h6 style={{ fontWeight: 600 }} className='mb-0'>{collection.name || 'no name'}</h6>
                                             </td>
@@ -100,7 +100,7 @@ const Portfolio = () => {
                                                         {
                                                             collection.collectionList?.map(list => (
                                                                 <React.Fragment key={list.id}>
-                                                                    <tr onClick={() => getListItems(list)} style={{ backgroundColor: "darkblue", color: "#fff" }}>
+                                                                    <tr onClick={() => getListItems(list)} className={list.items ? 'parent' : ''}>
                                                                         <td style={{ width: "40%" }}>{list.name}</td>
                                                                         <td style={{ width: "15%" }}></td>
                                                                         <td style={{ width: "15%" }}>{list.purchasingPrice}</td>
@@ -108,7 +108,7 @@ const Portfolio = () => {
                                                                         <td style={{ width: "15%" }}>{list.discountPrice}</td>
                                                                     </tr>
                                                                     {
-                                                                        list.items ? <tr>
+                                                                        list.items ? <tr className={`products ${list.items.length ? 'opened': ''}`}>
                                                                             <td colSpan={5} className='p-0'>
                                                                                 <div className="table-responsive">
                                                                                     <table className="table table-hover bordered striped mb-0">

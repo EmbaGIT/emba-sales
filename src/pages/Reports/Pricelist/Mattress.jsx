@@ -36,7 +36,7 @@ const Mattress = () => {
     }
 
     return (
-        <div>
+        <div className='price-list'>
             <div className='mt-3 row'>
                 <div className='col-lg-12 col-md-12 mb-3'>
                     <input className='form-control' type="text" placeholder='Axtarış' value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -45,7 +45,7 @@ const Mattress = () => {
                     <div className="table-responsive">
                         <table className="table table-hover bordered striped">
                             <thead>
-                            <tr style={{backgroundColor: "blue", color: "#fff"}}>
+                            <tr className='t-header'>
                                 <th style={{width: "55%"}}>Matrasslar</th>
                                 <th style={{width: "15%"}}>Mağaza Alış</th>
                                 <th style={{width: "15%"}}>Mağaza Satış</th>
@@ -57,14 +57,14 @@ const Mattress = () => {
                             {
                                 mattresses?.map(mattress => (
                                     <React.Fragment key={mattress.id}>
-                                        <tr style={{backgroundColor: "darkblue", color: "#fff"}}
+                                        <tr className={mattress.mattresses ? 'parent' : ''}
                                             onClick={() => getListItems(mattress)}>
                                             <td colSpan={4}>
                                                 <h6 style={{fontWeight: 600}} className='mb-0'>{mattress.name}</h6>
                                             </td>
                                         </tr>
                                         {
-                                            mattress.mattresses ? <tr>
+                                            mattress.mattresses ? <tr className={`products ${mattress.mattresses.length ? 'opened': ''}`}>
                                                 <td colSpan={4} className='p-0'>
                                                     <div className="table-responsive">
                                                         <table className="table table-hover bordered striped mb-0">
