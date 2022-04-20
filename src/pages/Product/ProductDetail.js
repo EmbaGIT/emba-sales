@@ -166,7 +166,8 @@ const Product = () => {
         Promise
             .all([
                 get(`/v2/products/state/category/168/parent/209?brand=NONbrand&state=Deste_Daxildir`),
-                get(`/v2/products/state/category/168/parent/209?brand=NONbrand&state=Deste_Daxil_Deyil`)
+                get(`/v2/products/state/category/168/parent/209?brand=NONbrand&state=Deste_Daxil_Deyil`),
+                get(`/v2/products/state/category/168/parent/209?brand=Embawood&state=Deste_Daxil_Deyil`),
             ])
             .then(promises => {
                 promises.map((promise, i) => {
