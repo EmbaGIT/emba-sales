@@ -37,7 +37,7 @@ const Outsource = () => {
 
                             <tbody>
                             {
-                                products?.map(product => (
+                                products?.sort((p1, p2) => p1.id - p2.id).map(product => (
                                     <tr key={product.id}>
                                         <td style={{width: "55%"}}>{product.name}</td>
                                         <td style={{width: "15%"}}>{product.purchasingPrice}</td>

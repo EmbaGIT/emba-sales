@@ -122,7 +122,7 @@ const Category = () => {
                         {
                             userBrand ?
                                 <>
-                                    <option value="NONBrand">Non Brand</option>
+                                    <option value="NONbrand">Non Brand</option>
                                     <option value="IdealDizayn">Ideal Dizayn</option>
                                     <option value="Dolcenoche">Dolcenoche</option>
                                 </>

@@ -37,7 +37,7 @@ const Tables = () => {
 
                             <tbody>
                             {
-                                tables?.map(table => (
+                                tables?.sort((t1, t2) => t1.id - t2.id).map(table => (
                                     <tr key={table.id}>
                                         <td style={{width: "55%"}}>{table.name}</td>
                                         <td style={{width: "15%"}}>{table.purchasingPrice}</td>

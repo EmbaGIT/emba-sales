@@ -55,7 +55,7 @@ const Mattress = () => {
 
                             <tbody>
                             {
-                                mattresses?.map(mattress => (
+                                mattresses?.sort((m1, m2) => m1.id - m2.id).map(mattress => (
                                     <React.Fragment key={mattress.id}>
                                         <tr className={mattress.mattresses ? 'parent' : ''}
                                             onClick={() => getListItems(mattress)}>
@@ -70,7 +70,7 @@ const Mattress = () => {
                                                         <table className="table table-hover bordered striped mb-0">
                                                             <tbody>
                                                             {
-                                                                mattress.mattresses?.map(list => (
+                                                                mattress.mattresses?.sort((i1, i2) => i1.id - i2.id).map(list => (
                                                                     <React.Fragment key={list.id}>
                                                                         <tr>
                                                                             <td style={{width: "55%"}}>{list.name}</td>

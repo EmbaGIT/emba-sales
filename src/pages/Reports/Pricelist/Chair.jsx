@@ -58,7 +58,7 @@ const Chair = () => {
 
                             <tbody>
                             {
-                                chairs?.map(chair => (
+                                chairs?.sort((c1, c2) => c1.id - c2.id).map(chair => (
                                     <React.Fragment key={chair.id}>
                                         <tr className={chair.chairs ? 'parent' : ''}
                                             onClick={() => getListItems(chair)}>
@@ -73,7 +73,7 @@ const Chair = () => {
                                                         <table className="table table-hover bordered striped mb-0">
                                                             <tbody>
                                                             {
-                                                                chair.chairs?.map(list => (
+                                                                chair.chairs?.sort((i1, i2) => i1.id - i2.id).map(list => (
                                                                     <React.Fragment key={list.id}>
                                                                         <tr>
                                                                             <td style={{width: "55%"}}>{list.name}</td>

@@ -85,7 +85,7 @@ const Portfolio = () => {
 
                             <tbody>
                             {
-                                collections?.map(collection => (
+                                collections?.sort((c1, c2) => c1.id - c2.id).map(collection => (
                                     <React.Fragment key={collection.id}>
                                         <tr className='text-center'>
                                             <td colSpan={5}>
@@ -98,7 +98,7 @@ const Portfolio = () => {
                                                     <table className="table table-hover bordered striped mb-0">
                                                         <tbody>
                                                         {
-                                                            collection.collectionList?.map(list => (
+                                                            collection.collectionList?.sort((i1, i2) => i1.id - i2.id).map(list => (
                                                                 <React.Fragment key={list.id}>
                                                                     <tr onClick={() => getListItems(list)} className={list.items ? 'parent' : ''}>
                                                                         <td style={{ width: "40%" }}>{list.name}</td>
@@ -114,7 +114,7 @@ const Portfolio = () => {
                                                                                     <table className="table table-hover bordered striped mb-0">
                                                                                         <tbody>
                                                                                         {
-                                                                                            list.items?.map(item => (
+                                                                                            list.items?.sort((l1, l2) => l1.id - l2.id).map(item => (
                                                                                                 <tr key={item.id}>
                                                                                                     <td style={{ width: "40%" }}>{item.name}</td>
                                                                                                     <td style={{ width: "15%" }}>{item.status}</td>

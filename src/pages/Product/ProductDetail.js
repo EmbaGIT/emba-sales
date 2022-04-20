@@ -254,10 +254,12 @@ const Product = () => {
                 <div className="col-lg-5">
                     {productInfo &&
                         <>
-                            <div className="d-flex">
-                                <h1 className="product-name">{productInfo.name}</h1>
-                            </div>
-                            <div className="product-price-box mt-2">
+                            {
+                                productInfo.name ? <div className="d-flex">
+                                    <h1 className="product-name">{productInfo.name}</h1>
+                                </div> : null
+                            }
+                            <div className="product-price-box">
                                 <div className="d-flex align-items-center product-info-wrapper justify-content-between">
                                     <div className="price-block">
                                     <span className="product-price-current">
@@ -293,6 +295,7 @@ const Product = () => {
                                         }}
                                         options={allOptions}
                                         showCheckbox
+                                        placeholder='Çarpayı içi seçin...'
                                     />
                                 </div>
 
@@ -316,7 +319,7 @@ const Product = () => {
                                             onClickHandle={handleModuleInfo}
                                             fw={true}
                                         />
-                                    ))}</div> : <p className='mt-4'>Yataq içi seçilməyib</p>}
+                                    ))}</div> : <p className='mt-4'>Çarpayı içi seçilməyib.</p>}
                             </div> : null}
                         </>
                     }
