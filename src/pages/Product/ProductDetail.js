@@ -168,9 +168,10 @@ const Product = () => {
                 get(`/v2/products/state/category/168/parent/209?brand=NONbrand&state=Deste_Daxildir`),
                 get(`/v2/products/state/category/168/parent/209?brand=NONbrand&state=Deste_Daxil_Deyil`),
                 get(`/v2/products/state/category/168/parent/209?brand=Embawood&state=Deste_Daxil_Deyil`),
-                get(`/api/v2/products/state/category/178/parent/990?brand=NONbrand&state=Deste_Daxildir`),
+                get(`/v2/products/state/category/178/parent/990?brand=NONbrand&state=Deste_Daxildir`),
             ])
             .then(promises => {
+                console.log("promises: ", promises)
                 promises.map((promise, i) => {
                     return promise.map(p => {
                         Promise.all([
