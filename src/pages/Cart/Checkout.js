@@ -810,19 +810,19 @@ const Checkout = () => {
                         <h6>Müştəri bazasında axtarın</h6>
                         <div className="input-group row mb-3">
                             <div className="col-md-4 mb-2">
-                                <label>Ad<span className="text-danger">*</span></label>
-                                <input type="text" className="form-control"
-                                       value={checkoutState.customerInfo && checkoutState.customerInfo?.name}
-                                       onChange={e => handleInputChange("name", e.target.value)}/>
-                                {!formValidation.name &&
-                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
-                            </div>
-                            <div className="col-md-4 mb-2">
                                 <label>Soyad<span className="text-danger">*</span></label>
                                 <input type="text" className="form-control"
                                        value={checkoutState.customerInfo && checkoutState.customerInfo?.surname}
                                        onChange={e => handleInputChange("surname", e.target.value)}/>
                                 {!formValidation.surname &&
+                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                            </div>
+                            <div className="col-md-4 mb-2">
+                                <label>Ad<span className="text-danger">*</span></label>
+                                <input type="text" className="form-control"
+                                       value={checkoutState.customerInfo && checkoutState.customerInfo?.name}
+                                       onChange={e => handleInputChange("name", e.target.value)}/>
+                                {!formValidation.name &&
                                 <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                             <div className="col-md-4 mb-2">

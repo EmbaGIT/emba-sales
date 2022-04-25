@@ -117,7 +117,7 @@ const Portfolio = () => {
                                                                                             list.items?.sort((l1, l2) => l1.id - l2.id).map(item => (
                                                                                                 <tr key={item.id}>
                                                                                                     <td style={{ width: "40%" }}>{item.name}</td>
-                                                                                                    <td style={{ width: "15%" }}>{item.status}</td>
+                                                                                                    <td style={{ width: "15%" }}>{item.status ? 'Dəstə Daxildir' : 'Dəstə Daxil Deyil'}</td>
                                                                                                     <td style={{ width: "15%" }}>{item.purchasingPrice}</td>
                                                                                                     <td style={{ width: "15%" }}>{item.sellingPrice}</td>
                                                                                                     <td style={{ width: "15%" }}>{item.discountPrice}</td>

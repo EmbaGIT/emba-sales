@@ -451,7 +451,7 @@ input[type=number] {
     left: 25px;
     width: 65px;
     height: 65px;
-    z-index: 1000;
+    z-index: 2;
     background: #398420;
     border-radius: 50%;
     cursor: pointer;
