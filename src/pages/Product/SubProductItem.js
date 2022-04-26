@@ -102,7 +102,7 @@ const SubProductItem = (props) => {
                 <div className="p-2">
                     {options.length ?
                         <select className="form-control form-select">
-                            {allSelected ? <option value=''>Anbar Qalığı</option> : null}
+                            {allSelected ? <option value=''>Anbar Məlumatı</option> : null}
                             {options.map((info, index)  => (<option key={index} value="1">{info.warehouse} - {info.quantity}</option>))}
                         </select>
                         : <div>Anbar məlumatı yoxdur</div>
