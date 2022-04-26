@@ -18,6 +18,8 @@ const SubProductItem = (props) => {
     const [charUID, setCharUID] = useState('');
     const [charCode, setCharCode] = useState('');
     const [price, setPrice] = useState(props.price);
+    const [options, setOptions] = useState(props.stock)
+    const [allSelected, setAllSelected] = useState(true)
 
     useEffect(() => {
         if(props.characteristics.length){
@@ -27,11 +29,15 @@ const SubProductItem = (props) => {
         }
     }, []);
 
-    const handleInputChange = (value) => {
+    const handleInputChange = async (value) => {
         const selectValue=value.split(',');
         setCharUID(selectValue[0]);
         setCharCode(selectValue[1]);
         setPrice(selectValue[2]);
+
+        const newOptions = await props.characteristicsChangeHandler(props.uid, selectValue[0])
+        setOptions(newOptions[0].stock)
+        setAllSelected(false)
     }
 
     const addToCartHandler = () => {
@@ -85,6 +91,7 @@ const SubProductItem = (props) => {
                 <div className="p-2">
                     {props.characteristics.length ?
                         <select className="form-control form-select" onChange={e => handleInputChange(e.target.value)}>
+                            {allSelected ? <option value=''>Ümumü Xarakteristikalar</option> : null}
                             {props.characteristics.map(characteristic  => (
                                 <option key={characteristic.id} value={`${characteristic.uid},${characteristic.code}, ${characteristic.price ? characteristic.price : 0}`}>{characteristic.name} - ({characteristic.code}) - {characteristic.price}AZN</option>
                             ))}
@@ -93,9 +100,10 @@ const SubProductItem = (props) => {
                     }
                 </div>
                 <div className="p-2">
-                    {props.stock.length ?
+                    {options.length ?
                         <select className="form-control form-select">
-                            {props.stock.map((info, index)  => (<option key={index} value="1">{info.warehouse} - {info.quantity}</option>))}
+                            {allSelected ? <option value=''>Anbar Qalığı</option> : null}
+                            {options.map((info, index)  => (<option key={index} value="1">{info.warehouse} - {info.quantity}</option>))}
                         </select>
                         : <div>Anbar məlumatı yoxdur</div>
                     }

@@ -41,16 +41,21 @@ const Product = () => {
         setCartIsShown(false);
     };
 
-    function getProductStock(uid) {
+    function getProductStock(uid, ch_uid) {
         return post(`${getHost('sales', 8087)}/api/inventory`, {
             "user_uid": authCtx.user_uid,
             "goods": [
                 {
                     "product_uid": uid,
-                    "characteristic_uid": ""
+                    "characteristic_uid": ch_uid !== undefined ? ch_uid : ""
                 }
             ]
         });
+    }
+
+    async function onCharacteristicsChange(pr_uid, ch_uid) {
+        const response = await getProductStock(pr_uid.toString(), ch_uid)
+        return response
     }
 
     function getProductFiles(id) {
@@ -320,6 +325,7 @@ const Product = () => {
                                             stock={item[0].stock}
                                             onClickHandle={handleModuleInfo}
                                             fw={true}
+                                            characteristicsChangeHandler={onCharacteristicsChange}
                                         />
                                     ))}</div> : <p className='mt-4'>Çarpayı içi seçilməyib.</p>}
                             </div> : null}
@@ -349,6 +355,7 @@ const Product = () => {
                         category_id={category_id}
                         stock={item.stock[0].stock}
                         onClickHandle={handleModuleInfo}
+                        characteristicsChangeHandler={onCharacteristicsChange}
                     />
                 ))}
             </div>
@@ -372,6 +379,7 @@ const Product = () => {
                                     category_id={category_id}
                                     stock={item.stock[0].stock}
                                     onClickHandle={handleModuleInfo}
+                                    characteristicsChangeHandler={onCharacteristicsChange}
                     />
                 ))}
             </div>
