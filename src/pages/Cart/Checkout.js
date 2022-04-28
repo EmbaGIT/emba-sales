@@ -991,7 +991,7 @@ const Checkout = () => {
                                     onChangeRaw={(e) => e.preventDefault()}
                                     dateFormat="yyyy-MM-dd"
                                     className="form-control"
-                                    selected={paymentDate ? new Date(paymentDate) : ''}
+                                    selected={paymentDate ? new Date(paymentDate) : new Date()}
                                     onChange={(date) => setPaymentDate(date)}
                                     minDate={new Date()}
                                 />
