@@ -107,7 +107,7 @@ const Checkout = () => {
         isDisabled: true
     });
     const [customerSearch, setCustomerSearch] = useState(false);
-    const [paymentDate, setPaymentDate] = useState();
+    const [paymentDate, setPaymentDate] = useState(new Date());
     const [deliveryDate, setDeliveryDate] = useState();
     const [availableCustomer, setAvailableCustomer] = useState([]);
     const [customerRefactoringInfo, setCustomerRefactoringInfo] = useState({
@@ -991,7 +991,7 @@ const Checkout = () => {
                                     onChangeRaw={(e) => e.preventDefault()}
                                     dateFormat="yyyy-MM-dd"
                                     className="form-control"
-                                    selected={paymentDate ? new Date(paymentDate) : new Date()}
+                                    selected={paymentDate}
                                     onChange={(date) => setPaymentDate(date)}
                                     minDate={new Date()}
                                 />
