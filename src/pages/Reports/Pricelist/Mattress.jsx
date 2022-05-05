@@ -28,7 +28,7 @@ const Mattress = () => {
                             return {...mattress, mattresses: m.mattresses};
                         }
                     } else {
-                        return mattress;
+                        return { ...mattress, mattresses: null };
                     }
                 })
             ])
@@ -43,7 +43,7 @@ const Mattress = () => {
                 </div>
                 <div className="col-12">
                     <div className="table-responsive">
-                        <table className="table table-hover bordered striped">
+                        <table className="table table-striped">
                             <thead>
                             <tr className='t-header'>
                                 <th style={{width: "55%"}}>Matrasslar</th>
@@ -57,17 +57,19 @@ const Mattress = () => {
                             {
                                 mattresses?.sort((m1, m2) => m1.id - m2.id).map(mattress => (
                                     <React.Fragment key={mattress.id}>
-                                        <tr className={mattress.mattresses ? 'parent' : ''}
+                                        <tr className={`set ${mattress.mattresses ? 'parent' : ''}`}
                                             onClick={() => getListItems(mattress)}>
-                                            <td colSpan={4}>
-                                                <h6 style={{fontWeight: 600}} className='mb-0'>{mattress.name}</h6>
+                                            <td colSpan={4} className='p-0'>
+                                                <div>
+                                                    <h6 style={{fontWeight: 600}} className='mb-0'>{mattress.name}</h6>
+                                                </div>
                                             </td>
                                         </tr>
                                         {
                                             mattress.mattresses ? <tr className={`products ${mattress.mattresses.length ? 'opened': ''}`}>
                                                 <td colSpan={4} className='p-0'>
-                                                    <div className="table-responsive">
-                                                        <table className="table table-hover bordered striped mb-0">
+                                                    <div className="table-responsive py-3 px-4">
+                                                        <table className="table bordered mb-0">
                                                             <tbody>
                                                             {
                                                                 mattress.mattresses?.sort((i1, i2) => i1.id - i2.id).map(list => (

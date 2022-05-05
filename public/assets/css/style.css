@@ -688,17 +688,20 @@ input[type=number] {
 }
 
 .price-list .t-header {
-    background-color: rgba(0, 0, 0, .75);
+    background-color: #398420;
     color: #fff;
 }
 
-tr.parent {
-    border: 3px solid #000;
+tr.set td > div {
+    padding: .5rem .7rem;
+}
+
+tr.parent td > div {
+    border: 4px solid #398420;
     border-bottom: none;
 }
 
 tr.products {
-    border: 3px solid #000;
     border-top: none;
     transform: scaleY(0);
     transform-origin: top;
@@ -717,4 +720,24 @@ tr.products.opened {
     animation-name: scaleTr;
     animation-duration: .3s;
     animation-fill-mode: forwards;
+}
+
+tr.products.closed {
+    animation-name: scaleTr;
+    animation-duration: .3s;
+    animation-fill-mode: forwards;
+    animation-direction: reverse;
+}
+
+tr.opened div {
+    border: 4px solid #398420;
+    border-top: none;
+}
+
+tr.opened .table tbody tr:last-child {
+    border-color: #fff !important;
+}
+
+tr.opened .table-responsive {
+    background-color: #fff !important;
 }

@@ -25,7 +25,7 @@ const Outsource = () => {
                 </div>
                 <div className="col-12">
                     <div className="table-responsive">
-                        <table className="table table-hover bordered striped">
+                        <table className="table bordered table-striped">
                             <thead>
                             <tr className='t-header'>
                                 <th style={{width: "55%"}}>Номенклатура</th>

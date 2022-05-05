@@ -31,7 +31,7 @@ const Chair = () => {
                             return {...chair, chairs: c.chairs};
                         }
                     } else {
-                        return chair;
+                        return { ...chair, chairs: null };
                     }
                 })
             ])
@@ -46,7 +46,7 @@ const Chair = () => {
                 </div>
                 <div className="col-12">
                     <div className="table-responsive">
-                        <table className="table table-hover bordered striped">
+                        <table className="table table-striped">
                             <thead>
                             <tr className='t-header'>
                                 <th style={{width: "55%"}}>Stullar</th>
@@ -60,17 +60,19 @@ const Chair = () => {
                             {
                                 chairs?.sort((c1, c2) => c1.id - c2.id).map(chair => (
                                     <React.Fragment key={chair.id}>
-                                        <tr className={chair.chairs ? 'parent' : ''}
+                                        <tr className={`set ${chair.chairs ? 'parent' : ''}`}
                                             onClick={() => getListItems(chair)}>
-                                            <td colSpan={4}>
-                                                <h6 style={{fontWeight: 600}} className='mb-0'>{chair.name}</h6>
+                                            <td colSpan={4} className='p-0'>
+                                                <div>
+                                                    <h6 style={{fontWeight: 600}} className='mb-0'>{chair.name}</h6>
+                                                </div>
                                             </td>
                                         </tr>
                                         {
                                             chair.chairs ? <tr className={`products ${chair.chairs.length ? 'opened': ''}`}>
                                                 <td colSpan={4} className='p-0'>
-                                                    <div className="table-responsive">
-                                                        <table className="table table-hover bordered striped mb-0">
+                                                    <div className="table-responsive py-3 px-4">
+                                                        <table className="table bordered mb-0">
                                                             <tbody>
                                                             {
                                                                 chair.chairs?.sort((i1, i2) => i1.id - i2.id).map(list => (

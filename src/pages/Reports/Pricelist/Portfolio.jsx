@@ -57,7 +57,7 @@ const Portfolio = () => {
                                 return { ...list, items: items.items };
                             }
                         }
-                        return list;
+                        return { ...list, items: null };
                     })
                 }))
             ])
@@ -72,7 +72,7 @@ const Portfolio = () => {
                 </div>
                 <div className="col-12">
                     <div className="table-responsive">
-                        <table className="table table-hover bordered striped">
+                        <table className="table bordered">
                             <thead>
                                 <tr className='t-header'>
                                     <th style={{ width: "40%" }}>Model</th>
@@ -89,35 +89,46 @@ const Portfolio = () => {
                                     <React.Fragment key={collection.id}>
                                         <tr className='text-center'>
                                             <td colSpan={5}>
-                                                <h6 style={{ fontWeight: 600 }} className='mb-0'>{collection.name || 'no name'}</h6>
+                                                <h6 style={{ fontWeight: 700, color: "#398420" }} className='mb-0'>{collection.name || 'no name'}</h6>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colSpan={5} className='p-0'>
                                                 <div className="table-responsive">
-                                                    <table className="table table-hover bordered striped mb-0">
+                                                    <table className="table bordered table-striped mb-0">
                                                         <tbody>
                                                         {
                                                             collection.collectionList?.sort((i1, i2) => i1.id - i2.id).map(list => (
                                                                 <React.Fragment key={list.id}>
-                                                                    <tr onClick={() => getListItems(list)} className={list.items ? 'parent' : ''}>
-                                                                        <td style={{ width: "40%" }}>{list.name}</td>
-                                                                        <td style={{ width: "15%" }}></td>
-                                                                        <td style={{ width: "15%" }}>{list.purchasingPrice}</td>
-                                                                        <td style={{ width: "15%" }}>{list.sellingPrice}</td>
-                                                                        <td style={{ width: "15%" }}>{list.discountPrice}</td>
+                                                                    <tr onClick={() => getListItems(list)} className={`set ${list.items ? 'parent' : ''}`}>
+                                                                        <td colSpan={5} className='p-0'>
+                                                                            <div className='d-flex' style={{ padding: "0" }}>
+                                                                                <div style={{ width: "40%", padding: ".5rem .7rem" }}>{list.name}</div>
+                                                                                <div style={{ width: "15%", padding: ".5rem .7rem" }}></div>
+                                                                                <div style={{ width: "15%", padding: ".5rem .7rem" }}>{list.purchasingPrice}</div>
+                                                                                <div style={{ width: "15%", padding: ".5rem .7rem" }}>{list.sellingPrice}</div>
+                                                                                <div style={{ width: "15%", padding: ".5rem .7rem" }}>{list.discountPrice}</div>
+                                                                            </div>
+                                                                        </td>
                                                                     </tr>
                                                                     {
                                                                         list.items ? <tr className={`products ${list.items.length ? 'opened': ''}`}>
                                                                             <td colSpan={5} className='p-0'>
                                                                                 <div className="table-responsive">
-                                                                                    <table className="table table-hover bordered striped mb-0">
+                                                                                    <table className="table bordered mb-0">
                                                                                         <tbody>
                                                                                         {
                                                                                             list.items?.sort((l1, l2) => l1.id - l2.id).map(item => (
                                                                                                 <tr key={item.id}>
                                                                                                     <td style={{ width: "40%" }}>{item.name}</td>
-                                                                                                    <td style={{ width: "15%" }}>{item.status ? 'Dəstə Daxildir' : 'Dəstə Daxil Deyil'}</td>
+                                                                                                    <td style={{ width: "15%" }}>
+                                                                                                        {item.status
+                                                                                                            ? <span
+                                                                                                                style={{color: "#398420", fontWeight: 600 }}>Dəstə Daxildir</span>
+                                                                                                            : <span
+                                                                                                                style={{color: "red", fontWeight: 600 }}>Dəstə Daxil Deyil</span>
+                                                                                                        }
+                                                                                                    </td>
                                                                                                     <td style={{ width: "15%" }}>{item.purchasingPrice}</td>
                                                                                                     <td style={{ width: "15%" }}>{item.sellingPrice}</td>
                                                                                                     <td style={{ width: "15%" }}>{item.discountPrice}</td>
