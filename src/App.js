@@ -21,14 +21,14 @@ import ReportOptions from "./pages/Reports/ReportOptions";
 import Warehouse from "./pages/Reports/Warehouse";
 import Stock from "./pages/Reports/Stock";
 import Sales from "./pages/Reports/Sales";
-import Pricelist from "./pages/Reports/Pricelist/Pricelist";
+// import Pricelist from "./pages/Reports/Pricelist/Pricelist";
 import { getHost } from "./helpers/host";
 import authContext from "./store/AuthContext";
-import Portfolio from "./pages/Reports/Pricelist/Portfolio";
-import Chair from "./pages/Reports/Pricelist/Chair";
-import Mattress from "./pages/Reports/Pricelist/Mattress";
-import Outsource from "./pages/Reports/Pricelist/Outsource";
-import Tables from "./pages/Reports/Pricelist/Tables";
+// import Portfolio from "./pages/Reports/Pricelist/Portfolio";
+// import Chair from "./pages/Reports/Pricelist/Chair";
+// import Mattress from "./pages/Reports/Pricelist/Mattress";
+// import Outsource from "./pages/Reports/Pricelist/Outsource";
+// import Tables from "./pages/Reports/Pricelist/Tables";
 // import OutOfPortfolio from "./pages/Reports/Pricelist/Out-of-portfolio";
 
 export const IsAuth = createContext(null);
@@ -100,12 +100,12 @@ const App = () => {
                         <Stock stock={{ key: 'chair' }} />
                     </PrivateRoute>
                     <PrivateRoute path='/reports/sales' exact component={Sales} />
-                    <PrivateRoute path='/reports/pricelist' exact component={Pricelist} />
-                    <PrivateRoute path='/reports/pricelist/portfolio' exact component={Portfolio} />
-                    <PrivateRoute path='/reports/pricelist/chair' exact component={Chair} />
-                    <PrivateRoute path='/reports/pricelist/mattress' exact component={Mattress} />
-                    <PrivateRoute path='/reports/pricelist/outsource' exact component={Outsource} />
-                    <PrivateRoute path='/reports/pricelist/tables' exact component={Tables} />
+                    {/*<PrivateRoute path='/reports/pricelist' exact component={Pricelist} />*/}
+                    {/*<PrivateRoute path='/reports/pricelist/portfolio' exact component={Portfolio} />*/}
+                    {/*<PrivateRoute path='/reports/pricelist/chair' exact component={Chair} />*/}
+                    {/*<PrivateRoute path='/reports/pricelist/mattress' exact component={Mattress} />*/}
+                    {/*<PrivateRoute path='/reports/pricelist/outsource' exact component={Outsource} />*/}
+                    {/*<PrivateRoute path='/reports/pricelist/tables' exact component={Tables} />*/}
                     {/*<PrivateRoute path='/reports/pricelist/out-of-portfolio' exact component={OutOfPortfolio} />*/}
                 </Switch>
             </Layout>
