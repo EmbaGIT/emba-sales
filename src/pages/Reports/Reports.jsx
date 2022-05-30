@@ -6,6 +6,7 @@ const menuItems = [
     {title: 'Mənim Satışlarım', url: 'sales'},
     {title: 'Qarşılıqlı Hesablaşmalar', url: ''},
     {title: 'Anbar Qalığı', url: 'options'},
+    {title: 'Mənim Satışlarım Ətraflı', url: 'sales-detailed'},
     // {title: 'Price List', url: 'pricelist'}
 ]
 

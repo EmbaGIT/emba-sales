@@ -563,8 +563,10 @@ input[type=number] {
 
 /* Calendar */
 .Calendar {
+    max-width: 100% !important;
     width: 100% !important;
     font-size: .75rem !important;
+    z-index: 1 !important;
 }
 
 .Calendar__section.-hiddenPrevious {
@@ -740,4 +742,33 @@ tr.opened .table tbody tr:last-child {
 
 tr.opened .table-responsive {
     background-color: #fff !important;
+}
+
+tr.hidden {
+    transform: scaleY(0);
+    display: none;
+}
+
+tr.show {
+    transform: scaleY(1);
+    display: revert;
+}
+
+.parent-row {
+    cursor: pointer;
+}
+
+.parent-row + tr {
+    transition: transform .5s;
+    transform-origin: top;
+}
+
+.sales-table table tr th.long,
+.sales-table table tr td.long {
+    width: 30%;
+}
+
+.sales-table table tr th.short,
+.sales-table table tr td.short {
+    width: 10%;
 }
