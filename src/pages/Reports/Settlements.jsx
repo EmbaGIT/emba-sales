@@ -1,0 +1,179 @@
+import React, {useEffect, useState} from 'react'
+import {post} from '../../api/Api'
+import {getHost} from '../../helpers/host'
+import Loader from 'react-loader-spinner'
+import ReactPaginate from 'react-paginate'
+import {formattedDate} from '../../helpers/formattedDate'
+import {Calendar} from 'react-modern-calendar-datepicker'
+import {calendarLocaleAZ} from '../../locales/calendar-locale'
+
+export const Settlements = () => {
+    const [mutualCalculation, setMutualCalculation] = useState({})
+    const [isFetching, setIsFetching] = useState(true)
+    const [page, setPage] = useState(0)
+
+    const paginate = (n) => {
+        setPage(+n.selected)
+    }
+
+    // Default start and end dates
+    const defaultStartDate = new Date(2015, 1, 1)
+    const defaultEndDate = new Date()
+
+    // Minimum and maximum date
+    const minimumDate = {
+        year: new Date(defaultStartDate).getFullYear(),
+        month: new Date(defaultStartDate).getMonth() + 1,
+        day: new Date(defaultStartDate).getDate()
+    }
+    const maximumDate = {
+        year: defaultEndDate.getFullYear(),
+        month: defaultEndDate.getMonth() + 1,
+        day: defaultEndDate.getDate()
+    }
+
+    // Convert date to string to post to server
+    const convertDateToString = (startDate, endDate) => ({
+        start: formattedDate(startDate),
+        end: formattedDate(endDate)
+    })
+
+    // Convert array to react-modern-calendar-datepicker format
+    const convertArrToCalendar = (arr) => ({
+        year: Number(arr[0]),
+        month: Number(arr[1]),
+        day: Number(arr[2])
+    })
+
+    // state for date of type string
+    const [stringDateState, setStringDateState] = useState(convertDateToString(defaultStartDate, defaultEndDate))
+
+    // calendar dates
+    const startDateArr = stringDateState.start.split('-')
+    const endDateArr = stringDateState.end.split('-')
+
+    const defaultFrom = convertArrToCalendar(startDateArr)
+    const defaultTo = convertArrToCalendar(endDateArr)
+
+    const defaultRange = { from: defaultFrom, to: defaultTo }
+    const [selectedDayRange, setSelectedDayRange] = useState(defaultRange)
+
+    // get selected date from calendar
+    const onDateChange = async (date) => {
+        await setSelectedDayRange(date)
+        await setPage(0)
+
+        const { from, to } = date
+        if (from && to) {
+            setStringDateState(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
+        }
+    }
+
+    useEffect(() => {
+        setIsFetching(true)
+        const { start, end } = stringDateState
+
+        post(`${getHost('erp/report', 8091)}/api/mutual-calculation?size=10&page=${page}`, {
+            "databegin": start,
+            "dataend": end,
+            "uid": "c834a64a-f516-11eb-80d8-2c44fd84f8db3"
+        })
+            .then(response => {
+                setMutualCalculation(response)
+                setIsFetching(false)
+            })
+    }, [page, stringDateState])
+
+    useEffect(() => console.log(mutualCalculation), [mutualCalculation])
+
+    return (
+        <div className='container-fluid row'>
+            <div className='col-12 d-flex justify-content-between align-items-end mb-3'>
+                <h1>Qarşılıqlı Hesablaşmalar</h1>
+            </div>
+
+            <div className='col-12 my-4'>
+                <Calendar
+                    value={selectedDayRange}
+                    onChange={onDateChange}
+                    shouldHighlightWeekends
+                    minimumDate={minimumDate}
+                    maximumDate={maximumDate}
+                    locale={calendarLocaleAZ}
+                />
+            </div>
+
+            {
+                isFetching
+                    ? <div
+                        className='col-12 d-flex justify-content-center w-100'
+                        style={{backdropFilter: 'blur(2px)', zIndex: '100'}}
+                    >
+                        <Loader
+                            type='ThreeDots'
+                            color='#00BFFF'
+                            height={60}
+                            width={60}
+                        />
+                    </div>
+                    : <div className='table-responsive sales-table'>
+                        <table className='table table-striped table-bordered'>
+                            <thead>
+                                <tr>
+                                    <th scope='col' className='long'>Tarix</th>
+                                    <th scope='col' className='long'>Realizasiya sənədi</th>
+                                    <th scope='col' className='short'>İlkin qalıq</th>
+                                    <th scope='col' className='short'>Mədaxil</th>
+                                    <th scope='col' className='short'>Məxaric</th>
+                                    <th scope='col' className='short'>Son qalıq</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {
+                                    mutualCalculation.Items?.map((calculation, i) => {
+                                        return (
+                                            <tr key={i}>
+                                                <td className='long'>{calculation.date}</td>
+                                                <td className='long'>{calculation.document}</td>
+                                                <td className='short'>{calculation.initial_balance}</td>
+                                                <td className='short'>{calculation.income}</td>
+                                                <td className='short'>{calculation.out}</td>
+                                                <td className='short'>{calculation.balance}</td>
+                                            </tr>
+                                        )
+                                    })
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+            }
+
+            {
+                isFetching
+                    ? null
+                    : <div className='d-flex justify-content-center'>
+                        <ReactPaginate
+                            previousLabel='Əvvəlki'
+                            nextLabel='Növbəti'
+                            previousClassName='page-item'
+                            nextClassName='page-item'
+                            previousLinkClassName='page-link'
+                            nextLinkClassName='page-link'
+                            breakLabel='...'
+                            breakClassName='break-me'
+                            pageCount={mutualCalculation.totalPages + 1 || 0}
+                            marginPagesDisplayed={2}
+                            pageRangeDisplayed={3}
+                            onPageChange={paginate}
+                            containerClassName='pagination'
+                            activeClassName='active'
+                            pageClassName='page-item'
+                            pageLinkClassName='page-link'
+                            forcePage={page}
+                        />
+                    </div>
+            }
+        </div>
+    )
+}

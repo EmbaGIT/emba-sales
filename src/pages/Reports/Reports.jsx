@@ -4,9 +4,9 @@ import jwt from "jwt-decode";
 
 const menuItems = [
     {title: 'Mənim Satışlarım', url: 'sales'},
-    {title: 'Qarşılıqlı Hesablaşmalar', url: ''},
+    {title: 'Qarşılıqlı Hesablaşmalar', url: 'settlements'},
     {title: 'Anbar Qalığı', url: 'options'},
-    {title: 'Mənim Satışlarım Ətraflı', url: 'sales-detailed'},
+    {title: 'Distribütorun Mağazaya Satışı', url: 'sales-detailed'},
     // {title: 'Price List', url: 'pricelist'}
 ]
 
@@ -32,8 +32,8 @@ const Reports = () => {
                                 (brand === "Madeyra" && item.title === "Price List")
                                     ? null
                                     : <div className="col-lg-3 col-md-4 mb-3">
-                                        <Link to={`/reports/${item.url}`}>
-                                            <div className='category-box'>
+                                        <Link to={`/reports/${item.url}`} className='d-block h-100'>
+                                            <div className='category-box h-100 d-flex align-items-center justify-content-center'>
                                                 <div className="category-hover-box">
                                                     <span className='category-name'>{item.title}</span>
                                                 </div>

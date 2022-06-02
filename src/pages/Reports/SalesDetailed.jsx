@@ -113,16 +113,6 @@ const SalesDetailed = () => {
         <div className='container-fluid row'>
             <div className='col-12 d-flex justify-content-between align-items-end'>
                 <h1>Mənim Satışlarım</h1>
-                {
-                    sales.total === undefined
-                        ? <Loader
-                            type='ThreeDots'
-                            color='#00BFFF'
-                            height={60}
-                            width={60}
-                        />
-                        : <h6>{sales.total?.toFixed(2)} AZN</h6>
-                }
             </div>
 
             <div className='col-12 my-4'>
@@ -134,6 +124,19 @@ const SalesDetailed = () => {
                     maximumDate={maximumDate}
                     locale={calendarLocaleAZ}
                 />
+            </div>
+
+            <div className='col-12 d-flex justify-content-end'>
+                {
+                    sales.total === undefined
+                        ? <Loader
+                            type='ThreeDots'
+                            color='#00BFFF'
+                            height={60}
+                            width={60}
+                        />
+                        : <h6>{sales.total?.toFixed(2)} AZN</h6>
+                }
             </div>
 
             {
