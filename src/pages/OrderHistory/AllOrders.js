@@ -32,12 +32,14 @@ const AllOrders = () => {
         const orders=[];
         list.content.forEach(order => {
             let totalPrice=0;
+            // let orderNum = order.orderStateList[0]?.erpResponseMessage.split(' ')[2];
             order.goods.map(item => {
                 totalPrice += (item.product_price*item.product_quantity - (item.product_price*item.product_quantity*item.product_discount/100));
             })
             orders.push({
                 ...order,
-                totalPrice
+                totalPrice,
+                // orderNum
             })
         })
         setOrderState(orders);
@@ -48,6 +50,8 @@ const AllOrders = () => {
         post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}&size=10`).then(res => {
             orderList(res, page);
             setPageState(res);
+
+            console.log('res: ', res)
         })
     }, [page, rerender]);
 
@@ -217,6 +221,7 @@ const AllOrders = () => {
                                         <th scope='col'>Sifariş statusu</th>
                                         <th scope='col'>Sifariş tarixi</th>
                                         <th scope='col'>Ümumi Qiymət</th>
+                                        {/*<th scope='col'>1C Sifariş Nömrəsi</th>*/}
                                         <th scope='col'>-</th>
                                     </tr>
                                     </thead>
@@ -235,6 +240,7 @@ const AllOrders = () => {
                                             </td>
                                             <td>{order.createdAt} {order.creationTime}</td>
                                             <td>{order.totalPrice} AZN</td>
+                                            {/*<td>{order.orderNum}</td>*/}
                                             <td>
                                                 {(order.status === 'ORDER_FAILED' || order.status === 'SAVED') &&
                                                 <i className="fas fa-trash-alt text-danger cursor-pointer" onClick={handleOrderDelete.bind(this, order.id)}/>}

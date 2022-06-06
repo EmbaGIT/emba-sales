@@ -12,8 +12,9 @@ const SalesDetailed = () => {
     const [sales, setSales] = useState({})
     const [classNames, setClassNames] = useState([])
     const [page, setPage] = useState(0)
-    const [isFetching, setIsFetching] = useState(true)
+    const [isFetching, setIsFetching] = useState(false)
     const paginationContainer = useRef()
+    const didMount = useRef(false)
 
     const showItems = (i) => {
         setClassNames(classNames.map((name, index) => {
@@ -84,29 +85,33 @@ const SalesDetailed = () => {
         const { from, to } = date
         if (from && to) {
             setStringDateState(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
-            paginationContainer.current.scrollIntoView({ behavior: 'smooth' })
+            paginationContainer.current?.scrollIntoView({ behavior: 'smooth' })
         }
     }
 
     useEffect(() => {
-        setIsFetching(true)
-        const { start, end } = stringDateState
+        if (didMount.current) {
+            setIsFetching(true)
+            const { start, end } = stringDateState
 
-        post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=10&page=${page}`, {
-            databegin: start,
-            dataend: end,
-            uid: 'c834a64a-f516-11eb-80d8-2c44fd84f8db3'
-        })
-            .then(response => {
-                setIsFetching(false)
-                setSales(response)
-
-                const salesLength = response.customerGroups?.length
-                setClassNames(new Array(salesLength).fill().map(elm => ({
-                    hidden: true
-                })))
+            post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=10&page=${page}`, {
+                databegin: start,
+                dataend: end,
+                uid: 'c834a64a-f516-11eb-80d8-2c44fd84f8db3'
             })
-            .catch(error => console.log('error: ', error))
+                .then(response => {
+                    setIsFetching(false)
+                    setSales(response)
+
+                    const salesLength = response.customerGroups?.length
+                    setClassNames(new Array(salesLength).fill().map(elm => ({
+                        hidden: true
+                    })))
+                })
+                .catch(error => console.log('error: ', error))
+        } else {
+            didMount.current = true
+        }
     }, [page, stringDateState])
 
     return (
@@ -128,14 +133,18 @@ const SalesDetailed = () => {
 
             <div className='col-12 d-flex justify-content-end'>
                 {
-                    sales.total === undefined
+                    isFetching
                         ? <Loader
                             type='ThreeDots'
                             color='#00BFFF'
                             height={60}
                             width={60}
                         />
-                        : <h6>{sales.total?.toFixed(2)} AZN</h6>
+                        : (
+                            sales.total === undefined
+                                ? null
+                                : <h6>{sales.total?.toFixed(2)} AZN</h6>
+                        )
                 }
             </div>
 
@@ -152,71 +161,75 @@ const SalesDetailed = () => {
                             width={60}
                         />
                     </div>
-                    : <div className='table-responsive sales-table'>
-                        <table className='table table-striped table-bordered'>
-                            <thead>
-                            <tr>
-                                <th scope='col' className='long'>Müştəri ünvanı</th>
-                                <th scope='col' className='long'>Realizasiya sənədi</th>
-                                <th scope='col' className='long'>Sifariş</th>
-                                <th scope='col' className='short'>Cəmi</th>
-                            </tr>
-                            </thead>
+                    : (
+                        Object.keys(sales).length === 0
+                            ? null
+                            : <div className='table-responsive sales-table'>
+                                <table className='table table-striped table-bordered'>
+                                    <thead>
+                                    <tr>
+                                        <th scope='col' className='long'>Müştəri ünvanı</th>
+                                        <th scope='col' className='long'>Realizasiya sənədi</th>
+                                        <th scope='col' className='long'>Sifariş</th>
+                                        <th scope='col' className='short'>Cəmi</th>
+                                    </tr>
+                                    </thead>
 
-                            <tbody>
-                            {
-                                sales.customerGroups?.map((order, i) => {
-                                    return (
-                                        <React.Fragment key={i}>
-                                            <tr onClick={showItems.bind(null, i)} className='parent-row'>
-                                                <td className='long'>{order.customer_adress || 'Müştəri ünvanı yoxdur'}</td>
-                                                <td className='long'>{order.sales_group.realizas_group.realizas || 'Sənəd yoxdur'}</td>
-                                                <td className='long'>{order.sales_group.sales_order || 'Sifariş yoxdur'}</td>
-                                                <td className='short'>{order.sales_group.realizas_group.total?.toFixed(2) || '0'} AZN</td>
-                                            </tr>
+                                    <tbody>
+                                    {
+                                        sales.customerGroups?.map((order, i) => {
+                                            return (
+                                                <React.Fragment key={i}>
+                                                    <tr onClick={showItems.bind(null, i)} className='parent-row'>
+                                                        <td className='long'>{order.customer_adress || 'Müştəri ünvanı yoxdur'}</td>
+                                                        <td className='long'>{order.sales_group.realizas_group.realizas || 'Sənəd yoxdur'}</td>
+                                                        <td className='long'>{order.sales_group.sales_order || 'Sifariş yoxdur'}</td>
+                                                        <td className='short'>{order.sales_group.realizas_group.total?.toFixed(2) || '0'} AZN</td>
+                                                    </tr>
 
-                                            <tr className={classNames[i]?.hidden ? 'hidden' : 'show'}>
-                                                <td colSpan={4} className='p-0'>
-                                                    <div className='table-responsive'>
-                                                        <table className='table table-bordered mb-0'>
-                                                            <thead>
-                                                            <tr>
-                                                                <th className='long'>Adı</th>
-                                                                <th className='long'>Xarakteristika</th>
-                                                                <th className='long'>Sayı</th>
-                                                                <th className='short'>Cəmi</th>
-                                                            </tr>
-                                                            </thead>
+                                                    <tr className={classNames[i]?.hidden ? 'hidden' : 'show'}>
+                                                        <td colSpan={4} className='p-0'>
+                                                            <div className='table-responsive'>
+                                                                <table className='table table-bordered mb-0'>
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th className='long'>Adı</th>
+                                                                        <th className='long'>Xarakteristika</th>
+                                                                        <th className='long'>Sayı</th>
+                                                                        <th className='short'>Cəmi</th>
+                                                                    </tr>
+                                                                    </thead>
 
-                                                            <tbody>
-                                                            {
-                                                                order.sales_group.realizas_group.items?.map((item, index) => {
-                                                                    return (
-                                                                        <tr key={index}>
-                                                                            <td className='long'>{item.product_uid}</td>
-                                                                            <td className='long'>{item.product_characteristic_uid || 'Xarakteristika yoxdur'}</td>
-                                                                            <td className='long'>{item.product_quantity}</td>
-                                                                            <td className='short'>{item.product_total} AZN</td>
-                                                                        </tr>
-                                                                    )
-                                                                })
-                                                            }
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </React.Fragment>
-                                    )
-                                })
-                            }
-                            </tbody>
-                        </table>
-                    </div>
+                                                                    <tbody>
+                                                                    {
+                                                                        order.sales_group.realizas_group.items?.map((item, index) => {
+                                                                            return (
+                                                                                <tr key={index}>
+                                                                                    <td className='long'>{item.product_uid}</td>
+                                                                                    <td className='long'>{item.product_characteristic_uid || 'Xarakteristika yoxdur'}</td>
+                                                                                    <td className='long'>{item.product_quantity}</td>
+                                                                                    <td className='short'>{item.product_total} AZN</td>
+                                                                                </tr>
+                                                                            )
+                                                                        })
+                                                                    }
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </React.Fragment>
+                                            )
+                                        })
+                                    }
+                                    </tbody>
+                                </table>
+                            </div>
+                        )
             }
 
             {
-                isFetching
+                (isFetching || Object.keys(sales).length === 0)
                     ? null
                     : <div className='d-flex justify-content-center' ref={paginationContainer}>
                         <ReactPaginate

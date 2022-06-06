@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {post} from '../../api/Api'
 import {getHost} from '../../helpers/host'
 import Loader from 'react-loader-spinner'
@@ -9,8 +9,9 @@ import {calendarLocaleAZ} from '../../locales/calendar-locale'
 
 export const Settlements = () => {
     const [mutualCalculation, setMutualCalculation] = useState({})
-    const [isFetching, setIsFetching] = useState(true)
+    const [isFetching, setIsFetching] = useState(false)
     const [page, setPage] = useState(0)
+    const didMount = useRef(false)
 
     const paginate = (n) => {
         setPage(+n.selected)
@@ -70,21 +71,23 @@ export const Settlements = () => {
     }
 
     useEffect(() => {
-        setIsFetching(true)
-        const { start, end } = stringDateState
+        if (didMount.current) {
+            setIsFetching(true)
+            const { start, end } = stringDateState
 
-        post(`${getHost('erp/report', 8091)}/api/mutual-calculation?size=10&page=${page}`, {
-            "databegin": start,
-            "dataend": end,
-            "uid": "c834a64a-f516-11eb-80d8-2c44fd84f8db3"
-        })
-            .then(response => {
-                setMutualCalculation(response)
-                setIsFetching(false)
+            post(`${getHost('erp/report', 8091)}/api/mutual-calculation?size=10&page=${page}`, {
+                "databegin": start,
+                "dataend": end,
+                "uid": "c834a64a-f516-11eb-80d8-2c44fd84f8db3"
             })
+                .then(response => {
+                    setMutualCalculation(response)
+                    setIsFetching(false)
+                })
+        } else {
+            didMount.current = true
+        }
     }, [page, stringDateState])
-
-    useEffect(() => console.log(mutualCalculation), [mutualCalculation])
 
     return (
         <div className='container-fluid row'>
@@ -116,63 +119,69 @@ export const Settlements = () => {
                             width={60}
                         />
                     </div>
-                    : <div className='table-responsive sales-table'>
-                        <table className='table table-striped table-bordered'>
-                            <thead>
-                                <tr>
-                                    <th scope='col' className='long'>Tarix</th>
-                                    <th scope='col' className='long'>Realizasiya sənədi</th>
-                                    <th scope='col' className='short'>İlkin qalıq</th>
-                                    <th scope='col' className='short'>Mədaxil</th>
-                                    <th scope='col' className='short'>Məxaric</th>
-                                    <th scope='col' className='short'>Son qalıq</th>
-                                </tr>
-                            </thead>
+                    : (
+                        Object.keys(mutualCalculation).length === 0
+                            ? null
+                            : <div className='table-responsive sales-table'>
+                                <table className='table table-striped table-bordered'>
+                                    <thead>
+                                        <tr>
+                                            <th scope='col' className='long'>Tarix</th>
+                                            <th scope='col' className='long'>Realizasiya sənədi</th>
+                                            <th scope='col' className='short'>İlkin qalıq</th>
+                                            <th scope='col' className='short'>Mədaxil</th>
+                                            <th scope='col' className='short'>Məxaric</th>
+                                            <th scope='col' className='short'>Son qalıq</th>
+                                        </tr>
+                                    </thead>
 
-                            <tbody>
-                                {
-                                    mutualCalculation.Items?.map((calculation, i) => {
-                                        return (
-                                            <tr key={i}>
-                                                <td className='long'>{calculation.date}</td>
-                                                <td className='long'>{calculation.document}</td>
-                                                <td className='short'>{calculation.initial_balance}</td>
-                                                <td className='short'>{calculation.income}</td>
-                                                <td className='short'>{calculation.out}</td>
-                                                <td className='short'>{calculation.balance}</td>
-                                            </tr>
-                                        )
-                                    })
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                    <tbody>
+                                        {
+                                            mutualCalculation.Items?.map((calculation, i) => {
+                                                return (
+                                                    <tr key={i}>
+                                                        <td className='long'>{calculation.date}</td>
+                                                        <td className='long'>{calculation.document}</td>
+                                                        <td className='short'>{calculation.initial_balance}</td>
+                                                        <td className='short'>{calculation.income}</td>
+                                                        <td className='short'>{calculation.out}</td>
+                                                        <td className='short'>{calculation.finalbalance}</td>
+                                                    </tr>
+                                                )
+                                            })
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        )
             }
 
             {
                 isFetching
                     ? null
-                    : <div className='d-flex justify-content-center'>
-                        <ReactPaginate
-                            previousLabel='Əvvəlki'
-                            nextLabel='Növbəti'
-                            previousClassName='page-item'
-                            nextClassName='page-item'
-                            previousLinkClassName='page-link'
-                            nextLinkClassName='page-link'
-                            breakLabel='...'
-                            breakClassName='break-me'
-                            pageCount={mutualCalculation.totalPages + 1 || 0}
-                            marginPagesDisplayed={2}
-                            pageRangeDisplayed={3}
-                            onPageChange={paginate}
-                            containerClassName='pagination'
-                            activeClassName='active'
-                            pageClassName='page-item'
-                            pageLinkClassName='page-link'
-                            forcePage={page}
-                        />
-                    </div>
+                    : (
+                        Object.keys(mutualCalculation).length === 0 ? null : <div className='d-flex justify-content-center'>
+                            <ReactPaginate
+                                previousLabel='Əvvəlki'
+                                nextLabel='Növbəti'
+                                previousClassName='page-item'
+                                nextClassName='page-item'
+                                previousLinkClassName='page-link'
+                                nextLinkClassName='page-link'
+                                breakLabel='...'
+                                breakClassName='break-me'
+                                pageCount={mutualCalculation.totalPages + 1 || 0}
+                                marginPagesDisplayed={2}
+                                pageRangeDisplayed={3}
+                                onPageChange={paginate}
+                                containerClassName='pagination'
+                                activeClassName='active'
+                                pageClassName='page-item'
+                                pageLinkClassName='page-link'
+                                forcePage={page}
+                            />
+                        </div>
+                    )
             }
         </div>
     )

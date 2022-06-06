@@ -669,8 +669,8 @@ const Checkout = () => {
                             <table className="table text-start">
                                 <thead className="">
                                 <tr>
-                                    <th style={{width: '110px'}}>Distribütora göndərilsin</th>
-                                    <th style={{width: '110px'}}>Rezerv olunsun</th>
+                                    {/*<th style={{width: '110px'}}>Distribütora göndərilsin</th>*/}
+                                    {/*<th style={{width: '110px'}}>Rezerv olunsun</th>*/}
                                     <th>Modelin adı</th>
                                     <th style={{width: '110px'}}>Qiyməti</th>
                                     <th style={{width: '110px'}}>Son qiyməti</th>
@@ -679,30 +679,30 @@ const Checkout = () => {
                                 <tbody className="">
                                 {checkoutState.items?.map(product => (
                                     <tr key={product.id}>
-                                        <td>
-                                            <input
-                                                className="form-check-input me-2"
-                                                type="checkbox"
-                                                name={`product_createsales${product.id}`}
-                                                id={`product_createsales${product.id}`}
-                                                onChange={e => handleInputChange(`product_createsales${product.id}`, { id: product.id, checked: e.target.checked })}
-                                                checked={product.product_createsales}
-                                            />
-                                            <label className="form-check-label" htmlFor={`product_createsales${product.id}`}>{product.product_createsales ? 'Bəli' : 'Xeyr'}</label>
-                                        </td>
+                                        {/*<td>*/}
+                                        {/*    <input*/}
+                                        {/*        className="form-check-input me-2"*/}
+                                        {/*        type="checkbox"*/}
+                                        {/*        name={`product_createsales${product.id}`}*/}
+                                        {/*        id={`product_createsales${product.id}`}*/}
+                                        {/*        onChange={e => handleInputChange(`product_createsales${product.id}`, { id: product.id, checked: e.target.checked })}*/}
+                                        {/*        checked={product.product_createsales}*/}
+                                        {/*    />*/}
+                                        {/*    <label className="form-check-label" htmlFor={`product_createsales${product.id}`}>{product.product_createsales ? 'Bəli' : 'Xeyr'}</label>*/}
+                                        {/*</td>*/}
 
-                                        <td>
-                                            <input
-                                                className="form-check-input me-2"
-                                                type="checkbox"
-                                                name={`product_reserve${product.id}`}
-                                                id={`product_reserve${product.id}`}
-                                                onChange={e => handleInputChange(`product_reserve${product.id}`, { id: product.id, checked: e.target.checked })}
-                                                checked={product.product_reserve}
-                                                disabled={!product.product_createsales}
-                                            />
-                                            <label className="form-check-label" htmlFor={`product_reserve${product.id}`}>{product.product_reserve ? 'Bəli' : 'Xeyr'}</label>
-                                        </td>
+                                        {/*<td>*/}
+                                        {/*    <input*/}
+                                        {/*        className="form-check-input me-2"*/}
+                                        {/*        type="checkbox"*/}
+                                        {/*        name={`product_reserve${product.id}`}*/}
+                                        {/*        id={`product_reserve${product.id}`}*/}
+                                        {/*        onChange={e => handleInputChange(`product_reserve${product.id}`, { id: product.id, checked: e.target.checked })}*/}
+                                        {/*        checked={product.product_reserve}*/}
+                                        {/*        disabled={!product.product_createsales}*/}
+                                        {/*    />*/}
+                                        {/*    <label className="form-check-label" htmlFor={`product_reserve${product.id}`}>{product.product_reserve ? 'Bəli' : 'Xeyr'}</label>*/}
+                                        {/*</td>*/}
 
                                         <td>
                                             {product.name}
