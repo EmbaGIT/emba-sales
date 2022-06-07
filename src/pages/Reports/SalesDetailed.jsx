@@ -7,6 +7,7 @@ import "react-modern-calendar-datepicker/lib/DatePicker.css";
 import {post} from '../../api/Api'
 import {getHost} from '../../helpers/host'
 import {formattedDate, getSpecificDate} from '../../helpers/formattedDate'
+import jwt from 'jwt-decode'
 
 const SalesDetailed = () => {
     const [sales, setSales] = useState({})
@@ -15,6 +16,11 @@ const SalesDetailed = () => {
     const [isFetching, setIsFetching] = useState(false)
     const paginationContainer = useRef()
     const didMount = useRef(false)
+
+    const getUser = () => {
+        const token = localStorage.getItem("jwt_token");
+        return jwt(token);  // decodes user from jwt and returns it
+    }
 
     const showItems = (i) => {
         setClassNames(classNames.map((name, index) => {
@@ -93,11 +99,12 @@ const SalesDetailed = () => {
         if (didMount.current) {
             setIsFetching(true)
             const { start, end } = stringDateState
+            const user = getUser()
 
             post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=10&page=${page}`, {
                 databegin: start,
                 dataend: end,
-                uid: 'c834a64a-f516-11eb-80d8-2c44fd84f8db3'
+                uid: user.uid
             })
                 .then(response => {
                     setIsFetching(false)
@@ -108,7 +115,10 @@ const SalesDetailed = () => {
                         hidden: true
                     })))
                 })
-                .catch(error => console.log('error: ', error))
+                .catch(error => {
+                    setIsFetching(false)
+                    return error
+                })
         } else {
             didMount.current = true
         }
@@ -258,14 +268,3 @@ const SalesDetailed = () => {
 }
 
 export default SalesDetailed
-
-
-// import jwt from "jwt-decode";
-// const SalesDetailed = () => {
-// const getUser = () => {
-//     const token = localStorage.getItem("jwt_token");
-//     return jwt(token);  // decodes user from jwt and returns it
-// }
-// useEffect(() => {
-//     const user = getUser();
-// }, [stringDateState]);

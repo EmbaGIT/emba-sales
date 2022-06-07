@@ -75,6 +75,14 @@ axiosInstance.interceptors.response.use((res) => {
     }
     return res;
 }, (error) => {
+    if (error?.response?.status === 422) {
+        toast.error(<MessageComponent text={error?.response?.data || 'Xəta baş verdi!'} />, {
+            position: toast.POSITION.TOP_LEFT,
+            toastId: 'error-toast-message',
+            autoClose: 3000,
+            closeOnClick: true,
+        });
+    }
     if (error?.response?.status === 403 || error?.response?.status === 401) {
         localStorage.removeItem('jwt_token');
         window.location.href = '/login';

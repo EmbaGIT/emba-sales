@@ -6,12 +6,18 @@ import ReactPaginate from 'react-paginate'
 import {formattedDate} from '../../helpers/formattedDate'
 import {Calendar} from 'react-modern-calendar-datepicker'
 import {calendarLocaleAZ} from '../../locales/calendar-locale'
+import jwt from "jwt-decode";
 
 export const Settlements = () => {
     const [mutualCalculation, setMutualCalculation] = useState({})
     const [isFetching, setIsFetching] = useState(false)
     const [page, setPage] = useState(0)
     const didMount = useRef(false)
+
+    const getUser = () => {
+        const token = localStorage.getItem("jwt_token");
+        return jwt(token);  // decodes user from jwt and returns it
+    }
 
     const paginate = (n) => {
         setPage(+n.selected)
@@ -74,15 +80,20 @@ export const Settlements = () => {
         if (didMount.current) {
             setIsFetching(true)
             const { start, end } = stringDateState
+            const user = getUser()
 
             post(`${getHost('erp/report', 8091)}/api/mutual-calculation?size=10&page=${page}`, {
                 "databegin": start,
                 "dataend": end,
-                "uid": "c834a64a-f516-11eb-80d8-2c44fd84f8db3"
+                "uid": user.uid
             })
                 .then(response => {
                     setMutualCalculation(response)
                     setIsFetching(false)
+                })
+                .catch(error => {
+                    setIsFetching(false)
+                    return error
                 })
         } else {
             didMount.current = true
