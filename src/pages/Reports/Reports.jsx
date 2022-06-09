@@ -4,9 +4,9 @@ import jwt from "jwt-decode";
 
 const menuItems = [
     {title: 'Mənim Satışlarım', url: 'sales'},
-    {title: 'Qarşılıqlı Hesablaşmalar', url: 'settlements'},
+    // {title: 'Qarşılıqlı Hesablaşmalar', url: 'settlements'},
     {title: 'Anbar Qalığı', url: 'options'},
-    {title: 'Distribütorun Mağazaya Satışı', url: 'sales-detailed'},
+    // {title: 'Distribütorun Mağazaya Satışı', url: 'sales-detailed'},
     // {title: 'Price List', url: 'pricelist'}
 ]
 

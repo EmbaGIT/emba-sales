@@ -24,8 +24,8 @@ import Sales from "./pages/Reports/Sales";
 // import Pricelist from "./pages/Reports/Pricelist/Pricelist";
 import { getHost } from "./helpers/host";
 import authContext from "./store/AuthContext";
-import SalesDetailed from "./pages/Reports/SalesDetailed";
-import {Settlements} from "./pages/Reports/Settlements";
+// import SalesDetailed from "./pages/Reports/SalesDetailed";
+// import {Settlements} from "./pages/Reports/Settlements";
 // import Portfolio from "./pages/Reports/Pricelist/Portfolio";
 // import Chair from "./pages/Reports/Pricelist/Chair";
 // import Mattress from "./pages/Reports/Pricelist/Mattress";
@@ -102,8 +102,8 @@ const App = () => {
                         <Stock stock={{ key: 'chair' }} />
                     </PrivateRoute>
                     <PrivateRoute path='/reports/sales' exact component={Sales} />
-                    <PrivateRoute path='/reports/sales-detailed' exact component={SalesDetailed} />
-                    <PrivateRoute path='/reports/settlements' exact component={Settlements} />
+                    {/*<PrivateRoute path='/reports/sales-detailed' exact component={SalesDetailed} />*/}
+                    {/*<PrivateRoute path='/reports/settlements' exact component={Settlements} />*/}
                     {/*<PrivateRoute path='/reports/pricelist' exact component={Pricelist} />*/}
                     {/*<PrivateRoute path='/reports/pricelist/portfolio' exact component={Portfolio} />*/}
                     {/*<PrivateRoute path='/reports/pricelist/chair' exact component={Chair} />*/}
