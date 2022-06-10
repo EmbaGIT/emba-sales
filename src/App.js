@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import Layout from "./layout/Layout";
 import {get} from "./api/Api";
+import jwt from "jwt-decode";
 import Home from './pages/HomePage';
 import Product from './pages/Product/ProductDetail';
 import SearchResult from './pages/SearchResult';
@@ -22,10 +23,10 @@ import Warehouse from "./pages/Reports/Warehouse";
 import Stock from "./pages/Reports/Stock";
 import Sales from "./pages/Reports/Sales";
 // import Pricelist from "./pages/Reports/Pricelist/Pricelist";
-import { getHost } from "./helpers/host";
+import {getHost} from "./helpers/host";
 import authContext from "./store/AuthContext";
-// import SalesDetailed from "./pages/Reports/SalesDetailed";
-// import {Settlements} from "./pages/Reports/Settlements";
+import SalesDetailed from "./pages/Reports/SalesDetailed";
+import {Settlements} from "./pages/Reports/Settlements";
 // import Portfolio from "./pages/Reports/Pricelist/Portfolio";
 // import Chair from "./pages/Reports/Pricelist/Chair";
 // import Mattress from "./pages/Reports/Pricelist/Mattress";
@@ -40,13 +41,18 @@ const App = () => {
     const [isUserAuth, setIsUserAuth] = useState(authCtx.token);
     const [menuList, setMenuList] = useState([]);
     const [isFetchingData, setIsFetchingData] = useState(true);
+    const [isAccountant, setIsAccountant] = useState(false)
 
     useEffect(() => {
         setIsUserAuth(authCtx.token);
+
+        if (authCtx.token) {
+            setIsAccountant(jwt(authCtx.token).roles.includes('ACCOUNTANT'))
+        }
     }, [authCtx])
 
     useEffect(() => {
-        if(isUserAuth){
+        if (isUserAuth) {
             get(`/menu/search?sort=menuOrder,desc&size=20`).then(res => {
                 const menuListArr = [];
                 res.content.forEach((menu, i) => {
@@ -83,7 +89,7 @@ const App = () => {
                         </Route>
                     )}
                     <PrivateRoute path='/' exact>
-                        <Home menuData={menuList} isFetching={isFetchingData} />
+                        <Home menuData={menuList} isFetching={isFetchingData}/>
                     </PrivateRoute>
                     <PrivateRoute path='/category/:id/:page' component={CategoryList}/>
                     <PrivateRoute path='/product/:brand/:category_id/:parent_id' component={Product}/>
@@ -92,18 +98,24 @@ const App = () => {
                     <PrivateRoute path='/checkout' exact component={Checkout}/>
                     <PrivateRoute path='/orderPrint/:id' exact component={OrderPrint}/>
                     <PrivateRoute path='/allOrder' exact component={AllOrders}/>
-                    <PrivateRoute path='/reports' exact component={Reports} />
-                    <PrivateRoute path='/reports/options' exact component={ReportOptions} />
-                    <PrivateRoute path='/reports/warehouse/:page/:pageSize' exact component={Warehouse} />
+                    <PrivateRoute path='/reports' exact component={Reports}/>
+                    <PrivateRoute path='/reports/options' exact component={ReportOptions}/>
+                    <PrivateRoute path='/reports/warehouse/:page/:pageSize' exact component={Warehouse}/>
                     <PrivateRoute path='/reports/fabric/:page/:pageSize' exact>
-                        <Stock stock={{ key: 'fabric' }}/>
+                        <Stock stock={{key: 'fabric'}}/>
                     </PrivateRoute>
                     <PrivateRoute path='/reports/chair/:page/:pageSize' exact>
-                        <Stock stock={{ key: 'chair' }} />
+                        <Stock stock={{key: 'chair'}}/>
                     </PrivateRoute>
-                    <PrivateRoute path='/reports/sales' exact component={Sales} />
-                    {/*<PrivateRoute path='/reports/sales-detailed' exact component={SalesDetailed} />*/}
-                    {/*<PrivateRoute path='/reports/settlements' exact component={Settlements} />*/}
+                    <PrivateRoute path='/reports/sales' exact component={Sales}/>
+                    {
+                        isAccountant && (
+                            <>
+                                <PrivateRoute path='/reports/sales-detailed' exact component={SalesDetailed}/>
+                                <PrivateRoute path='/reports/settlements' exact component={Settlements}/>
+                            </>
+                        )
+                    }
                     {/*<PrivateRoute path='/reports/pricelist' exact component={Pricelist} />*/}
                     {/*<PrivateRoute path='/reports/pricelist/portfolio' exact component={Portfolio} />*/}
                     {/*<PrivateRoute path='/reports/pricelist/chair' exact component={Chair} />*/}
