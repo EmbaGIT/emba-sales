@@ -3,7 +3,6 @@ import Loader from 'react-loader-spinner'
 import ReactPaginate from 'react-paginate'
 import { Calendar } from "react-modern-calendar-datepicker";
 import { calendarLocaleAZ } from "../../locales/calendar-locale";
-import "react-modern-calendar-datepicker/lib/DatePicker.css";
 import {post} from '../../api/Api'
 import {getHost} from '../../helpers/host'
 import {formattedDate, getSpecificDate} from '../../helpers/formattedDate'
@@ -40,6 +39,8 @@ const SalesDetailed = () => {
         setPage(+n.selected)
         paginationContainer.current.scrollIntoView({ behavior: 'smooth' })
     }
+
+    const saveSelectedDate = (dateStr) => localStorage.setItem('salesDate', JSON.stringify(dateStr))
 
     // Default start and end dates
     const defaultStartDate = new Date(2015, 1, 1)
@@ -92,8 +93,43 @@ const SalesDetailed = () => {
         if (from && to) {
             setStringDateState(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
             paginationContainer.current?.scrollIntoView({ behavior: 'smooth' })
+            saveSelectedDate(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
         }
     }
+
+    useEffect(() => {
+        const salesDate = JSON.parse(localStorage.getItem(('salesDate')))
+        const user = getUser()
+
+        const start = salesDate?.start.split('-')
+        const end = salesDate?.end.split('-')
+        let defaultCalendarValue = {}
+
+        if (start && end) {
+            defaultCalendarValue = {
+                from: { day: parseInt(start[2]), month: parseInt(start[1]), year: parseInt(start[0]) },
+                to: { day: parseInt(end[2]), month: parseInt(end[1]), year: parseInt(end[0]) }
+            }
+        }
+
+        if (salesDate) {
+            setSelectedDayRange(defaultCalendarValue)
+
+            post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=10&page=${page}`, {
+                "databegin": salesDate.start,
+                "dataend": salesDate.end,
+                "uid": user.uid
+            })
+                .then(response => {
+                    setSales(response)
+                    setIsFetching(false)
+                })
+                .catch(error => {
+                    setIsFetching(false)
+                    return error
+                })
+        }
+    }, [])
 
     useEffect(() => {
         if (didMount.current) {

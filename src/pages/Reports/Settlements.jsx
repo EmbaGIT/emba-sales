@@ -23,6 +23,8 @@ export const Settlements = () => {
         setPage(+n.selected)
     }
 
+    const saveSelectedDate = (dateStr) => localStorage.setItem('settlementDate', JSON.stringify(dateStr))
+
     // Default start and end dates
     const defaultStartDate = new Date(2015, 1, 1)
     const defaultEndDate = new Date()
@@ -72,9 +74,44 @@ export const Settlements = () => {
 
         const { from, to } = date
         if (from && to) {
+            saveSelectedDate(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
             setStringDateState(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
         }
     }
+
+    useEffect(() => {
+        const settlementDate = JSON.parse(localStorage.getItem(('settlementDate')))
+        const user = getUser()
+
+        const start = settlementDate?.start.split('-')
+        const end = settlementDate?.end.split('-')
+        let defaultCalendarValue = {}
+
+        if (start && end) {
+            defaultCalendarValue = {
+                from: { day: parseInt(start[2]), month: parseInt(start[1]), year: parseInt(start[0]) },
+                to: { day: parseInt(end[2]), month: parseInt(end[1]), year: parseInt(end[0]) }
+            }
+        }
+
+        if (settlementDate) {
+            setSelectedDayRange(defaultCalendarValue)
+
+            post(`${getHost('erp/report', 8091)}/api/mutual-calculation?size=10&page=${page}`, {
+                "databegin": settlementDate.start,
+                "dataend": settlementDate.end,
+                "uid": user.uid
+            })
+                .then(response => {
+                    setMutualCalculation(response)
+                    setIsFetching(false)
+                })
+                .catch(error => {
+                    setIsFetching(false)
+                    return error
+                })
+        }
+    }, [])
 
     useEffect(() => {
         if (didMount.current) {
