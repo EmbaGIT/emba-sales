@@ -55,7 +55,9 @@ export const Settlements = () => {
     })
 
     // state for date of type string
-    const [stringDateState, setStringDateState] = useState(convertDateToString(defaultStartDate, defaultEndDate))
+    const lsSavedDate = JSON.parse(localStorage.getItem(('settlementDate')))
+    const defaultStringDateState = lsSavedDate || convertDateToString(defaultStartDate, defaultEndDate)
+    const [stringDateState, setStringDateState] = useState(defaultStringDateState)
 
     // calendar dates
     const startDateArr = stringDateState.start.split('-')

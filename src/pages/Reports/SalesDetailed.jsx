@@ -10,7 +10,11 @@ import jwt from 'jwt-decode'
 
 const SalesDetailed = () => {
     const [sales, setSales] = useState({})
-    const [classNames, setClassNames] = useState([])
+    const [classNames, setClassNames] = useState(
+        Array(10)
+            .fill(undefined)
+            .map((_) => ({ hidden: true }))
+    )
     const [page, setPage] = useState(0)
     const [isFetching, setIsFetching] = useState(false)
     const paginationContainer = useRef()
@@ -72,7 +76,9 @@ const SalesDetailed = () => {
     })
 
     // state for date of type string
-    const [stringDateState, setStringDateState] = useState(convertDateToString(defaultStartDate, defaultEndDate))
+    const lsSavedDate = JSON.parse(localStorage.getItem(('salesDate')))
+    const defaultStringDateState = lsSavedDate || convertDateToString(defaultStartDate, defaultEndDate)
+    const [stringDateState, setStringDateState] = useState(defaultStringDateState)
 
     // calendar dates
     const startDateArr = stringDateState.start.split('-')
@@ -113,6 +119,7 @@ const SalesDetailed = () => {
         }
 
         if (salesDate) {
+            setIsFetching(true)
             setSelectedDayRange(defaultCalendarValue)
 
             post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=10&page=${page}`, {
