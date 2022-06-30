@@ -29,7 +29,12 @@ const Category = () => {
 
     useEffect(() => {
         const token = jwt(localStorage.getItem("jwt_token"));
-        setUserBrand(token.brand);
+        if (token.brand === 'Embawood/Madeyra') {
+            setUserBrand('');
+        } else {
+            setUserBrand(token.brand);
+        }
+
 
         getParentList(brand, pageNumber);
     }, [pageNumber, category_id]);

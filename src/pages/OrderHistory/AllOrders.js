@@ -50,8 +50,6 @@ const AllOrders = () => {
         post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}&size=10`).then(res => {
             orderList(res, page);
             setPageState(res);
-
-            console.log('res: ', res)
         })
     }, [page, rerender]);
 
