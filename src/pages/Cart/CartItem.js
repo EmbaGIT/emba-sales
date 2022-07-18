@@ -57,13 +57,23 @@ const CartItem = (props) =>{
                 </div>
             </div>
             <div className="basket-product-price-row">
-                <input type="text" disabled={props.isDisabled} className="form-control"
+                <input type="number" disabled={props.isDisabled} className="form-control"
                        onBlur={event => event.target.value.trim() && props.applyDiscountProduct("single", {
                            id: props.product.id,
                            discount: parseInt(event.target.value),
                            characteristic_uid: props.product.characteristic_uid,
                        })}
-                       onChange={event => props.handleInputChange(props.index, props.pr_index, event.target.value)}
+                       onChange={event => {
+                           if (event.target.value > 100) {
+                               props.handleInputChange(props.index, props.pr_index, 100)
+                           } else if (event.target.value < 0) {
+                               props.handleInputChange(props.index, props.pr_index, 0)
+                           } else if (event.target.value.startsWith('0')) {
+                               props.handleInputChange(props.index, props.pr_index, event.target.value.slice(1))
+                           } else {
+                               props.handleInputChange(props.index, props.pr_index, event.target.value)
+                           }
+                       }}
                        value={props.product.discount}
                        style={{width: '80px'}} placeholder="%"/>
             </div>

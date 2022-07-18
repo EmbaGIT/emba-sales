@@ -227,9 +227,20 @@ const Cart = () => {
                             </div>
                             <div className="input-group">
                                 <div>
-                                    <input type="text" id="isDisabled" disabled={!isDisabled} autoComplete="off"
+                                    <input type="number" id="isDisabled" disabled={!isDisabled} autoComplete="off"
+                                           placeholder='%'
                                            value={totalDiscount}
-                                           onChange={e => setTotalDiscount(e.target.value)}
+                                           onChange={e => {
+                                               if (e.target.value > 100) {
+                                                   setTotalDiscount(100)
+                                               } else if (e.target.value < 0) {
+                                                   setTotalDiscount(0)
+                                               } else if (e.target.value.startsWith('0')) {
+                                                   setTotalDiscount(e.target.value.slice(1))
+                                               } else {
+                                                   setTotalDiscount(e.target.value)
+                                               }
+                                           }}
                                            onBlur={event => event.target.value.trim() && applyDiscountProduct("all", event.target.value)}
                                            className="form-control"/>
                                 </div>
