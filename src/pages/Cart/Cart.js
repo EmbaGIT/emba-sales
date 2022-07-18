@@ -204,7 +204,7 @@ const Cart = () => {
                                     </tr>
                                     <tr>
                                         <td>Ümumi endirim faizi:</td>
-                                        <td className="text-right">{cartCtx.totalDiscount}%</td>
+                                        <td className="text-right">{cartCtx.totalDiscount || 0}%</td>
                                     </tr>
                                     </tbody>
                                 </table>
