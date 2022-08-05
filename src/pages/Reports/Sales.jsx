@@ -11,6 +11,7 @@ import { getHost } from "../../helpers/host";
 const Sales = () => {
     const [sale, setSale] = useState({});
     const [isFetching, setIsFetching] = useState(true);
+    const [noSales, setNoSales] = useState(false)
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
@@ -78,10 +79,10 @@ const Sales = () => {
         post(`${getHost('erp/report', 8091)}/api/sales/report`, { databegin: start, dataend: end, uid: user.uid })
             .then((res) => {
                 setSale(res);
-                setIsFetching(false);
             }).catch((err) => {
+                setNoSales(true)
                 console.log("err", err);
-            });
+            }).finally(() => setIsFetching(false));
     }, [stringDateState]);
 
     return (
@@ -111,7 +112,7 @@ const Sales = () => {
                                     height={60}
                                     width={60}/>
                             </div>
-                            : <table className="table bordered striped calendar-result">
+                            : !noSales ? <table className="table bordered striped calendar-result">
                             <thead>
                             <tr>
                                 <th scope='col'>Mağaza adı</th>
@@ -130,9 +131,21 @@ const Sales = () => {
                                 <td data-label='Məbləğ'>{sale?.sum} AZN</td>
                             </tr>
                             </tbody>
-                        </table>
+                        </table> : null
                     }
                 </div>
+            </div>
+            {
+                !noSales
+                    ? null
+                    : <div className='col-12'>
+                        <div className="alert alert-danger text-center py-3" role="alert">
+                            Bu adlı satıcının satışı yoxdur
+                        </div>
+                    </div>
+            }
+            <div className='col-12'>
+
             </div>
         </div>
     )

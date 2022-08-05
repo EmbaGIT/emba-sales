@@ -170,7 +170,7 @@ const SalesDetailed = () => {
     return (
         <div className='container-fluid row'>
             <div className='col-12 d-flex justify-content-between align-items-end'>
-                <h1>Mənim Satışlarım</h1>
+                <h1>Distribütorun Mağazaya Satışı</h1>
             </div>
 
             <div className='col-12 my-4'>
