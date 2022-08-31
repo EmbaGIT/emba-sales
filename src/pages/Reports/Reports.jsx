@@ -55,6 +55,17 @@ const Reports = () => {
                         </React.Fragment>
                     ))
                 }
+                {
+                    brand === 'Embawood' ? <div className="col-lg-3 col-md-4 mb-3">
+                        <a href='https://1drv.ms/x/s!ArrmD3gpN8JGc6afQd0dC7EsRaw?e=oO3oX6' className='d-block h-100' target='_blank'>
+                            <div className='category-box h-100 d-flex align-items-center justify-content-center'>
+                                <div className="category-hover-box">
+                                    <span className='category-name'>Embawood Price List</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div> : null
+                }
             </div>
         </div>
     )
