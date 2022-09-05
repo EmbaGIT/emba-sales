@@ -43,7 +43,7 @@ const Category = () => {
         setProductList([]);
         setIsFetchingData(true);
         if (brand) {
-            get(`/v2/parents/category/${category_id}?brand=${brand}&pageNumber=${page}&pageSize=16`).then(res => {
+            get(`/v2/parents/category/${category_id}?brand=${brand}&isVisible=true&pageNumber=${page}&pageSize=16`).then(res => {
                 setPageInfo(res);
                 const productListArr = [];
 
@@ -113,8 +113,8 @@ const Category = () => {
     return (
         <div>
             <div className="row">
-                <div className="col-md-4 d-flex mb-3">
-                    <h5 className="me-2">Brend</h5>
+                <div className="col-md-4 d-flex align-items-center mb-3">
+                    <h5 className="me-3 mb-0">Brend</h5>
                     <select className="form-control form-select"
                             onChange={e => handleInputChange("brand_select", e.target.value)}>
                         {
