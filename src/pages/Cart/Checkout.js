@@ -438,6 +438,16 @@ const Checkout = () => {
                 ...prevState,
                 [type]: value
             }))
+
+            if (type === 'surname' || type === 'name') {
+                !alldata.name && !alldata.surname
+                    ? setFormValidation(prevState => ({
+                        ...prevState, name: false, surname: false
+                    }))
+                    : setFormValidation(prevState => ({
+                        ...prevState, name: true, surname: true
+                    }))
+            }
         }
         setCheckoutState(prevState => ({
             ...prevState,
@@ -476,12 +486,19 @@ const Checkout = () => {
             other_phone: '',
             address: '',
         });
-        if (handleNameSurnameValidation()) {
+
+        const validNameSurnameSearchQuery = (checkoutState.customerInfo.surname.length >= 3 || checkoutState.customerInfo.name.length >= 3) && (checkoutState.customerInfo.surname.length !== 0 || checkoutState.customerInfo.name.length !== 0)
+
+        if (handleNameSurnameValidation() && validNameSurnameSearchQuery) {
+            const {
+                surname, name, patronymic, identifierNumber, finCode
+            } = checkoutState.customerInfo
+
             getAvailableCustomer({
                 variables: {
-                    name: `${checkoutState.customerInfo.surname} ${checkoutState.customerInfo.name} ${checkoutState.customerInfo.patronymic}`,
-                    serial: checkoutState.customerInfo.identifierNumber ? checkoutState.customerInfo.identifierNumber : null,
-                    finCode: checkoutState.customerInfo.finCode ? checkoutState.customerInfo.finCode : null
+                    name: `${surname} ${name} ${patronymic}`.trim(),
+                    serial: identifierNumber || null,
+                    finCode: finCode || null
                 }
             });
         }
@@ -495,15 +512,14 @@ const Checkout = () => {
     }
 
     const handleNameSurnameValidation = () => {
-        !checkoutState.customerInfo.name ? setFormValidation(prevState => ({
-            ...prevState,
-            name: false
-        })) : setFormValidation(prevState => ({...prevState, name: true}))
-        !checkoutState.customerInfo.surname ? setFormValidation(prevState => ({
-            ...prevState,
-            surname: false
-        })) : setFormValidation(prevState => ({...prevState, surname: true}))
-        return !(!checkoutState.customerInfo.name || !checkoutState.customerInfo.surname);
+        !checkoutState.customerInfo.name && !checkoutState.customerInfo.surname
+            ? setFormValidation(prevState => ({
+                ...prevState, name: false, surname: false
+            }))
+            : setFormValidation(prevState => ({
+                ...prevState, name: true, surname: true
+            }))
+        return !!checkoutState.customerInfo.name || !!checkoutState.customerInfo.surname;
     }
 
     const handleValidation = () => {
@@ -809,8 +825,18 @@ const Checkout = () => {
                     <div className="card-body">
                         <h6>Müştəri bazasında axtarın</h6>
                         <div className="input-group row mb-3">
+                            {
+                                (!(checkoutState.customerInfo.surname.length >= 3 || checkoutState.customerInfo.name.length >= 3)
+                                    && (checkoutState.customerInfo.surname.length !== 0 || checkoutState.customerInfo.name.length !== 0))
+                                && <div className='col-12'>
+                                    <small className='text-danger'>
+                                        Axtarış üçün ad və ya soyad xanasına ən azı 3 simvol daxil edin.
+                                    </small>
+                                </div>
+                            }
                             <div className="col-md-4 mb-2">
-                                <label>Soyad<span className="text-danger">*</span></label>
+                                {/*<label>Soyad<span className="text-danger">*</span></label>*/}
+                                <label>Soyad</label>
                                 <input type="text" className="form-control"
                                        value={checkoutState.customerInfo && checkoutState.customerInfo?.surname}
                                        onChange={e => handleInputChange("surname", e.target.value)}/>
@@ -818,12 +844,13 @@ const Checkout = () => {
                                     <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                             <div className="col-md-4 mb-2">
-                                <label>Ad<span className="text-danger">*</span></label>
+                                {/*<label>Ad<span className="text-danger">*</span></label>*/}
+                                <label>Ad</label>
                                 <input type="text" className="form-control"
                                        value={checkoutState.customerInfo && checkoutState.customerInfo?.name}
                                        onChange={e => handleInputChange("name", e.target.value)}/>
                                 {!formValidation.name &&
-                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                             <div className="col-md-4 mb-2">
                                 <label>Ata adı</label>
@@ -859,7 +886,10 @@ const Checkout = () => {
                                 </div>
                             </div>
                             <div className="col-md-3 d-flex align-items-end">
-                                <div className="btn btn-primary" onClick={searchOnDatabase}>Axtar</div>
+                                <div
+                                    className="btn btn-primary"
+                                    onClick={searchOnDatabase}
+                                >Axtar</div>
                             </div>
                         </div>
                         {available_customer_loading && <p>Məlumat yüklənir...</p>}
@@ -911,7 +941,7 @@ const Checkout = () => {
                                     placeholder='Şəhər seçin...'
                                 />
                                 {!formValidation.city &&
-                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                         </div>
                         <div className="row mb-3">
@@ -923,7 +953,7 @@ const Checkout = () => {
                                           onChange={e => handleInputChange("address", e.target.value)}
                                 />
                                 {!formValidation.address &&
-                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                         </div>
 
@@ -935,7 +965,7 @@ const Checkout = () => {
                                            onChange={e => handleInputChange("mobile_phone", e.target.value)}
                                            value={checkoutState.customerInfo && checkoutState.customerInfo.mobile_phone}/>
                                 {!formValidation.mobile_phone &&
-                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                             <div className="col-md-6">
                                 <label>Digər telefon</label>
@@ -996,7 +1026,7 @@ const Checkout = () => {
                                     minDate={new Date()}
                                 />
                                 {!formValidation.delivery_date &&
-                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                             <div className="col-md-6">
                                 <label>Çatdırılma tarixi<span className="text-danger">*</span></label>
@@ -1009,7 +1039,7 @@ const Checkout = () => {
                                     minDate={new Date()}
                                 />
                                 {!formValidation.payment_date &&
-                                <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                             </div>
                         </div>
                         <div className="row mb-3">
