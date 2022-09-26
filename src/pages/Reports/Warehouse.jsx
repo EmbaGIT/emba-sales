@@ -6,10 +6,12 @@ import ReactPaginate from "react-paginate";
 import Select from "react-select";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { getHost } from "../../helpers/host";
+import CartContext from "../../store/CartContext";
 
 const Warehouse = () => {
     const history = useHistory();
     const params = useParams();
+    const cartCtx = useContext(CartContext)
     const [warehouseInfo, setWarehouseInfo] = useState({});
     const [isFetching, setIsFetching] = useState(false);
     const [page, setPage] = useState(Number(params.page));
@@ -59,6 +61,45 @@ const Warehouse = () => {
                 console.log("error in getting goods: ", err);
             });
         }).catch(error => console.log("error in cleaning cache: ", error));
+    }
+
+    const addToCartHandler = async (uid, characteristics) => {
+        const product = await get(`/products/uid/${uid}`)
+        const { id, name, price } = product
+        const brand = product.attributes.filter(a => a.groups.name === 'Brand')[0].name
+        const parent = product.attributes.filter(a => a.groups.name === 'Model')[0].name
+        const category = product.attributes.filter(a => a.groups.name === 'Vidmebeli')[0].id.toString()
+        const parent_id = product.attributes.filter(a => a.groups.name === 'Model')[0].id.toString()
+        const color_id = product.colors[0]?.id.toString() ?? ''
+        const characteristic_uid = product.characteristics.filter(c => c.name === characteristics).uid ?? ''
+        const characteristic_code = product.characteristics.filter(c => c.name === characteristics).code ?? ''
+        let files = []
+
+        const fileUrl = color_id
+            ? `${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category}&parent=${parent_id}&product=${id}&color=${color_id}`
+            : `${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category}&parent=${parent_id}&product=${id}`
+
+        await get(fileUrl).then(productFiles => files = productFiles)
+
+        cartCtx.addItem({
+            amount: 1,
+            discount: 0,
+            id,
+            name,
+            price,
+            parent,
+            parent_id,
+            brand,
+            category,
+            uid,
+            characteristic_uid,
+            characteristic_code,
+            color_id,
+            files,
+            discount_price: price,
+            product_createsales: false,
+            product_reserve: false,
+        });
     }
 
     return (
@@ -125,15 +166,27 @@ const Warehouse = () => {
                                     <th scope='col'>Məhsul adı</th>
                                     <th scope='col'>Məhsulun xatakteristikası</th>
                                     <th scope='col'>Məhsulun sayı</th>
+                                    <th scope='col'>Səbətə at</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {warehouseInfo.goods?.map((good, i) => (
+                                {warehouseInfo.goods?.sort((g1, g2) => g1?.characteristicName?.localeCompare(g2?.characteristicName)).map((good, i) => (
                                     <tr key={i}>
                                         <td>{+i + (Number(page) * Number(pageSize.value)) + 1}</td>
                                         <td><span className="cursor-pointer text-primary font-weight-bolder">{good.productName}</span></td>
                                         <td>{good.characteristicName}</td>
                                         <td>{good.quantity}</td>
+                                        <td>
+                                            <div>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-success"
+                                                    onClick={() => addToCartHandler(good.productUid, good.characteristicName)}
+                                                >
+                                                    <i className="fas fa-cart-plus"/>
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
                                 </tbody>
