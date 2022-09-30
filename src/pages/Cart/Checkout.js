@@ -420,6 +420,8 @@ const Checkout = () => {
                     mobile_phone: false,
                     other_phone: false,
                     address: false,
+                    city: false,
+                    email: false
                 }))
             } else {
                 setIsRefactorDisabled(prevState => ({
@@ -427,6 +429,8 @@ const Checkout = () => {
                     mobile_phone: true,
                     other_phone: true,
                     address: true,
+                    city: true,
+                    email: true
                 }))
             }
         } else {

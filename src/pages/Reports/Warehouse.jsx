@@ -65,7 +65,8 @@ const Warehouse = () => {
 
     const addToCartHandler = async (uid, characteristics) => {
         const product = await get(`/products/uid/${uid}`)
-        const { id, name, price } = product
+        const price = product.price ?? product.characteristics.find(ch => ch.name === characteristics)?.price
+        const { id, name } = product
         const brand = product.attributes.filter(a => a.groups.name === 'Brand')[0].name
         const parent = product.attributes.filter(a => a.groups.name === 'Model')[0].name
         const category = product.attributes.filter(a => a.groups.name === 'Vidmebeli')[0].id.toString()
