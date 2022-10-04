@@ -67,20 +67,19 @@ const Warehouse = () => {
         const product = await get(`/products/uid/${uid}`)
         const price = product.price ?? product.characteristics.find(ch => ch.name === characteristics)?.price
         const { id, name } = product
-        const brand = product.attributes.filter(a => a.groups.name === 'Brand')[0].name
-        const parent = product.attributes.filter(a => a.groups.name === 'Model')[0].name
-        const category = product.attributes.filter(a => a.groups.name === 'Vidmebeli')[0].id.toString()
-        const parent_id = product.attributes.filter(a => a.groups.name === 'Model')[0].id.toString()
+        const brand = product.attributes.find(a => a.groups.name === 'Brand').name
+        const parent = product.attributes.find(a => a.groups.name === 'Model').name
+        const category = product.attributes.find(a => a.groups.name === 'Vidmebeli').id.toString()
+        const parent_id = product.attributes.find(a => a.groups.name === 'Model').id.toString()
         const color_id = product.colors[0]?.id.toString() ?? ''
-        const characteristic_uid = product.characteristics.filter(c => c.name === characteristics).uid ?? ''
-        const characteristic_code = product.characteristics.filter(c => c.name === characteristics).code ?? ''
-        let files = []
+        const characteristic_uid = product.characteristics.find(c => c.name === characteristics)?.uid ?? ''
+        const characteristic_code = product.characteristics.find(c => c.name === characteristics)?.code ?? ''
 
         const fileUrl = color_id
             ? `${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category}&parent=${parent_id}&product=${id}&color=${color_id}`
             : `${getHost('files', 8089)}/api/image/resource?brand=${brand}&bucket=emba-store-images&category=${category}&parent=${parent_id}&product=${id}`
 
-        await get(fileUrl).then(productFiles => files = productFiles)
+        const files = await get(fileUrl)
 
         cartCtx.addItem({
             amount: 1,
