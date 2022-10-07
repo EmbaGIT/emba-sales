@@ -1,13 +1,15 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
-const CountInput = React.forwardRef((props, ref) => {
+const CountInput = props => {
     const [count, setCount] = useState(props.defaultValue);
 
     const handleOnChange = (type) => {
-        if(type==="add"){
-            setCount(count => ++count);
-        }else if(type==="remove" && count > 0){
-            setCount(count => --count);
+        if (type==="add") {
+            setCount(count => count + 1);
+            props.handleUpdate(count + 1);
+        } else if (type==="remove" && count > 0) {
+            setCount(count => count - 1);
+            props.handleUpdate(count - 1);
         }
     }
 
@@ -20,11 +22,12 @@ const CountInput = React.forwardRef((props, ref) => {
                    className="count-input"
                    min="0"
                    max="12"
-                   ref={ref} readOnly/>
+                   readOnly
+            />
             <button type="button" className="count_up" onClick={handleOnChange.bind(null, "add")}><i className="fas fa-plus"/>
             </button>
         </div>
     )
-});
+};
 
 export default CountInput;

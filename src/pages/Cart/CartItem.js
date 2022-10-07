@@ -1,4 +1,4 @@
-import {useRef, useContext} from 'react';
+import {useContext} from 'react';
 import noImage from "../../assets/images/no-image.png";
 import CountInput from "../../UI/CountInput";
 import CartContext from "../../store/CartContext";
@@ -6,7 +6,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const CartItem = (props) =>{
-    const amountInputRef = useRef();
     const cartCtx = useContext(CartContext);
     const handleDelete = (id) => {
         confirmAlert({
@@ -25,10 +24,10 @@ const CartItem = (props) =>{
         });
     }
 
-    const handleUpdate = (id) => {
-        const enteredAmount = amountInputRef.current.value;
+    const handleUpdate = (amount) => {
+        const enteredAmount = amount;
         const enteredAmountNumber = +enteredAmount;
-        cartCtx.updateItem(enteredAmountNumber, id);
+        cartCtx.updateItem(enteredAmountNumber, props.product.id);
     }
 
     return(
@@ -46,8 +45,10 @@ const CartItem = (props) =>{
                 <span className="text-success">Qiymət: {props.product.price} ₼</span>
             </div>
             <div>
-                <CountInput defaultValue={props.product.amount} ref={amountInputRef}/>
-                <div className="btn btn-success btn-sm w-100" onClick={handleUpdate.bind(this, props.product.id)}><i className="fas fa-sync-alt"/></div>
+                <CountInput
+                    defaultValue={props.product.amount}
+                    handleUpdate={handleUpdate}
+                />
             </div>
             <div className="basket-product-price-row">
                 <div className="basket-product-old-price">

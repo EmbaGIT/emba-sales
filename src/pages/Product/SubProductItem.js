@@ -12,7 +12,6 @@ const img = {
 };
 
 const SubProductItem = (props) => {
-    const amountInputRef = useRef();
     const cartCtx = useContext(CartContext);
     const [isAmountValid, setIsAmountValid] = useState(true);
     const [charUID, setCharUID] = useState('');
@@ -20,6 +19,7 @@ const SubProductItem = (props) => {
     const [price, setPrice] = useState(props.price);
     const [options, setOptions] = useState(props.stock)
     const [allSelected, setAllSelected] = useState(true)
+    const [defaultValue, setDefaultValue] = useState(props.defaultValue)
 
     useEffect(() => {
         if(props.characteristics.length){
@@ -41,10 +41,10 @@ const SubProductItem = (props) => {
     }
 
     const addToCartHandler = () => {
-        const enteredAmount = amountInputRef.current.value;
+        const enteredAmount = defaultValue;
         const enteredAmountNumber = +enteredAmount;
 
-        if (enteredAmount.trim().length === 0 || enteredAmountNumber < 1 || enteredAmountNumber > 12) {
+        if (enteredAmount.toString().trim().length === 0 || enteredAmountNumber < 1 || enteredAmountNumber > 12) {
             setIsAmountValid(false);
             return;
         } else {
@@ -113,7 +113,10 @@ const SubProductItem = (props) => {
                     <div className="sub-item-price-block">
                         {props.price ? props.price : 0} AZN
                     </div>
-                    <CountInput defaultValue={props.defaultValue} ref={amountInputRef}/>
+                    <CountInput
+                        defaultValue={defaultValue}
+                        handleUpdate={setDefaultValue}
+                    />
                     <div className="text-end">
                         <button type="button" className="btn btn-success" onClick={addToCartHandler}>
                             <i className="fas fa-cart-plus"/>
