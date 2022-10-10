@@ -33,6 +33,7 @@ import {Settlements} from "./pages/Reports/Settlements";
 // import Outsource from "./pages/Reports/Pricelist/Outsource";
 // import Tables from "./pages/Reports/Pricelist/Tables";
 // import OutOfPortfolio from "./pages/Reports/Pricelist/Out-of-portfolio";
+import Instructions from "./pages/Instructions";
 
 export const IsAuth = createContext(null);
 
@@ -108,6 +109,7 @@ const App = () => {
                         <Stock stock={{key: 'chair'}}/>
                     </PrivateRoute>
                     <PrivateRoute path='/reports/sales' exact component={Sales}/>
+                    <PrivateRoute path='/instructions' exact component={Instructions}/>
                     {
                         isAccountant && (
                             <>
