@@ -131,8 +131,15 @@ const Checkout = () => {
         delivery_date: true,
         payment_date: true
     })
-
     const [creditPercent, setCreditPercent] = useState(2);
+    const [customerSelected, setCustomerSelected] = useState(false)
+    const [isNewCustomer, setIsNewCustomer] = useState(false)
+    const [temporaryUserInfo, setTemporaryUserInfo] = useState({
+        name: '',
+        surname: '',
+        patronymic: ''
+    })
+    const [lastSelectedUid, setLastSelectedUid] = useState('')
 
     const handlePercentChange = e => {
         const { value } = e.target;
@@ -150,6 +157,10 @@ const Checkout = () => {
             if (available_customer.search.length) {
                 setAvailableCustomer(available_customer.search);
             }
+            if (available_customer.search.length === 1) {
+                handleFullInfo(available_customer.search[0].uid)
+            }
+            setCustomerSelected(!available_customer.search.length)
         }, onError: (err) => {
             console.log(err)
         }
@@ -317,6 +328,11 @@ const Checkout = () => {
                     isDisabled: true
                 })
             }
+            setCustomerSelected(true)
+            if (cartCtx.savedId) {
+                setAvailableCustomer((customer_full_info.search))
+                setCustomerSelected(true)
+            }
         },
         onError: (error) => {
             console.log(error)
@@ -373,12 +389,21 @@ const Checkout = () => {
                 setPaymentDate(resOrderInfo.content[0].payment_date);
                 setPaymentType(resOrderInfo.content[0].payment_method);
                 setDeliveryType(resOrderInfo.content[0].delivery_type);
+                setCustomerSearch(true)
+                setCustomerSelected(true)
+                handleFullInfo(resOrderInfo.content[0].client_uid)
             })
         }
     }, [cartCtx]);
 
     const handleInputChange = (type, value) => {
         let alldata = {...checkoutState.customerInfo};
+        if (temporaryUserInfo.hasOwnProperty(type)) {
+            setTemporaryUserInfo(prev => ({
+                ...prev,
+                [type]: value
+            }))
+        }
         if (type === 'select_city') {
             alldata = {
                 ...alldata,
@@ -466,6 +491,7 @@ const Checkout = () => {
     }, [creditPercent]);
 
     const searchOnDatabase = () => {
+        setCustomerSelected(false)
         setAvailableCustomer([]);
         setCheckoutState(prevstate => ({
             ...prevstate,
@@ -513,6 +539,7 @@ const Checkout = () => {
                 uid: `${uid}`
             }
         });
+        setLastSelectedUid(uid)
     }
 
     const handleNameSurnameValidation = () => {
@@ -898,15 +925,65 @@ const Checkout = () => {
                         </div>
                         {available_customer_loading && <p>Məlumat yüklənir...</p>}
                         {customerSearch && (availableCustomer?.length ?
-                            <select className="form-control form-select mb-3"
-                                    defaultValue={'DEFAULT'}
-                                    onChange={e => handleFullInfo(e.target.value)}>
-                                <option value='DEFAULT' disabled>Müştəri seçin</option>
-                                {availableCustomer.map(customer => (
-                                    <option key={customer.uid} value={customer.uid}>{customer.name}</option>
-                                ))}
-                            </select> : <p>Məlumat tapılmadı.</p>)}
-                        <div className="mb-3">
+                            <div>
+                                {!isNewCustomer && availableCustomer?.length > 1 ? <><label className={customerSelected ? '' : 'text-danger'}>Zəhmət olmasa müştərini siyahıdan seçin:</label>
+                                    <select className="form-control form-select mb-3"
+                                            defaultValue={'DEFAULT'}
+                                            onChange={e => handleFullInfo(e.target.value)}>
+                                        <option value='DEFAULT' disabled>Müştəri seçin</option>
+                                        {availableCustomer.map(customer => (
+                                            <option key={customer.uid} value={customer.uid}>{customer.name}</option>
+                                        ))}
+                                    </select></> : null}
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="isNewCustomer"
+                                        onChange={e => {
+                                            setIsNewCustomer(e.target.checked)
+                                            if (e.target.checked) {
+                                                setCheckoutState(prevState => ({
+                                                    ...prevState,
+                                                    customerInfo: {
+                                                        uid: '',
+                                                        name: '',
+                                                        surname: '',
+                                                        patronymic: '',
+                                                        finCode: '',
+                                                        identifierNumber: '',
+                                                        passport_series: 'AZE',
+                                                        birthdate: '',
+                                                        city: {
+                                                            code: '',
+                                                            name: ''
+                                                        },
+                                                        mobile_phone: '',
+                                                        other_phone: '',
+                                                        address: '',
+                                                        gender: 1,
+                                                        email: '',
+                                                        note: '',
+                                                        ...temporaryUserInfo
+                                                    }
+                                                }));
+                                            } else {
+                                                if (lastSelectedUid) {
+                                                    handleFullInfo(lastSelectedUid)
+                                                }
+                                            }
+                                        }}
+                                    />
+                                    <label className="form-check-label" htmlFor="isNewCustomer">
+                                        Yeni müştəri
+                                    </label>
+                                </div>
+                            </div>
+                            : availableCustomer?.length < 1
+                                ? <p>Məlumat tapılmadı.</p>
+                                : null
+                        )}
+                        {(customerSearch && availableCustomer?.length && customerSelected && !isNewCustomer) ? <div className="mb-3">
                             <div className="form-check">
                                 <input
                                     className="form-check-input"
@@ -919,81 +996,82 @@ const Checkout = () => {
                                     Məlumatları Yenilə
                                 </label>
                             </div>
-                        </div>
+                        </div> : null}
 
-                        <div className="row mb-3">
-                            <div className="col-md-6">
-                                <label htmlFor='birthdate'>Doğum tarixi</label>
-                                <BirthDateDatepicker
-                                    selectedDate={checkoutState.customerInfo.birthdate ? new Date(checkoutState.customerInfo.birthdate) : ""}
-                                    isDisabled={isRefactorDisabled.birthdate}
-                                    onDateChange={handleInputChange}
-                                />
+                        {customerSearch && (customerSelected || isNewCustomer) && <>
+                            <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <label htmlFor='birthdate'>Doğum tarixi</label>
+                                    <BirthDateDatepicker
+                                        selectedDate={checkoutState.customerInfo.birthdate ? new Date(checkoutState.customerInfo.birthdate) : ""}
+                                        isDisabled={isRefactorDisabled.birthdate && (availableCustomer?.length && !isNewCustomer)}
+                                        onDateChange={handleInputChange}
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <label>Şəhər<span className="text-danger">*</span></label>
+                                    <Select
+                                        isDisabled={isRefactorDisabled.city && (availableCustomer?.length && !isNewCustomer)}
+                                        styles={selectStyles}
+                                        options={city}
+                                        value={checkoutState.customerInfo && checkoutState.customerInfo?.city ? [{
+                                            value: checkoutState.customerInfo?.city?.code,
+                                            label: checkoutState.customerInfo?.city?.name
+                                        }] : ''}
+                                        components={(props) => NoOptionsMessage(props, 'Şəhər tapılmadı.')}
+                                        onChange={value => handleInputChange("select_city", value)}
+                                        placeholder='Şəhər seçin...'
+                                    />
+                                    {!formValidation.city &&
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                </div>
                             </div>
-                            <div className="col-md-6">
-                                <label>Şəhər<span className="text-danger">*</span></label>
-                                <Select
-                                    isDisabled={isRefactorDisabled.city}
-                                    styles={selectStyles}
-                                    options={city}
-                                    value={checkoutState.customerInfo && checkoutState.customerInfo?.city ? [{
-                                        value: checkoutState.customerInfo?.city?.code,
-                                        label: checkoutState.customerInfo?.city?.name
-                                    }] : ''}
-                                    components={(props) => NoOptionsMessage(props, 'Şəhər tapılmadı.')}
-                                    onChange={value => handleInputChange("select_city", value)}
-                                    placeholder='Şəhər seçin...'
-                                />
-                                {!formValidation.city &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                            <div className="row mb-3">
+                                <div className="col-12">
+                                    <label htmlFor='address'>Ünvan<span className="text-danger">*</span></label>
+                                    <textarea className="form-control"
+                                              disabled={isRefactorDisabled.address && (availableCustomer?.length && !isNewCustomer)}
+                                              value={checkoutState.customerInfo && checkoutState.customerInfo.address}
+                                              onChange={e => handleInputChange("address", e.target.value)}
+                                    />
+                                    {!formValidation.address &&
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                </div>
                             </div>
-                        </div>
-                        <div className="row mb-3">
-                            <div className="col-12">
-                                <label htmlFor='address'>Ünvan<span className="text-danger">*</span></label>
-                                <textarea className="form-control"
-                                          disabled={isRefactorDisabled.address}
-                                          value={checkoutState.customerInfo && checkoutState.customerInfo.address}
-                                          onChange={e => handleInputChange("address", e.target.value)}
-                                />
-                                {!formValidation.address &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
-                            </div>
-                        </div>
 
-                        <div className="row mb-3">
-                            <div className="col-md-6">
-                                <label>Mobil telefon<span className="text-danger">*</span></label>
-                                <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
-                                           disabled={isRefactorDisabled.mobile_phone}
-                                           onChange={e => handleInputChange("mobile_phone", e.target.value)}
-                                           value={checkoutState.customerInfo && checkoutState.customerInfo.mobile_phone}/>
-                                {!formValidation.mobile_phone &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                            <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <label>Mobil telefon<span className="text-danger">*</span></label>
+                                    <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
+                                               disabled={isRefactorDisabled.mobile_phone && (availableCustomer?.length && !isNewCustomer)}
+                                               onChange={e => handleInputChange("mobile_phone", e.target.value)}
+                                               value={checkoutState.customerInfo && checkoutState.customerInfo.mobile_phone}/>
+                                    {!formValidation.mobile_phone &&
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                </div>
+                                <div className="col-md-6">
+                                    <label>Digər telefon</label>
+                                    <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
+                                               disabled={isRefactorDisabled.other_phone && (availableCustomer?.length && !isNewCustomer)}
+                                               onChange={e => handleInputChange("other_phone", e.target.value)}
+                                               value={checkoutState.customerInfo && checkoutState.customerInfo.other_phone}/>
+                                </div>
                             </div>
-                            <div className="col-md-6">
-                                <label>Digər telefon</label>
-                                <InputMask mask="(+\9\9499) 999-99-99" className="form-control"
-                                           disabled={isRefactorDisabled.other_phone}
-                                           onChange={e => handleInputChange("other_phone", e.target.value)}
-                                           value={checkoutState.customerInfo && checkoutState.customerInfo.other_phone}/>
+                            <div className="row mb-3">
+                                <div className="col-md-12">
+                                    <label>Email</label>
+                                    <input className="form-control"
+                                           disabled={isRefactorDisabled.email && (availableCustomer?.length && !isNewCustomer)}
+                                           onChange={e => handleInputChange("email", e.target.value)}
+                                           value={checkoutState.customerInfo && checkoutState.customerInfo.email}/>
+                                </div>
                             </div>
-                        </div>
-                        <div className="row mb-3">
-                            <div className="col-md-12">
-                                <label>Email</label>
-                                <input className="form-control"
-                                       disabled={isRefactorDisabled.email}
-                                       onChange={e => handleInputChange("email", e.target.value)}
-                                       value={checkoutState.customerInfo && checkoutState.customerInfo.email}/>
-                            </div>
-                        </div>
-                        <div className="row mb-3">
-                            <div className="col-12">
-                                <div className="d-flex">
+                            <div className="row mb-3">
+                                <div className="col-12">
+                                    <div className="d-flex">
                                     <span className="form-check">
                                         <input
-                                            disabled={isRefactorDisabled.gender}
+                                            disabled={isRefactorDisabled.gender && (availableCustomer?.length && !isNewCustomer)}
                                             className="form-check-input"
                                             type="radio"
                                             name="gender"
@@ -1003,9 +1081,9 @@ const Checkout = () => {
                                         />
                                         <label className="form-check-label" htmlFor="male">Kişi</label>
                                     </span>
-                                    <span className="form-check ms-3">
+                                        <span className="form-check ms-3">
                                         <input
-                                            disabled={isRefactorDisabled.gender}
+                                            disabled={isRefactorDisabled.gender && (availableCustomer?.length && !isNewCustomer)}
                                             className="form-check-input"
                                             type="radio"
                                             name="gender"
@@ -1015,48 +1093,49 @@ const Checkout = () => {
                                         />
                                         <label className="form-check-label" htmlFor="female">Qadın</label>
                                     </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="row mb-3">
-                            <div className="col-md-6">
-                                <label>Ödəniş tarixi<span className="text-danger">*</span></label>
-                                <DatePicker
-                                    onChangeRaw={(e) => e.preventDefault()}
-                                    dateFormat="yyyy-MM-dd"
-                                    className="form-control"
-                                    selected={new Date(paymentDate)}
-                                    onChange={(date) => setPaymentDate(date)}
-                                    minDate={new Date()}
-                                />
-                                {!formValidation.delivery_date &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                            <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <label>Ödəniş tarixi<span className="text-danger">*</span></label>
+                                    <DatePicker
+                                        onChangeRaw={(e) => e.preventDefault()}
+                                        dateFormat="yyyy-MM-dd"
+                                        className="form-control"
+                                        selected={new Date(paymentDate)}
+                                        onChange={(date) => setPaymentDate(date)}
+                                        minDate={new Date()}
+                                    />
+                                    {!formValidation.delivery_date &&
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                </div>
+                                <div className="col-md-6">
+                                    <label>Çatdırılma tarixi<span className="text-danger">*</span></label>
+                                    <DatePicker
+                                        onChangeRaw={(e) => e.preventDefault()}
+                                        dateFormat="yyyy-MM-dd"
+                                        className="form-control"
+                                        selected={deliveryDate ? new Date(deliveryDate) : ''}
+                                        onChange={(date) => setDeliveryDate(date)}
+                                        minDate={new Date()}
+                                    />
+                                    {!formValidation.payment_date &&
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                </div>
                             </div>
-                            <div className="col-md-6">
-                                <label>Çatdırılma tarixi<span className="text-danger">*</span></label>
-                                <DatePicker
-                                    onChangeRaw={(e) => e.preventDefault()}
-                                    dateFormat="yyyy-MM-dd"
-                                    className="form-control"
-                                    selected={deliveryDate ? new Date(deliveryDate) : ''}
-                                    onChange={(date) => setDeliveryDate(date)}
-                                    minDate={new Date()}
-                                />
-                                {!formValidation.payment_date &&
-                                    <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                            <div className="row mb-3">
+                                <div className="col-md-12">
+                                    <label>Şərh</label>
+                                    <textarea className="form-control"
+                                              onChange={e => handleInputChange("note", e.target.value)}
+                                              value={checkoutState.customerInfo && checkoutState.customerInfo.note}/>
+                                </div>
                             </div>
-                        </div>
-                        <div className="row mb-3">
-                            <div className="col-md-12">
-                                <label>Şərh</label>
-                                <textarea className="form-control"
-                                          onChange={e => handleInputChange("note", e.target.value)}
-                                          value={checkoutState.customerInfo && checkoutState.customerInfo.note}/>
-                            </div>
-                        </div>
+                        </>}
                     </div>
                 </div>
-                <div className="row mt-3">
+                {customerSearch && (customerSelected || isNewCustomer) && <div className="row mt-3">
                     <div className="col-md-12 d-flex justify-content-end">
                         <button
                             disabled={isAddingWishlist}
@@ -1071,7 +1150,7 @@ const Checkout = () => {
                             {isSending ? "Gözləyin" : "Göndər"}
                         </button>
                     </div>
-                </div>
+                </div>}
             </div>
         </div>
     )
