@@ -8,6 +8,7 @@ const menuItems = [
     {title: 'Qarşılıqlı Hesablaşmalar', url: 'settlements'},
     {title: 'Anbar Qalığı', url: 'options'},
     {title: 'Distribütorun Mağazaya Satışı', url: 'sales-detailed'},
+    {title: 'Rezervdə olan sifarişlər', url: 'sales-reserve'}
     // {title: 'Price List', url: 'pricelist'}
 ]
 

@@ -76,7 +76,13 @@ axiosInstance.interceptors.response.use((res) => {
     return res;
 }, (error) => {
     if (error?.response?.status === 422) {
-        toast.error(<MessageComponent text={error?.response?.data || 'Xəta baş verdi!'} />, {
+        let text = ''
+        if (typeof error?.response?.data === 'String') {
+            text = error?.response?.data
+        } else {
+            text = error?.response?.data.message
+        }
+        toast.error(<MessageComponent text={text || 'Xəta baş verdi!'} />, {
             position: toast.POSITION.TOP_LEFT,
             toastId: 'error-toast-message',
             autoClose: 3000,

@@ -34,6 +34,7 @@ import {Settlements} from "./pages/Reports/Settlements";
 // import Tables from "./pages/Reports/Pricelist/Tables";
 // import OutOfPortfolio from "./pages/Reports/Pricelist/Out-of-portfolio";
 import Instructions from "./pages/Instructions";
+import SalesReserve from "./pages/Reports/SalesReserve";
 
 export const IsAuth = createContext(null);
 
@@ -109,6 +110,7 @@ const App = () => {
                         <Stock stock={{key: 'chair'}}/>
                     </PrivateRoute>
                     <PrivateRoute path='/reports/sales' exact component={Sales}/>
+                    <PrivateRoute path='/reports/sales-reserve' exact component={SalesReserve}/>
                     <PrivateRoute path='/instructions' exact component={Instructions}/>
                     {
                         isAccountant && (
