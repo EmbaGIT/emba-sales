@@ -7,8 +7,7 @@ const menuItems = [
     {title: 'Mənim Satışlarım', url: 'sales'},
     {title: 'Qarşılıqlı Hesablaşmalar', url: 'settlements'},
     {title: 'Anbar Qalığı', url: 'options'},
-    {title: 'Distribütorun Mağazaya Satışı', url: 'sales-detailed'},
-    {title: 'Rezervdə olan sifarişlər', url: 'sales-reserve'}
+    {title: 'Distribütorun Mağazaya Satışı', url: 'sales-detailed'}
     // {title: 'Price List', url: 'pricelist'}
 ]
 
@@ -55,6 +54,19 @@ const Reports = () => {
                             }
                         </React.Fragment>
                     ))
+                }
+                {
+                    isAccountant
+                        ? <div className="col-lg-3 col-md-4 mb-3">
+                            <Link to='/reports/sales-reserve' className='d-block h-100'>
+                                <div className='category-box h-100 d-flex align-items-center justify-content-center'>
+                                    <div className="category-hover-box">
+                                        <span className='category-name'>Rezervdə olan sifarişlər</span>
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                        : null
                 }
                 {
                     brand === 'Embawood' ? <div className="col-lg-3 col-md-4 mb-3">
