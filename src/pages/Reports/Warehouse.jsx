@@ -8,6 +8,21 @@ import { Link, useHistory, useParams } from "react-router-dom";
 import { getHost } from "../../helpers/host";
 import CartContext from "../../store/CartContext";
 
+const categoryEnum = [
+    { id: 8, value: 'BEDROOM' },
+    { id: 19, value: 'CHAIR' },
+    { id: 17, value: 'COMMERCIAL_HOME' },
+    { id: 20, value: 'COMMERCIAL_HOME_TEXTILE' },
+    { id: 14, value: 'HALLWAY' },
+    { id: 22, value: 'KITCHEN' },
+    { id: 11, value: 'LIVING_ROOM' },
+    { id: 18, value: 'MATTRESS' },
+    { id: 15, value: 'MODULAR_GROUP' },
+    { id: 12, value: 'UPHOLDSTERED' },
+    { id: 16, value: 'WALL_UNIT' },
+    { id: 13, value: 'YOUNG' }
+]
+
 const Warehouse = () => {
     const history = useHistory();
     const params = useParams();
@@ -23,6 +38,8 @@ const Warehouse = () => {
         { value: 100, label: 100 }
     ];
     const [search, setSearch] = useState('');
+    const [categories, setCategories] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState('')
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
@@ -30,15 +47,27 @@ const Warehouse = () => {
     }
 
     useEffect(() => {
+        get(`/menu/search?sort=menuOrder,desc&size=20`).then(res => {
+            setCategories([
+                { value: '', label: 'Bütün dəstlər' },
+                ...res.content.map(category => ({
+                    value: categoryEnum.find(c => c.id === category.id).value,
+                    label: category.nameAz
+                }))
+            ])
+        })
+    }, [])
+
+    useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`${getHost('erp/report', 8091)}/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}&filter=${search}`).then((res) => {
+        get(`${getHost('erp/report', 8091)}/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}&category=${selectedCategory?.value || ''}&filter=${search}`).then((res) => {
             setWarehouseInfo(res);
             setIsFetching(false);
         }).catch((err) => {
             console.log("err", err);
         });
-    }, [page, pageSize, search]);
+    }, [page, pageSize, search, selectedCategory]);
 
     const paginate = (n) => {
         setPage(+n.selected);
@@ -54,7 +83,7 @@ const Warehouse = () => {
         const user = getUser();
         setIsFetching(true);
         remove(`${getHost('erp/report', 8091)}/api/warehouse/${user?.uid}`).then((res) => {
-            get(`${getHost('erp/report', 8091)}/api/warehouse/${user?.uid}?page=0&size=10&filter=${search}`).then((res) => {
+            get(`${getHost('erp/report', 8091)}/api/warehouse/${user?.uid}?page=0&size=10&category=${selectedCategory.value}&filter=${search}`).then((res) => {
                 setWarehouseInfo(res);
                 setIsFetching(false);
             }).catch((err) => {
@@ -102,6 +131,8 @@ const Warehouse = () => {
         });
     }
 
+    const changeCategory = category => setSelectedCategory(category)
+
     return (
         <div className='container-fluid row'>
             <div className="col-lg-3 col-md-6 mb-3">
@@ -146,6 +177,17 @@ const Warehouse = () => {
                                     <span><i className="fas fa-sync-alt"></i></span>
                                 </button>
                             </div>
+                            <div className='me-3' style={{ width: "20%" }}>
+                                <Select
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    defaultValue={''}
+                                    name="selectedCategory"
+                                    options={categories}
+                                    placeholder="Dəst seçin"
+                                    onChange={changeCategory}
+                                />
+                            </div>
                             <div style={{ width: "20%" }}>
                                 <Select
                                     className="basic-single"
@@ -170,7 +212,7 @@ const Warehouse = () => {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {warehouseInfo.goods?.sort((g1, g2) => g1?.characteristicName?.localeCompare(g2?.characteristicName)).map((good, i) => (
+                                {warehouseInfo.goods?.sort((g1, g2) => g1?.productName?.localeCompare(g2?.productName)).map((good, i) => (
                                     <tr key={i}>
                                         <td>{+i + (Number(page) * Number(pageSize.value)) + 1}</td>
                                         <td><span className="cursor-pointer text-primary font-weight-bolder">{good.productName}</span></td>
@@ -202,7 +244,7 @@ const Warehouse = () => {
                                 nextLinkClassName={'page-link'}
                                 breakLabel={'...'}
                                 breakClassName={'break-me'}
-                                pageCount={warehouseInfo?.totalPages + 1 || 0}
+                                pageCount={warehouseInfo?.totalPages || 0}
                                 marginPagesDisplayed={2}
                                 pageRangeDisplayed={3}
                                 onPageChange={paginate}
