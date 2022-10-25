@@ -212,7 +212,15 @@ const Warehouse = () => {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {warehouseInfo.goods?.sort((g1, g2) => g1?.productName?.localeCompare(g2?.productName)).map((good, i) => (
+                                {warehouseInfo.goods
+                                    ?.sort((g1, g2) => {
+                                        if (selectedCategory !== '' && selectedCategory.value === 'UPHOLDSTERED') {
+                                            return g1?.characteristicName?.localeCompare(g2?.characteristicName)
+                                        }
+
+                                        return g1?.productName?.localeCompare(g2?.productName)
+                                    })
+                                    .map((good, i) => (
                                     <tr key={i}>
                                         <td>{+i + (Number(page) * Number(pageSize.value)) + 1}</td>
                                         <td><span className="cursor-pointer text-primary font-weight-bolder">{good.productName}</span></td>
