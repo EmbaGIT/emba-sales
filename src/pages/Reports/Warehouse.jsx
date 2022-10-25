@@ -61,12 +61,16 @@ const Warehouse = () => {
     useEffect(() => {
         const user = getUser();
         setIsFetching(true);
-        get(`${getHost('erp/report', 8091)}/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}&category=${selectedCategory?.value || ''}&filter=${search}`).then((res) => {
-            setWarehouseInfo(res);
-            setIsFetching(false);
-        }).catch((err) => {
-            console.log("err", err);
-        });
+        const timer = setTimeout(() => {
+            get(`${getHost('erp/report', 8091)}/api/warehouse/${user?.uid}?page=${params.page}&size=${params.pageSize}&category=${selectedCategory?.value || ''}&filter=${search}`).then((res) => {
+                setWarehouseInfo(res);
+                setIsFetching(false);
+            }).catch((err) => {
+                console.log("err", err);
+            });
+        }, 500)
+
+        return () => clearTimeout(timer)
     }, [page, pageSize, search, selectedCategory]);
 
     const paginate = (n) => {
