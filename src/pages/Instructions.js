@@ -4,6 +4,10 @@ const videos = [
     {
         link: 'https://www.youtube.com/embed/XWb_YDTzKZA',
         title: 'EmbaStore Telim Saticilar'
+    },
+    {
+        link: 'https://www.youtube.com/embed/FxLvwBuCD6c',
+        title: 'Emba.Store_Ucotcular_1C'
     }
 ]
 

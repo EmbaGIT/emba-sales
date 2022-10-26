@@ -5,7 +5,7 @@ const ReportOptions = () => {
     return (
         <div className='container-fluid row'>
             <div className="col-lg-3 col-md-4 mb-3">
-                <Link to='/reports/warehouse/0/10'>
+                <Link to='/reports/warehouse/0/20'>
                     <div className='category-box'>
                         <div className="category-hover-box">
                             <span className='category-name'>Anbar qalığı</span>
