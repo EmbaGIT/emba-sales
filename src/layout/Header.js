@@ -94,6 +94,20 @@ const Header = (props) => {
                             )}
 
                             {authCtx.isLoggedIn && (
+                                <Link to="/announcements">
+                                    <span
+                                        className="text-reset me-4"
+                                        role="button"
+                                        data-toggle="tooltip"
+                                        data-placement="left"
+                                        title="Kampaniyalar"
+                                    >
+                                        <i className="fas fa-gift text-body" style={{fontSize: '23px'}}></i>
+                                    </span>
+                                </Link>
+                            )}
+
+                            {authCtx.isLoggedIn && (
                                 <Link to="/instructions">
                                     <span
                                         className="text-reset me-4"

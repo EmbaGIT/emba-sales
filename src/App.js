@@ -35,6 +35,8 @@ import {Settlements} from "./pages/Reports/Settlements";
 // import OutOfPortfolio from "./pages/Reports/Pricelist/Out-of-portfolio";
 import Instructions from "./pages/Instructions";
 import SalesReserve from "./pages/Reports/SalesReserve";
+import AnnouncementList from "./pages/Announcement/AnnouncementList";
+import AnnouncementItem from './pages/Announcement/AnnouncementItem';
 
 export const IsAuth = createContext(null);
 
@@ -112,6 +114,8 @@ const App = () => {
                     <PrivateRoute path='/reports/sales' exact component={Sales}/>
                     <PrivateRoute path='/reports/sales-reserve' exact component={SalesReserve}/>
                     <PrivateRoute path='/instructions' exact component={Instructions}/>
+                    <PrivateRoute path='/announcements' exact component={AnnouncementList}/>
+                    <PrivateRoute path='/announcements/:id' exact component={AnnouncementItem}/>
                     {
                         isAccountant && (
                             <>

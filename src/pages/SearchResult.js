@@ -27,7 +27,10 @@ const SearchProductList = () => {
             const productListArr = [];
             res.content.forEach(product => {
                 if(product.colors.length){
-                    get(`${getHost('files', 8089)}/api/image/resource?brand=${product.brand}&category=${product.categoryId}&bucket=emba-store-images&parent=${product.parentId}&product=${product.id}&isBanner=true`).then(file => {
+                    const url = product.parentId
+                        ? `api/image/resource?brand=${product.brand}&category=${product.categoryId}&bucket=emba-store-images&parent=${product.parentId}&product=${product.id}&isBanner=true`
+                        : `api/image/resource?brand=${product.brand}&category=${product.categoryId}&bucket=emba-store-images&product=${product.id}&isBanner=true`
+                    get(`${getHost('files', 8089)}/${url}`).then(file => {
                         productListArr.push({
                             ...product,
                             colors: product.colors,
@@ -41,7 +44,10 @@ const SearchProductList = () => {
                         ]))
                     })
                 }else{
-                    get(`${getHost('files', 8089)}/api/image/resource?brand=${product.brand}&category=${product.categoryId}&bucket=emba-store-images&parent=${product.parentId}&product=${product.id}&isBanner=true`).then(file => {
+                    const url = product.parentId
+                        ? `api/image/resource?brand=${product.brand}&category=${product.categoryId}&bucket=emba-store-images&parent=${product.parentId}&product=${product.id}&isBanner=true`
+                        : `api/image/resource?brand=${product.brand}&category=${product.categoryId}&bucket=emba-store-images&product=${product.id}&isBanner=true`
+                    get(`${getHost('files', 8089)}/${url}`).then(file => {
                         productListArr.push({
                             ...product,
                             file
