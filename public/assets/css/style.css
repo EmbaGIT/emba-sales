@@ -785,11 +785,11 @@ tr.show {
     height: 100%;
 }
 
-.announcement__list-img {
+.announcement__list-img img {
     width: 100%;
 }
 
-.announcement__item-img {
+.announcement__item-img img {
     height: 320px;
     width: 100%;
     object-fit: cover;
