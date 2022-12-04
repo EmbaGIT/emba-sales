@@ -12,7 +12,7 @@ const AnnouncementList = () => {
     useEffect(() => {
         get(`${getHost('announcement', 8093)}/api/announcement`)
             .then(data => setActiveAnnouncements(data.content.filter(campaign => campaign.status === 'ACTIVE')))
-            .catch(err => setError(err))
+            .catch(err => setError(err.message))
             .finally(() => setIsLoading(false))
     }, [])
 
@@ -29,8 +29,8 @@ const AnnouncementList = () => {
                 </div>
                 : null
             }
-            { !isLoading && error ? <div>{error}</div> : null }
-            { !isLoading && activeAnnouncements.length && activeAnnouncements.map(announcement => (
+            { !isLoading && error ? <h4 className='text-danger'>{error}</h4> : null }
+            { (!isLoading && activeAnnouncements.length) ? activeAnnouncements.map(announcement => (
                 <div className="col-lg-3 col-md-4 col-sm-12 announcement__list" key={announcement.id}>
                     <div className="border-5 rounded overflow-hidden shadow-lg announcement__list-item">
                         <div className="announcement__list-img">
@@ -49,7 +49,7 @@ const AnnouncementList = () => {
                         </div>
                     </div>
                 </div>
-            ))}
+            )) : null }
         </div>
     )
 }

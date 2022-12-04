@@ -14,11 +14,9 @@ const AnnouncementItem = () => {
     useEffect(() => {
         get(`${getHost('announcement', 8093)}/api/announcement/${id}`)
             .then(data => setAnnouncement(data))
-            .catch(err => setError(err))
+            .catch(err => setError(err.message))
             .finally(() => setIsLoading(false))
     }, [])
-
-    useEffect(() => console.log(announcement), [announcement])
 
     return (
         <div className='row announcement__item'>
@@ -34,9 +32,9 @@ const AnnouncementItem = () => {
                     </div>
                     : null
                 }
-                { !isLoading && error ? <div>{error}</div> : null }
+                { !isLoading && error ? <h4 className='text-danger'>{error}</h4> : null }
                 {
-                    !isLoading && Object.keys(announcement).length && <div className='row'>
+                    (!isLoading && Object.keys(announcement).length) ? <div className='row'>
                         <div className='col-lg-6 col-md-6'>
                             <div className='announcement__item-img'>
                                 <img src={announcement.file?.url} />
@@ -57,7 +55,7 @@ const AnnouncementItem = () => {
                                 }
                             </div>
                         </div>
-                    </div>
+                    </div> : null
                 }
             </div>
         </div>
