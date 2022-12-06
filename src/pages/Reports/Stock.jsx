@@ -78,6 +78,18 @@ const Stock = ({ stock }) => {
         const { key } = stock;
 
         get(`${getHost('erp/report', 8091)}/api/${key}?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
+            if (stock.key === 'fabric') {
+                const items = {
+                    ...res,
+                    items: res.items.map(item => {
+                        const { semiFinishedProductStock, ...rest } = item;
+                        return rest;
+                    })
+                };
+                setStockGoods(items);
+                setIsFetching(false);
+                return;
+            }
             setStockGoods(res);
             setIsFetching(false);
         }).catch((err) => {
