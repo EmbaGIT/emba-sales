@@ -12,7 +12,7 @@ const buttons = [
 ]
 
 const tableHeaders = {
-    fabric: ["Məhsul adı", "Masallı divan-kreslo material anbarı", "Masallı yumşaq mebel yarımfabrikat anbarı", "Sumqayıt stul material anbarı"],
+    fabric: ["Məhsul adı", "Masallı divan-kreslo material anbarı", "Sumqayıt stul material anbarı"],
     chair: ["Stullar", "Sumqayıt stul material anbarı"]
 }
 
@@ -54,6 +54,18 @@ const Stock = ({ stock }) => {
         setPage(Number(params.page));
 
         get(`${getHost('erp/report', 8091)}/api/${key}?page=0&size=${pageSize.value}&filter=${search}`).then((res) => {
+            if (stock.key === 'fabric') {
+                const items = {
+                    ...res,
+                    items: res.items.map(item => {
+                        const { semiFinishedProductStock, ...rest } = item;
+                        return rest;
+                    })
+                };
+                setStockGoods(items);
+                setIsFetching(false);
+                return;
+            }
             setStockGoods(res);
             setIsFetching(false);
         }).catch((err) => {
@@ -72,6 +84,8 @@ const Stock = ({ stock }) => {
             console.log("err", err);
         });
     }, [page, pageSize, search]);
+
+    useEffect(() => console.log(stockGoods), [stockGoods])
 
     return (
         <div className='container-fluid row'>
