@@ -39,7 +39,7 @@ const AnnouncementList = () => {
                         <div className="announcement__list-info p-3">
                             <h4>{announcement.title || 'Kampaniya adı mövcud deyil'}</h4>
                             <p className="mb-0 d-flex justify-content-between align-content-end">
-                                {announcement.content || 'Kampaniya məzmunu mövcud deyil'}
+                                {announcement.description || 'Kampaniya məzmunu mövcud deyil'}
                                 <NavLink to={`announcements/${announcement.id}`}>
                                     <button className="btn btn-success px-2 py-1">
                                         Ətraflı
