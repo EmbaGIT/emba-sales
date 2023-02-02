@@ -16,6 +16,23 @@ import {formattedDate} from "../../helpers/formattedDate";
 import BirthDateDatepicker from "../../components/birthDateDatepicker";
 import { getHost } from "../../helpers/host";
 
+const clientPurOptions = [
+    { value: 0, label: 'Cehiz' },
+    { value: 1, label: 'Yeniləmə/Şəxsi mənzil' },
+    { value: 2, label: 'Bağ evi' },
+    { value: 3, label: 'İcarə mənzil' },
+    { value: 4, label: 'Hədiyyə' },
+    { value: 5, label: 'Digər' },
+]
+const clientInterOptions = [
+    { value: 0, label: 'Rəsmi səhifə' },
+    { value: 1, label: 'Mağaza' },
+    { value: 2, label: 'Sosial şəbəkə' },
+    { value: 3, label: 'Reklam banner' },
+    { value: 4, label: 'Sosial media' },
+    { value: 5, label: 'Dost/Tanış/Ailə üzvləri məsləhəti' },
+]
+
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
       search(criteria: {
@@ -87,7 +104,9 @@ const Checkout = () => {
             address: '',
             gender: 1,
             email: '',
-            note: ''
+            note: '',
+            client_pur: 0,
+            client_inter: 0
         }
     })
     const [paymentType, setPaymentType] = useState(0);
@@ -404,7 +423,17 @@ const Checkout = () => {
                 [type]: value
             }))
         }
-        if (type === 'select_city') {
+        if (type === 'select_client_pur') {
+            alldata = {
+                ...alldata,
+                client_pur: value
+            }
+        } else if (type === 'select_client_inter') {
+            alldata = {
+                ...alldata,
+                client_inter: value
+            }
+        } else if (type === 'select_city') {
             alldata = {
                 ...alldata,
                 city: {
@@ -1094,6 +1123,30 @@ const Checkout = () => {
                                         <label className="form-check-label" htmlFor="female">Qadın</label>
                                     </span>
                                     </div>
+                                </div>
+                            </div>
+                            <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <label>Alışın məqsədi<span className="text-danger">*</span></label>
+                                    <Select
+                                        styles={selectStyles}
+                                        options={clientPurOptions}
+                                        defaultValue={clientPurOptions[0]}
+                                        components={(props) => NoOptionsMessage(props, 'Alışın məqsədi üçün seçimlər tapılmadı.')}
+                                        onChange={value => handleInputChange("select_client_pur", value.value)}
+                                        placeholder='Alışın məqsədini seçin...'
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <label>Məlumat mənbəyi<span className="text-danger">*</span></label>
+                                    <Select
+                                        styles={selectStyles}
+                                        options={clientInterOptions}
+                                        defaultValue={clientInterOptions[0]}
+                                        components={(props) => NoOptionsMessage(props, 'Məlumat mənbəyi üçün seçimlər tapılmadı.')}
+                                        onChange={value => handleInputChange("select_client_inter", value.value)}
+                                        placeholder='Məlumat mənbəyini seçin...'
+                                    />
                                 </div>
                             </div>
                             <div className="row mb-3">
