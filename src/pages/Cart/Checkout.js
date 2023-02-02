@@ -17,20 +17,21 @@ import BirthDateDatepicker from "../../components/birthDateDatepicker";
 import { getHost } from "../../helpers/host";
 
 const clientPurOptions = [
-    { value: 0, label: 'Cehiz' },
+    { value: 0, label: 'Digər' },
     { value: 1, label: 'Yeniləmə/Şəxsi mənzil' },
     { value: 2, label: 'Bağ evi' },
     { value: 3, label: 'İcarə mənzil' },
     { value: 4, label: 'Hədiyyə' },
-    { value: 5, label: 'Digər' },
+    { value: 5, label: 'Cehiz' },
 ]
 const clientInterOptions = [
-    { value: 0, label: 'Rəsmi səhifə' },
+    { value: 0, label: 'Xatırlamıram' },
     { value: 1, label: 'Mağaza' },
     { value: 2, label: 'Sosial şəbəkə' },
     { value: 3, label: 'Reklam banner' },
     { value: 4, label: 'Sosial media' },
     { value: 5, label: 'Dost/Tanış/Ailə üzvləri məsləhəti' },
+    { value: 6, label: 'Rəsmi səhifə' },
 ]
 
 const CUSTOMER_QUERY = gql`
