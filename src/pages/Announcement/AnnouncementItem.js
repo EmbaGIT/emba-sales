@@ -44,13 +44,13 @@ const AnnouncementItem = () => {
                             <h1 className='announcement__item-title'>{announcement.title || 'Kampaniya adı mövcud' +
                                 ' deyil'}</h1>
                             <h5 className='announcement__item-content'>
-                                {announcement.content || 'Kampaniya məzmunu mövcud deyil'}
+                                {announcement.description || 'Kampaniya məzmunu mövcud deyil'}
                             </h5>
                             <hr />
                             <div className='announcement__item-description'>
                                 {
-                                    announcement.description
-                                        ? Parser(announcement.description)
+                                    announcement.content
+                                        ? Parser(announcement.content)
                                         : 'Kampaniyanın ətraflı məzmunu yoxdur'
                                 }
                             </div>
