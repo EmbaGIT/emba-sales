@@ -675,7 +675,9 @@ const Checkout = () => {
             client_fin_code: checkoutState.customerInfo.finCode,
             client_passport_series: checkoutState.customerInfo.passport_series,
             goods: order_goods,
-            bank_cash: bankCommission
+            bank_cash: bankCommission,
+            client_pur: checkoutState.customerInfo.client_pur,
+            client_inter: checkoutState.customerInfo.client_inter
         }
         if (status === "ORDERED" && handleValidation()) {
             setIsSending(true);
