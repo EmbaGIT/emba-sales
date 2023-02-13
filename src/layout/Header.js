@@ -51,6 +51,7 @@ const Header = (props) => {
         if (authCtx.isLoggedIn) {
             const lsToken = localStorage.getItem('jwt_token')
             const decodedToken = jwt(lsToken)
+            setSelectedBrand(decodedToken.brand)
 
             if (decodedToken.brand.includes('/'))
                 setIsDualUser(true)
@@ -91,6 +92,20 @@ const Header = (props) => {
                                         <option value="Madeyra">Madeyra</option>
                                     </select>
                                 </div>
+                            )}
+
+                            {authCtx.isLoggedIn && selectedBrand === 'Embawood' && (
+                                <a href="https://embawood.az/catalog/view/theme/embawood/catalog/katalog23.pdf" target="_blank" rel="noreferrer">
+                                    <span
+                                        className="text-reset me-4"
+                                        role="button"
+                                        data-toggle="tooltip"
+                                        data-placement="left"
+                                        title="Kataloq"
+                                    >
+                                        <i className="fas fa-book-reader text-body" style={{fontSize: '23px'}}></i>
+                                    </span>
+                                </a>
                             )}
 
                             {authCtx.isLoggedIn && (
