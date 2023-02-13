@@ -103,11 +103,11 @@ const Checkout = () => {
             mobile_phone: '',
             other_phone: '',
             address: '',
-            gender: 1,
+            gender: '',
             email: '',
             note: '',
-            client_pur: 0,
-            client_inter: 0
+            client_pur: null,
+            client_inter: null
         }
     })
     const [paymentType, setPaymentType] = useState(0);
@@ -149,7 +149,12 @@ const Checkout = () => {
         other_phone: true,
         email: true,
         delivery_date: true,
-        payment_date: true
+        payment_date: true,
+        client_pur: true,
+        client_inter: true,
+        client_gender: true,
+        birthdate: true,
+        isYounger: true
     })
     const [creditPercent, setCreditPercent] = useState(2);
     const [customerSelected, setCustomerSelected] = useState(false)
@@ -160,6 +165,7 @@ const Checkout = () => {
         patronymic: ''
     })
     const [lastSelectedUid, setLastSelectedUid] = useState('')
+    const [customerAge, setCustomerAge] = useState('')
 
     const handlePercentChange = e => {
         const { value } = e.target;
@@ -416,6 +422,12 @@ const Checkout = () => {
         }
     }, [cartCtx]);
 
+    const calculateAge = birthdate => {
+        const difference = Date.now() - birthdate.getTime()
+        const age_dt = new Date(difference)
+        return Math.abs(age_dt.getUTCFullYear() - 1970)
+    }
+
     const handleInputChange = (type, value) => {
         let alldata = {...checkoutState.customerInfo};
         if (temporaryUserInfo.hasOwnProperty(type)) {
@@ -424,7 +436,15 @@ const Checkout = () => {
                 [type]: value
             }))
         }
-        if (type === 'select_client_pur') {
+        if (type === 'birthdate') {
+            const d = new Date(value.getFullYear(), value.getMonth(), value.getDate())
+            const age = calculateAge(d)
+            setCustomerAge(age);
+            alldata = {
+                ...alldata,
+                [type]: value
+            }
+        } else if (type === 'select_client_pur') {
             alldata = {
                 ...alldata,
                 client_pur: value
@@ -476,7 +496,8 @@ const Checkout = () => {
                     other_phone: false,
                     address: false,
                     city: false,
-                    email: false
+                    email: false,
+                    birthdate: false
                 }))
             } else {
                 setIsRefactorDisabled(prevState => ({
@@ -485,7 +506,8 @@ const Checkout = () => {
                     other_phone: true,
                     address: true,
                     city: true,
-                    email: true
+                    email: true,
+                    birthdate: false
                 }))
             }
         } else {
@@ -615,10 +637,35 @@ const Checkout = () => {
         !checkoutState.customerInfo.city.code ? setFormValidation(prevState => ({
             ...prevState,
             city: false
-        })) : setFormValidation(prevState => ({...prevState, city: true}))
+        })) : setFormValidation(prevState => ({ ...prevState, city: true }));
+        (!checkoutState.customerInfo.client_pur && checkoutState.customerInfo.client_pur !== 0) ? setFormValidation(prevState => ({
+            ...prevState,
+            client_pur: false
+        })) : setFormValidation(prevState => ({ ...prevState, client_pur: true }));
+        (!checkoutState.customerInfo.client_inter && checkoutState.customerInfo.client_inter !== 0) ? setFormValidation(prevState => ({
+            ...prevState,
+            client_inter: false
+        })) : setFormValidation(prevState => ({ ...prevState, client_inter: true}));
+        (!checkoutState.customerInfo.gender && checkoutState.customerInfo.gender !== 0) ? setFormValidation(prevState => ({
+            ...prevState,
+            client_gender: false
+        })) : setFormValidation(prevState => ({ ...prevState, client_gender: true}))
+        !checkoutState.customerInfo.birthdate ? setFormValidation(prevState => ({
+            ...prevState,
+            birthdate: false
+        })) : setFormValidation(prevState => ({ ...prevState, birthdate: true }))
+        customerAge <= 16 ? setFormValidation(prevState => ({
+            ...prevState, isYounger: false
+        })) : setFormValidation(prevState => ({
+            ...prevState, isYounger: true
+        }))
+        !checkoutState.customerInfo.birthdate ? setFormValidation(prevState => ({
+            ...prevState,
+            birthdate: false
+        })) : setFormValidation(prevState => ({ ...prevState, birthdate: true}))
 
         return !(!checkoutState.customerInfo.name || !checkoutState.customerInfo.surname || !checkoutState.customerInfo.city || !checkoutState.customerInfo.address ||
-            !checkoutState.customerInfo.mobile_phone || !deliveryDate || !paymentDate);
+            !checkoutState.customerInfo.mobile_phone || !deliveryDate || !paymentDate || (!checkoutState.customerInfo.client_pur && checkoutState.customerInfo.client_pur !== 0) || (!checkoutState.customerInfo.client_inter && checkoutState.customerInfo.client_inter !== 0) || (!checkoutState.customerInfo.gender && checkoutState.customerInfo.gender !== 0) || !checkoutState.customerInfo.birthdate || (customerAge <= 16));
     }
 
     const onPriceChange = (event) => {
@@ -1039,6 +1086,15 @@ const Checkout = () => {
                                         isDisabled={isRefactorDisabled.birthdate && (availableCustomer?.length && !isNewCustomer)}
                                         onDateChange={handleInputChange}
                                     />
+                                    <div style={{
+                                        display: 'flex',
+                                        flexDirection: 'column'
+                                    }}>
+                                        {!formValidation.birthdate &&
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
+                                        {(checkoutState.customerInfo.birthdate && !formValidation.isYounger) &&
+                                            <small className="text-danger">Sifarişin qəbulu üçün minimum yaş həddi 16 olmalıdır.</small>}
+                                    </div>
                                 </div>
                                 <div className="col-md-6">
                                     <label>Şəhər<span className="text-danger">*</span></label>
@@ -1101,31 +1157,33 @@ const Checkout = () => {
                             <div className="row mb-3">
                                 <div className="col-12">
                                     <div className="d-flex">
-                                    <span className="form-check">
-                                        <input
-                                            disabled={isRefactorDisabled.gender && (availableCustomer?.length && !isNewCustomer)}
-                                            className="form-check-input"
-                                            type="radio"
-                                            name="gender"
-                                            id="male"
-                                            onChange={e => handleInputChange("male", e.target.checked)}
-                                            checked={(checkoutState.customerInfo.gender === 1)}
-                                        />
-                                        <label className="form-check-label" htmlFor="male">Kişi</label>
-                                    </span>
+                                        <span className="form-check">
+                                            <input
+                                                disabled={isRefactorDisabled.gender && (availableCustomer?.length && !isNewCustomer)}
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="gender"
+                                                id="male"
+                                                onChange={e => handleInputChange("male", e.target.checked)}
+                                                checked={(checkoutState.customerInfo.gender === 1)}
+                                            />
+                                            <label className="form-check-label" htmlFor="male">Kişi</label>
+                                        </span>
                                         <span className="form-check ms-3">
-                                        <input
-                                            disabled={isRefactorDisabled.gender && (availableCustomer?.length && !isNewCustomer)}
-                                            className="form-check-input"
-                                            type="radio"
-                                            name="gender"
-                                            id="female"
-                                            onChange={e => handleInputChange("female", e.target.checked)}
-                                            checked={(checkoutState.customerInfo.gender === 0)}
-                                        />
-                                        <label className="form-check-label" htmlFor="female">Qadın</label>
-                                    </span>
+                                            <input
+                                                disabled={isRefactorDisabled.gender && (availableCustomer?.length && !isNewCustomer)}
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="gender"
+                                                id="female"
+                                                onChange={e => handleInputChange("female", e.target.checked)}
+                                                checked={(checkoutState.customerInfo.gender === 0)}
+                                            />
+                                            <label className="form-check-label" htmlFor="female">Qadın</label>
+                                        </span>
                                     </div>
+                                    {!formValidation.client_gender &&
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                             </div>
                             <div className="row mb-3">
@@ -1134,22 +1192,26 @@ const Checkout = () => {
                                     <Select
                                         styles={selectStyles}
                                         options={clientPurOptions}
-                                        defaultValue={clientPurOptions[0]}
+                                        defaultValue=''
                                         components={(props) => NoOptionsMessage(props, 'Alışın məqsədi üçün seçimlər tapılmadı.')}
                                         onChange={value => handleInputChange("select_client_pur", value.value)}
                                         placeholder='Alışın məqsədini seçin...'
                                     />
+                                    {!formValidation.client_pur &&
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                                 <div className="col-md-6">
                                     <label>Məlumat mənbəyi<span className="text-danger">*</span></label>
                                     <Select
                                         styles={selectStyles}
                                         options={clientInterOptions}
-                                        defaultValue={clientInterOptions[0]}
+                                        defaultValue={''}
                                         components={(props) => NoOptionsMessage(props, 'Məlumat mənbəyi üçün seçimlər tapılmadı.')}
                                         onChange={value => handleInputChange("select_client_inter", value.value)}
                                         placeholder='Məlumat mənbəyini seçin...'
                                     />
+                                    {!formValidation.client_inter &&
+                                        <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                             </div>
                             <div className="row mb-3">
