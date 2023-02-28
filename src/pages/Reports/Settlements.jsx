@@ -176,8 +176,9 @@ export const Settlements = () => {
                                 <table className='table table-striped table-bordered'>
                                     <thead>
                                         <tr>
-                                            <th scope='col' className='long'>Tarix</th>
+                                            <th scope='col' className='short'>Tarix</th>
                                             <th scope='col' className='long'>Realizasiya sənədi</th>
+                                            <th scope='col' className='long'>Şərh</th>
                                             <th scope='col' className='short'>İlkin qalıq</th>
                                             <th scope='col' className='short'>Mədaxil</th>
                                             <th scope='col' className='short'>Məxaric</th>
@@ -190,8 +191,9 @@ export const Settlements = () => {
                                             mutualCalculation.Items?.map((calculation, i) => {
                                                 return (
                                                     <tr key={i}>
-                                                        <td className='long'>{calculation.date}</td>
+                                                        <td className='short'>{calculation.date}</td>
                                                         <td className='long'>{calculation.document}</td>
+                                                        <td className='long'>{calculation.comment}</td>
                                                         <td className='short'>{calculation.initial_balance}</td>
                                                         <td className='short'>{calculation.income}</td>
                                                         <td className='short'>{calculation.out}</td>
