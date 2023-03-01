@@ -11,6 +11,7 @@ import jwt from "jwt-decode";
 const Header = (props) => {
     const cartCtx = useContext(CartContext);
     const authCtx = useContext(AuthContext);
+    const [isAccountant, setIsAccountant] = useState(false);
     const logout = () => {
         authCtx.logout();
     };
@@ -55,7 +56,13 @@ const Header = (props) => {
 
             if (decodedToken.brand.includes('/'))
                 setIsDualUser(true)
+
+            if ((jwt(lsToken)).roles.includes('ACCOUNTANT')) {
+                setIsAccountant(true);
+            }
         }
+
+        return () => setIsAccountant(false);
     }, [authCtx.isLoggedIn])
 
     useEffect(() => {
@@ -92,6 +99,20 @@ const Header = (props) => {
                                         <option value="Madeyra">Madeyra</option>
                                     </select>
                                 </div>
+                            )}
+
+                            {isAccountant && (
+                                <Link to="/order-tracking">
+                                    <span
+                                        className="text-reset me-4"
+                                        role="button"
+                                        data-toggle="tooltip"
+                                        data-placement="left"
+                                        title="Sifarişlərin izlənməsi"
+                                    >
+                                        <i className="fas fa-truck text-body" style={{fontSize: '20px'}}></i>
+                                    </span>
+                                </Link>
                             )}
 
                             {authCtx.isLoggedIn && selectedBrand === 'Embawood' && (
