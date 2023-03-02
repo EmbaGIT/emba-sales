@@ -9,15 +9,15 @@ const OrderTracking = () => {
   const [orders, setOrders] = useState([])
 
   useEffect(() => {
-    // 'c834a64a-f516-11eb-80d8-2c44fd84f8db'
+    // '8f859d20-e5f4-11eb-80d7-2c44fd84f8db'
     post(`${getHost('erp/report', 8091)}/api/order-track?page=0&size=10`, {
-      uid: 'c834a64a-f516-11eb-80d8-2c44fd84f8db'
+      uid: '8f859d20-e5f4-11eb-80d7-2c44fd84f8db'
     }).then(res => {
       console.log(res)
       if (res.hasOwnProperty('info')) {
         setEmptyOrders(res)
       } else {
-        setOrders(res.sales_group)
+        setOrders(res?.salesGroups)
       }
     })
   }, [])
@@ -26,47 +26,44 @@ const OrderTracking = () => {
   useEffect(() => console.log(orders), [orders])
 
   return (
-    <div>
-      <h1>Sifarişlərinin izlənməsi</h1>
-      {
+    <div className='container-fluid row'>
+      <div className='col-12 d-flex justify-content-between align-items-end mb-3'>
+        <h1>Sifarişlərinin izlənməsi</h1>
+      </div>
+      {/* {
         !!Object.keys(emptyOrders).length && (
           <div className='alert alert-danger' role='alert'>
             {emptyOrders.info}
           </div>
         )
-      }
+      } */}
       {
-        !!orders.length && (
+        !!orders?.length && (
           <div>
-            <div className="table-responsive">
-              <table className="table bordered striped">
+            <div className='table-responsive sales-table'>
+              <table className='table table-striped table-bordered'>
                 <thead>
                   <tr>
-                    <th scope='col'>#</th>
-                    <th scope='col'>Müştəri A.S.A.</th>
-                    <th scope='col'>Sifariş</th>
-                    <th scope='col'>Status</th>
+                    <th scope='col' className='long'>Realizasiya sənədi</th>
+                    <th scope='col' className='short'>Müştəri A.S.A.</th>
+                    <th scope='col' className='short'>Miqdar</th>
+                    <th scope='col' className='long'>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order, i) => (
-                    <tr key={i}>
-                      <td>{+i}</td>
-                      <td><span className="cursor-pointer text-primary font-weight-bolder">{order.client_name}</span></td>
-                      <td>
-                        {order.status === 'ORDER_FAILED' &&
-                          <span className="badge bg-warning text-dark">Uğursuz sifariş</span>}
-                        {order.status === 'ORDERED' &&
-                          <span className="badge bg-success">Tamamlandı</span>}
-                        {order.status === 'SAVED' &&
-                          <span className="badge bg-primary">Yadda saxlanılan</span>}
-                      </td>
-                      <td>{order.createdAt} {order.creationTime}</td>
-                      <td>{order.totalPrice} AZN</td>
-                      {/*<td>{order.orderNum}</td>*/}
-                      <td>
-                        {(order.status === 'ORDER_FAILED' || order.status === 'SAVED') &&
-                          <i className="fas fa-trash-alt text-danger cursor-pointer" />}
+                  {orders?.map(order => (
+                    <tr key={order.uid_sales_order}>
+                      <td className='long'>{order.sales_order}</td>
+                      <td className='short'>{order.customer}</td>
+                      <td className='short'>{order.amount}</td>
+                      <td className='long'>
+                        <ol>
+                          {
+                            order.status.info.map((status, i) => (
+                              <li key={i}>{status}</li>
+                            ))
+                          }
+                        </ol>
                       </td>
                     </tr>
                   ))}
