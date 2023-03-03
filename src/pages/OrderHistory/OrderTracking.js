@@ -1,18 +1,41 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, Fragment } from 'react'
 import { post } from '../../api/Api'
 import { getHost } from '../../helpers/host'
 import AuthContext from '../../store/AuthContext'
+import Loader from "react-loader-spinner";
 
 const OrderTracking = () => {
   const { user_uid } = useContext(AuthContext)
   const [emptyOrders, setEmptyOrders] = useState({})
   const [orders, setOrders] = useState([])
+  const [isFetching, setIsFetching] = useState(false)
+  const [classNames, setClassNames] = useState(
+      Array(10)
+          .fill(undefined)
+          .map((_) => ({ hidden: true }))
+  )
+
+  const showItems = (i) => {
+      setClassNames(classNames.map((name, index) => {
+          if (i === index) {
+              if (classNames[i].hidden) {
+                  return {hidden: false}
+              }
+
+              return {hidden: true}
+          }
+
+          return name.hidden ? name : {hidden: true}
+      }))
+  }
 
   useEffect(() => {
+    setIsFetching(true)
     // '8f859d20-e5f4-11eb-80d7-2c44fd84f8db'
     post(`${getHost('erp/report', 8091)}/api/order-track?page=0&size=10`, {
       uid: '8f859d20-e5f4-11eb-80d7-2c44fd84f8db'
     }).then(res => {
+      setIsFetching(false)
       console.log(res)
       if (res.hasOwnProperty('info')) {
         setEmptyOrders(res)
@@ -30,6 +53,19 @@ const OrderTracking = () => {
       <div className='col-12 d-flex justify-content-between align-items-end mb-3'>
         <h1>Sifarişlərinin izlənməsi</h1>
       </div>
+      {
+        isFetching && <div
+            className='col-12 d-flex justify-content-center w-100'
+            style={{backdropFilter: 'blur(2px)', zIndex: '100'}}
+        >
+            <Loader
+                type='ThreeDots'
+                color='#00BFFF'
+                height={60}
+                width={60}
+            />
+        </div>
+      }
       {/* {
         !!Object.keys(emptyOrders).length && (
           <div className='alert alert-danger' role='alert'>
@@ -47,25 +83,64 @@ const OrderTracking = () => {
                     <th scope='col' className='long'>Realizasiya sənədi</th>
                     <th scope='col' className='short'>Müştəri A.S.A.</th>
                     <th scope='col' className='short'>Miqdar</th>
+                    <th scope='col' className='long'>Mərhələlər</th>
                     <th scope='col' className='long'>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {orders?.map(order => (
-                    <tr key={order.uid_sales_order}>
-                      <td className='long'>{order.sales_order}</td>
-                      <td className='short'>{order.customer}</td>
-                      <td className='short'>{order.amount}</td>
-                      <td className='long'>
-                        <ol>
-                          {
-                            order.status.info.map((status, i) => (
-                              <li key={i}>{status}</li>
-                            ))
-                          }
-                        </ol>
-                      </td>
-                    </tr>
+                  {orders?.map((order, i) => (
+                    <Fragment key={i}>
+                      <tr key={order.uid_sales_order} onClick={showItems.bind(null, i)} className='parent-row'>
+                        <td className='long'>{order.sales_order}</td>
+                        <td className='short'>{order.customer}</td>
+                        <td className='short'>{order.amount}</td>
+                        <td className='long'>
+                          <ol>
+                            {
+                              order.status.info.map((status, i) => (
+                                <li key={i}>{status}</li>
+                              ))
+                            }
+                          </ol>
+                        </td>
+                        <td className='short'>
+                          <span className={`order-tracking-status ${order.statusType === 'READY' ? 'completed' : 'in-progress'}`}>
+                            {order.statusType === 'READY'
+                              ? 'Bitib'
+                              : 'Davam edir'}
+                          </span>
+                        </td>
+                      </tr>
+
+                      <tr className={classNames[i]?.hidden ? 'hidden' : 'show'}>
+                        <td colSpan={5} className='p-0'>
+                          <div className='table-responsive'>
+                            <table className='table table-bordered mb-0'>
+                              <thead>
+                                <tr>
+                                  <th className='long'>Xarakteristika</th>
+                                  <th className='short'>Sayı</th>
+                                  <th className='short'>Cəmi</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {
+                                  order.items?.map((item, index) => {
+                                    return (
+                                      <tr key={index}>
+                                        <td className='long'>{item.product_uid || 'Xarakteristika yoxdur'}</td>
+                                        <td className='short'>{item.product_quantity}</td>
+                                        <td className='short'>{item.product_amount} AZN</td>
+                                      </tr>
+                                    )
+                                  })
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>

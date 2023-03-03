@@ -805,3 +805,21 @@ tr.show {
         margin-bottom: 1rem;
     }
 }
+
+.order-tracking-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.7rem;
+    font-size: 0.9rem;
+    display: inline-block;
+    text-align: center;
+}
+
+.order-tracking-status.completed {
+    color: #ffffff;
+    background-color: rgb(69, 203, 133);
+}
+
+.order-tracking-status.in-progress {
+    color: #f06548;
+    background-color: rgba(240, 101, 72, 0.1);
+}
