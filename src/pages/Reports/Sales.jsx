@@ -81,7 +81,6 @@ const Sales = () => {
                 setSale(res);
             }).catch((err) => {
                 setNoSales(true)
-                console.log("err", err);
             }).finally(() => setIsFetching(false));
     }, [stringDateState]);
 
