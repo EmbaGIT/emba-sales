@@ -19,6 +19,8 @@ const OrderTracking = () => {
   const [gettingActiveStatus, setGettingActiveStatus] = useState(false);
   const [pageInfo, setPageInfo] = useState({})
   const [page, setPage] = useState(0)
+  const [search, setSearch] = useState('')
+  const [error, setError] = useState({})
 
   const showItems = (i, status, uid) => {
       setClassNames(classNames.map((name, index) => {
@@ -59,11 +61,11 @@ const OrderTracking = () => {
   useEffect(() => {
     setIsFetching(true)
     // '8f859d20-e5f4-11eb-80d7-2c44fd84f8db'
-    post(`${getHost('erp/report', 8091)}/api/order-track?page=${page}&size=3`, {
-      uid: '8f859d20-e5f4-11eb-80d7-2c44fd84f8db'
+    // 'c834a64a-f516-11eb-80d8-2c44fd84f8db'
+    post(`${getHost('erp/report', 8091)}/api/order-track?page=${page}&size=3&customer=${search}`, {
+      uid: 'c834a64a-f516-11eb-80d8-2c44fd84f8db'
     }).then(res => {
-      console.log(res)
-      setIsFetching(false)
+      setError({})
       setSpinners(Array(res?.salesGroups?.length).fill().map(_ => ({show: false})))
       setPageInfo({
         totalPages: res.totalPages,
@@ -74,15 +76,14 @@ const OrderTracking = () => {
       } else {
         setOrders(res?.salesGroups)
       }
-    })
-  }, [page])
+    }).catch(err => {
+      setError(err?.response?.data)
+    }).finally(() => setIsFetching(false))
+  }, [page, search])
 
   const paginate = (n) => {
     setPage(+n.selected)
   }
-
-  useEffect(() => console.log(emptyOrders), [emptyOrders])
-  useEffect(() => console.log(orders), [orders])
 
   return (
     <div className='container-fluid row'>
@@ -102,17 +103,29 @@ const OrderTracking = () => {
             />
         </div>
       }
-      {/* {
-        !!Object.keys(emptyOrders).length && (
-          <div className='alert alert-danger' role='alert'>
-            {emptyOrders.info}
+      {
+        !orders?.length && !!Object.keys(error).length && (
+          <div className='alert alert-danger' role="alert">
+            {error?.Message}
           </div>
         )
-      } */}
+      }
       {
         !!orders?.length && (
           <div>
-            <div className='table-responsive sales-table'>
+            <div className='col-12 mb-3'>
+              <input
+                type='search'
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className='form-control form-control-lg'
+                placeholder='Müştəri adı ilə axtarış...'
+              />
+            </div>
+            <div className='col-12 mb-3'>
+              <hr />
+            </div>
+            {!Object.keys(error).length ? <div className='table-responsive sales-table'>
               <table className='table table-striped table-bordered'>
                 <thead>
                   <tr>
@@ -132,23 +145,17 @@ const OrderTracking = () => {
                         <td className='short'>{order.amount}</td>
                         <td className={`long ${(gettingActiveStatus && spinners[i].show) ? 'text-center' : ''}`}>
                           {
-                            (gettingActiveStatus && spinners[i].show) ? <div
-                                className='col-12 d-flex justify-content-center w-100'
-                                style={{backdropFilter: 'blur(2px)', zIndex: '100'}}
-                            >
-                                <Loader
-                                    type='ThreeDots'
-                                    color='#00BFFF'
-                                    height={60}
-                                    width={60}
-                                />
-                            </div> : <ol>
-                              {
-                                order.status.info.map((status, i) => (
-                                  <li key={i}>{status}</li>
-                                ))
-                              }
-                            </ol>
+                            (gettingActiveStatus && spinners[i].show)
+                              ? <div className='spinner-border text-primary' role="status">
+                                <span className='sr-only'>Loading...</span>
+                              </div>
+                              : <ol>
+                                {
+                                  order.status.info.map((status, i) => (
+                                    <li key={i}>{status}</li>
+                                  ))
+                                }
+                              </ol>
                           }
                         </td>
                         <td className='short'>
@@ -192,7 +199,9 @@ const OrderTracking = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </div> : <div className='alert alert-danger' role="alert">
+              {error?.Message}
+            </div>}
           </div>
         )
       }
@@ -200,7 +209,7 @@ const OrderTracking = () => {
       {
         isFetching
         ? null
-        : (
+        : !Object.keys(error).length && (
           pageInfo?.totalPages > 1 && <div className='d-flex justify-content-center'>
             <ReactPaginate
               previousLabel='Əvvəlki'
