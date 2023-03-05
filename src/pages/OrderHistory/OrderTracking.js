@@ -62,7 +62,7 @@ const OrderTracking = () => {
     setIsFetching(true)
     // '8f859d20-e5f4-11eb-80d7-2c44fd84f8db'
     // 'c834a64a-f516-11eb-80d8-2c44fd84f8db'
-    post(`${getHost('erp/report', 8091)}/api/order-track?page=${page}&size=3&customer=${search}`, {
+    post(`${getHost('erp/report', 8091)}/api/order-track?page=${page}&size=10&customer=${search}`, {
       uid: 'c834a64a-f516-11eb-80d8-2c44fd84f8db'
     }).then(res => {
       setError({})
