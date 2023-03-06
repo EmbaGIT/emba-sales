@@ -12,6 +12,7 @@ const Sales = () => {
     const [sale, setSale] = useState({});
     const [isFetching, setIsFetching] = useState(true);
     const [noSales, setNoSales] = useState(false)
+    const [error, setError] = useState({})
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
@@ -80,6 +81,7 @@ const Sales = () => {
             .then((res) => {
                 setSale(res);
             }).catch((err) => {
+                setError(err?.response?.data)
                 setNoSales(true)
             }).finally(() => setIsFetching(false));
     }, [stringDateState]);
@@ -135,17 +137,12 @@ const Sales = () => {
                 </div>
             </div>
             {
-                !noSales
-                    ? null
-                    : <div className='col-12'>
-                        <div className="alert alert-danger text-center py-3" role="alert">
-                            Bu adlı satıcının satışı yoxdur
-                        </div>
+                !!Object.keys(error).length && <div className='col-12'>
+                    <div className="alert alert-danger text-center py-3" role="alert">
+                        {error?.Message}
                     </div>
+                </div>
             }
-            <div className='col-12'>
-
-            </div>
         </div>
     )
 }

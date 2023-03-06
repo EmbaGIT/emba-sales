@@ -93,7 +93,11 @@ axiosInstance.interceptors.response.use((res) => {
         localStorage.removeItem('jwt_token');
         window.location.href = '/login';
     }
-    if (error?.response?.status && !error?.response?.config?.url?.includes('order-track')) {
+    if (
+        error?.response?.status &&
+        !error?.response?.config?.url?.includes('order-track') &&
+        !error?.response?.config?.url?.includes('sales/report')
+    ) {
         toast.error(<MessageComponent text={error?.response?.data?.message || 'Xəta baş verdi!'} />, {
             position: toast.POSITION.TOP_LEFT,
             toastId: 'error-toast-message',
