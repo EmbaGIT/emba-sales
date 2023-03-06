@@ -79,6 +79,17 @@ const Reports = () => {
                         </a>
                     </div> : null
                 }
+                {
+                    brand === 'Embawood' ? <div className="col-lg-3 col-md-4 mb-3">
+                        <a href='https://forms.gle/Ug4m1SYnKw6aJxNw9' className='d-block h-100' target='_blank'>
+                            <div className='category-box h-100 d-flex align-items-center justify-content-center'>
+                                <div className="category-hover-box">
+                                    <span className='category-name'>Kampaniya hesabatı</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div> : null
+                }
             </div>
         </div>
     )
