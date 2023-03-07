@@ -101,7 +101,7 @@ const Header = (props) => {
                                 </div>
                             )}
 
-                            {/* {isAccountant && (
+                            {isAccountant && (
                                 <Link to="/order-tracking">
                                     <span
                                         className="text-reset me-4"
@@ -113,7 +113,7 @@ const Header = (props) => {
                                         <i className="fas fa-truck text-body" style={{fontSize: '20px'}}></i>
                                     </span>
                                 </Link>
-                            )} */}
+                            )}
 
                             {authCtx.isLoggedIn && selectedBrand === 'Embawood' && (
                                 <a href="https://embawood.az/catalog/view/theme/embawood/catalog/katalog23.pdf" target="_blank" rel="noreferrer">
