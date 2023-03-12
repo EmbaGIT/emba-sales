@@ -27,6 +27,7 @@ import {getHost} from "./helpers/host";
 import authContext from "./store/AuthContext";
 import SalesDetailed from "./pages/Reports/SalesDetailed";
 import {Settlements} from "./pages/Reports/Settlements";
+import {SettlementsEmbakitchen} from "./pages/Reports/SettlementsEmbakitchen";
 // import Portfolio from "./pages/Reports/Pricelist/Portfolio";
 // import Chair from "./pages/Reports/Pricelist/Chair";
 // import Mattress from "./pages/Reports/Pricelist/Mattress";
@@ -123,6 +124,7 @@ const App = () => {
                             <>
                                 <PrivateRoute path='/reports/sales-detailed' exact component={SalesDetailed}/>
                                 <PrivateRoute path='/reports/settlements' exact component={Settlements}/>
+                                <PrivateRoute path='/reports/settlements/embakitchen' exact component={SettlementsEmbakitchen}/>
                             </>
                         )
                     }

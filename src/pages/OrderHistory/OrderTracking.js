@@ -86,7 +86,7 @@ const OrderTracking = () => {
   return (
     <div className='container-fluid row'>
       <div className='col-12 d-flex justify-content-between align-items-end mb-3'>
-        <h1>Sifarişlərinin izlənməsi</h1>
+        <h1>Özəl Sifarişlərinin izlənməsi</h1>
       </div>
       {
         isFetching && <div
@@ -129,7 +129,7 @@ const OrderTracking = () => {
                   <tr>
                     <th scope='col' className='long'>Realizasiya sənədi</th>
                     <th scope='col' className='short'>Müştəri A.S.A.</th>
-                    <th scope='col' className='short'>Miqdar</th>
+                    <th scope='col' className='short'>Məbləğ</th>
                     <th scope='col' className='long'>Mərhələlər</th>
                     <th scope='col' className='long'>Status</th>
                   </tr>

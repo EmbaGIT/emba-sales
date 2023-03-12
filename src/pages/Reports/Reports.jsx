@@ -6,6 +6,7 @@ import {get} from "../../api/Api";
 const menuItems = [
     {title: 'Mənim Satışlarım', url: 'sales'},
     {title: 'Qarşılıqlı Hesablaşmalar', url: 'settlements'},
+    {title: 'Qarşılıqlı Hesablaşmalar Embakitchen', url: 'settlements/embakitchen'},
     {title: 'Anbar Qalığı', url: 'options'},
     {title: 'Distribütorun Mağazaya Satışı', url: 'sales-detailed'}
     // {title: 'Price List', url: 'pricelist'}
