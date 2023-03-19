@@ -108,7 +108,7 @@ const Header = (props) => {
                                         role="button"
                                         data-toggle="tooltip"
                                         data-placement="left"
-                                        title="Sifarişlərin izlənməsi"
+                                        title="Özəl sifarişlərin izlənməsi"
                                     >
                                         <i className="fas fa-truck text-body" style={{fontSize: '20px'}}></i>
                                     </span>

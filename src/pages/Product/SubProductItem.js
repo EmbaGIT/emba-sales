@@ -20,6 +20,8 @@ const SubProductItem = (props) => {
     const [options, setOptions] = useState(props.stock)
     const [allSelected, setAllSelected] = useState(true)
     const [defaultValue, setDefaultValue] = useState(props.defaultValue)
+    const initialPrice = props.price
+    const [selectedPrice, setSelectedPrice] = useState(initialPrice)
 
     useEffect(() => {
         if(props.characteristics.length){
@@ -34,6 +36,7 @@ const SubProductItem = (props) => {
         setCharUID(selectValue[0]);
         setCharCode(selectValue[1]);
         setPrice(selectValue[2]);
+        setSelectedPrice(selectValue[2]);
 
         const newOptions = await props.characteristicsChangeHandler(props.uid, selectValue[0])
         setOptions(newOptions[0].stock)
@@ -111,7 +114,7 @@ const SubProductItem = (props) => {
                 <div className="line"/>
                 <div className="d-flex justify-content-between p-2 align-items-center">
                     <div className="sub-item-price-block">
-                        {props.price ? props.price : 0} AZN
+                        {selectedPrice ? selectedPrice : 0} AZN
                     </div>
                     <CountInput
                         defaultValue={defaultValue}
