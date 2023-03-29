@@ -96,7 +96,7 @@ const SubProductItem = (props) => {
                         <select className="form-control form-select" onChange={e => handleInputChange(e.target.value)}>
                             {allSelected ? <option value=''>Ümumü Xarakteristikalar</option> : null}
                             {props.characteristics.map(characteristic  => (
-                                <option key={characteristic.id} value={`${characteristic.uid},${characteristic.code}, ${characteristic.price ? characteristic.price : 0}`}>{characteristic.name} - ({characteristic.code}) - {characteristic.price}AZN</option>
+                                <option key={characteristic.id} value={`${characteristic.uid},${characteristic.code}, ${characteristic.price ? characteristic.price : 0}`}>{characteristic.name} - ({characteristic.code}) - {characteristic.price ? characteristic.price : 0} AZN</option>
                             ))}
                         </select>
                         : ''

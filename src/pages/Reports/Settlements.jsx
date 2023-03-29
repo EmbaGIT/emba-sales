@@ -11,7 +11,7 @@ import Modal from '../../UI/Modal'
 
 export const Settlements = () => {
     const [mutualCalculation, setMutualCalculation] = useState({})
-    const [isFetching, setIsFetching] = useState(false)
+    const [isFetching, setIsFetching] = useState(true)
     const [page, setPage] = useState(0)
     const [showModal, setShowModal] = useState(false)
     const [modalData, setModalData] = useState({})
