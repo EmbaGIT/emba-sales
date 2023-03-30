@@ -171,9 +171,9 @@ const OrderTracking = () => {
                             <table className='table table-bordered mb-0'>
                               <thead>
                                 <tr>
-                                  <th className='long'>Xarakteristika</th>
-                                  <th className='short'>Sayı</th>
-                                  <th className='short'>Cəmi</th>
+                                  <th className='long'>Ad</th>
+                                  <th className='short'>Say</th>
+                                  <th className='short'>Məbləğ</th>
                                 </tr>
                               </thead>
                               <tbody>
