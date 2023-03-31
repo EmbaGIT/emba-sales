@@ -172,6 +172,7 @@ const OrderTracking = () => {
                               <thead>
                                 <tr>
                                   <th className='long'>Ad</th>
+                                  <th className='long'>Xarakteristika</th>
                                   <th className='short'>Say</th>
                                   <th className='short'>Məbləğ</th>
                                 </tr>
@@ -181,7 +182,8 @@ const OrderTracking = () => {
                                   order.items?.map((item, index) => {
                                     return (
                                       <tr key={index}>
-                                        <td className='long'>{item.product_uid || 'Xarakteristika yoxdur'}</td>
+                                        <td className='long'>{item.product_uid}</td>
+                                        <td className='long'>{item.product_characteristic_uid || 'Xarakteristika yoxdur'}</td>
                                         <td className='short'>{item.product_quantity}</td>
                                         <td className='short'>{item.product_amount} AZN</td>
                                       </tr>
