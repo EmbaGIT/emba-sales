@@ -8,6 +8,8 @@ import {Calendar} from 'react-modern-calendar-datepicker'
 import {calendarLocaleAZ} from '../../locales/calendar-locale'
 import jwt from "jwt-decode";
 import Modal from '../../UI/Modal'
+import Select from "react-select"
+import DatePicker from "react-datepicker"
 
 export const Settlements = () => {
     const [mutualCalculation, setMutualCalculation] = useState({})
@@ -17,6 +19,17 @@ export const Settlements = () => {
     const [modalData, setModalData] = useState({})
     const [loadingModalData, setLoadingModalData] = useState(false)
     const didMount = useRef(false)
+    const sizeOptions = [
+        { value: 10, label: 10 },
+        { value: 20, label: 20 },
+        { value: 50, label: 50 },
+        { value: 100, label: 100 }
+    ];
+    const [pageSize, setPageSize] = useState(sizeOptions[0]);
+    const [searchByDate, setSearchByDate] = useState({
+        start_date: '',
+        end_date: ''
+    });
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
@@ -103,7 +116,7 @@ export const Settlements = () => {
         if (settlementDate) {
             setSelectedDayRange(defaultCalendarValue)
 
-            post(`${getHost('erp/report', 8091)}/api/mutual-calculation?size=10&page=${page}`, {
+            post(`${getHost('erp/report', 8091)}/api/mutual-calculation?size=${pageSize.value}&page=${page}`, {
                 "databegin": settlementDate.start,
                 "dataend": settlementDate.end,
                 "uid": user.uid
@@ -125,7 +138,7 @@ export const Settlements = () => {
             const { start, end } = stringDateState
             const user = getUser()
 
-            post(`${getHost('erp/report', 8091)}/api/mutual-calculation?size=10&page=${page}`, {
+            post(`${getHost('erp/report', 8091)}/api/mutual-calculation?size=${pageSize.value}&page=${page}`, {
                 "databegin": start,
                 "dataend": end,
                 "uid": user.uid
@@ -141,7 +154,7 @@ export const Settlements = () => {
         } else {
             didMount.current = true
         }
-    }, [page, stringDateState])
+    }, [page, stringDateState, pageSize])
 
     const getSaleInfo = (sales_uid, isRealization) => {
         if (!isRealization) return;
@@ -161,6 +174,17 @@ export const Settlements = () => {
             .finally(() => setLoadingModalData(false))
     }
 
+    const onPageSizeChange = (n) => setPageSize(n);
+
+    const handleInputChange = (type, value) => {
+        if(type === "start_date" || type==="end_date"){
+            setSearchByDate(prevState => ({
+                ...prevState,
+                [type]: value
+            }))
+        }
+    }
+
     return (
         <>
             <div className='container-fluid row'>
@@ -168,7 +192,44 @@ export const Settlements = () => {
                     <h1>Qarşılıqlı Hesablaşmalar</h1>
                 </div>
 
-                <div className='col-12 my-4'>
+                <div className='col-6 mb-3'>
+                    <h6 className="fm-poppins flex-1">Tarix aralığı üzrə axtarış</h6>
+                    <div className='d-flex'>
+                        <div className='w-50 me-2'>
+                            <DatePicker
+                                className="form-control"
+                                dateFormat="yyyy-MM-dd"
+                                selected={searchByDate?.start_date ? new Date(searchByDate?.start_date) : ''}
+                                onChange={(date) => handleInputChange("start_date", date)}
+                                style={{height: '40px !important'}}
+                            />
+                        </div>
+                        <div className='w-50 ms-2' style={{height: '40px !important'}}>
+                            <DatePicker
+                                className="form-control"
+                                dateFormat="yyyy-MM-dd"
+                                selected={searchByDate?.end_date ? new Date(searchByDate?.end_date) : ''}
+                                onChange={(date) => handleInputChange("end_date", date)}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className='col-3 mb-3'>
+                    <h6 className="fm-poppins flex-1">Məlumat sayı</h6>
+                    <div>
+                        <Select
+                            className="basic-single"
+                            classNamePrefix="select"
+                            defaultValue={pageSize}
+                            name="pageSize"
+                            options={sizeOptions}
+                            placeholder="Məhsul sayı"
+                            onChange={value => onPageSizeChange(value)}
+                        />
+                    </div>
+                </div>
+
+                {/* <div className='col-12 my-4'>
                     <Calendar
                         value={selectedDayRange}
                         onChange={onDateChange}
@@ -177,7 +238,7 @@ export const Settlements = () => {
                         maximumDate={maximumDate}
                         locale={calendarLocaleAZ}
                     />
-                </div>
+                </div> */}
 
                 {
                     isFetching
