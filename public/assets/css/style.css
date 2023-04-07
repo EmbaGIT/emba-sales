@@ -823,3 +823,14 @@ tr.show {
     color: #f06548;
     background-color: rgba(240, 101, 72, 0.1);
 }
+
+.settlement-datepicker input {
+    height: 40px;
+}
+
+.settlement-pagesize,
+.settlement-pagesize .select__control,
+.settlement-pagesize .select__value-container,
+.settlement-pagesize .select__indicators {
+    height: 40px;
+}

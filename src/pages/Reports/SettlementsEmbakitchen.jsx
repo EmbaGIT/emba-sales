@@ -4,19 +4,34 @@ import {getHost} from '../../helpers/host'
 import Loader from 'react-loader-spinner'
 import ReactPaginate from 'react-paginate'
 import {formattedDate} from '../../helpers/formattedDate'
-import {Calendar} from 'react-modern-calendar-datepicker'
-import {calendarLocaleAZ} from '../../locales/calendar-locale'
 import jwt from "jwt-decode";
 import Modal from '../../UI/Modal'
+import Select from "react-select"
+import DatePicker from "react-datepicker"
 
 export const SettlementsEmbakitchen = () => {
     const [mutualCalculation, setMutualCalculation] = useState({})
     const [isFetching, setIsFetching] = useState(true)
+    const [error, setError] = useState({})
     const [page, setPage] = useState(0)
     const [showModal, setShowModal] = useState(false)
     const [modalData, setModalData] = useState({})
     const [loadingModalData, setLoadingModalData] = useState(false)
     const didMount = useRef(false)
+    const sizeOptions = [
+        { value: 10, label: 10 },
+        { value: 20, label: 20 },
+        { value: 50, label: 50 },
+        { value: 100, label: 100 }
+    ];
+    const [pageSize, setPageSize] = useState(sizeOptions[0]);
+    const today = new Date();
+    const [searchByDate, setSearchByDate] = useState({
+        dataBegin: new Date(today.getMonth() === 0 && today.getDate() === 1 ? today.getFullYear() - 1 : today.getFullYear(), today.getMonth() === 0 && today.getDate() === 1 ? 11 : today.getDate() === 1 ? today.getMonth() - 1 : today.getMonth(), 1),
+        dataEnd: today
+    });
+    const startDate = useRef(null)
+    const endDate = useRef(null)
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
@@ -29,92 +44,35 @@ export const SettlementsEmbakitchen = () => {
 
     const saveSelectedDate = (dateStr) => localStorage.setItem('settlementDateKitchen', JSON.stringify(dateStr))
 
-    // Default start and end dates
-    const defaultStartDate = new Date(2015, 1, 1)
-    const defaultEndDate = new Date()
-
-    // Minimum and maximum date
-    const minimumDate = {
-        year: new Date(defaultStartDate).getFullYear(),
-        month: new Date(defaultStartDate).getMonth() + 1,
-        day: new Date(defaultStartDate).getDate()
-    }
-    const maximumDate = {
-        year: defaultEndDate.getFullYear(),
-        month: defaultEndDate.getMonth() + 1,
-        day: defaultEndDate.getDate()
-    }
-
     // Convert date to string to post to server
     const convertDateToString = (startDate, endDate) => ({
         start: formattedDate(startDate),
         end: formattedDate(endDate)
     })
 
-    // Convert array to react-modern-calendar-datepicker format
-    const convertArrToCalendar = (arr) => ({
-        year: Number(arr[0]),
-        month: Number(arr[1]),
-        day: Number(arr[2])
-    })
-
     // state for date of type string
     const lsSavedDate = JSON.parse(localStorage.getItem(('settlementDateKitchen')))
-    const defaultStringDateState = lsSavedDate || convertDateToString(defaultStartDate, defaultEndDate)
+    const defaultStringDateState = lsSavedDate || convertDateToString(searchByDate?.dataBegin, searchByDate?.dataEnd)
     const [stringDateState, setStringDateState] = useState(defaultStringDateState)
-
-    // calendar dates
-    const startDateArr = stringDateState.start.split('-')
-    const endDateArr = stringDateState.end.split('-')
-
-    const defaultFrom = convertArrToCalendar(startDateArr)
-    const defaultTo = convertArrToCalendar(endDateArr)
-
-    const defaultRange = { from: defaultFrom, to: defaultTo }
-    const [selectedDayRange, setSelectedDayRange] = useState(defaultRange)
-
-    // get selected date from calendar
-    const onDateChange = async (date) => {
-        await setSelectedDayRange(date)
-        await setPage(0)
-
-        const { from, to } = date
-        if (from && to) {
-            saveSelectedDate(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
-            setStringDateState(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
-        }
-    }
 
     useEffect(() => {
         const settlementDate = JSON.parse(localStorage.getItem(('settlementDateKitchen')))
         const user = getUser()
 
-        const start = settlementDate?.start.split('-')
-        const end = settlementDate?.end.split('-')
-        let defaultCalendarValue = {}
-
-        if (start && end) {
-            defaultCalendarValue = {
-                from: { day: parseInt(start[2]), month: parseInt(start[1]), year: parseInt(start[0]) },
-                to: { day: parseInt(end[2]), month: parseInt(end[1]), year: parseInt(end[0]) }
-            }
-        }
-
-        if (settlementDate) {
-            setSelectedDayRange(defaultCalendarValue)
-
-            post(`${getHost('erp/report', 8091)}/api/mutual-calculation/kitchen?size=10&page=${page}`, {
-                "databegin": settlementDate.start,
-                "dataend": settlementDate.end,
+        if (settlementDate || defaultStringDateState) {
+            post(`${getHost('erp/report', 8091)}/api/mutual-calculation/kitchen?size=${pageSize.value}&page=${page}`, {
+                "databegin": settlementDate?.start || defaultStringDateState?.start,
+                "dataend": settlementDate?.end || defaultStringDateState?.end,
                 "uid": user.uid
             })
                 .then(response => {
+                    setError({});
                     setMutualCalculation(response)
                     setIsFetching(false)
                 })
                 .catch(error => {
-                    setIsFetching(false)
-                    return error
+                    setIsFetching(false);
+                    setError(error?.response?.data);
                 })
         }
     }, [])
@@ -125,23 +83,24 @@ export const SettlementsEmbakitchen = () => {
             const { start, end } = stringDateState
             const user = getUser()
 
-            post(`${getHost('erp/report', 8091)}/api/mutual-calculation/kitchen?size=10&page=${page}`, {
+            post(`${getHost('erp/report', 8091)}/api/mutual-calculation/kitchen?size=${pageSize.value}&page=${page}`, {
                 "databegin": start,
                 "dataend": end,
                 "uid": user.uid
             })
                 .then(response => {
+                    setError({});
                     setMutualCalculation(response)
                     setIsFetching(false)
                 })
                 .catch(error => {
-                    setIsFetching(false)
-                    return error
+                    setIsFetching(false);
+                    setError(error?.response?.data);
                 })
         } else {
             didMount.current = true
         }
-    }, [page, stringDateState])
+    }, [page, stringDateState, pageSize])
 
     const getSaleInfo = (sales_uid, isRealization) => {
         if (!isRealization) return;
@@ -161,6 +120,42 @@ export const SettlementsEmbakitchen = () => {
             .finally(() => setLoadingModalData(false))
     }
 
+    const onPageSizeChange = (n) => {
+        setPageSize(n);
+        setPage(0);
+    }
+
+    const handleInputChange = (type, value) => {
+        if(type === "dataBegin" || type === "dataEnd"){
+            setSearchByDate(prevState => ({
+                ...prevState,
+                [type]: value
+            }))
+        }
+    }
+
+    const searchHandler = () => {
+        setPage(0);
+        const start = startDate?.current?.props?.selected;
+        const end = endDate?.current?.props?.selected;
+        
+        if (start && end) {
+            const startDate = {
+                year: new Date(start).getFullYear(),
+                month: new Date(start).getMonth(),
+                day: new Date(start).getDate()
+            }
+            const endDate = {
+                year: new Date(end).getFullYear(),
+                month: new Date(end).getMonth(),
+                day: new Date(end).getDate()
+            }
+
+            saveSelectedDate(convertDateToString(new Date(startDate.year, startDate.month, startDate.day), new Date(endDate.year, endDate.month, endDate.day)))
+            setStringDateState(convertDateToString(new Date(startDate.year, startDate.month, startDate.day), new Date(endDate.year, endDate.month, endDate.day)))
+        }
+    }
+
     return (
         <>
             <div className='container-fluid row'>
@@ -168,7 +163,60 @@ export const SettlementsEmbakitchen = () => {
                     <h1>Qarşılıqlı Hesablaşmalar Embakitchen</h1>
                 </div>
 
-                <div className='col-12 my-4'>
+                {!!Object.keys(error)?.length && <div className='col-12'>
+                    <div className="alert alert-danger" role="alert">
+                        {error?.Message || error?.error}
+                    </div>
+                </div>}
+
+                <div className='col-6 mb-3'>
+                    <h6 className="fm-poppins flex-1">Tarix aralığı üzrə axtarış</h6>
+                    <div className='d-flex'>
+                        <div className='w-50 me-2 settlement-datepicker'>
+                            <DatePicker
+                                className="form-control"
+                                dateFormat="yyyy-MM-dd"
+                                selected={searchByDate?.dataBegin ? new Date(searchByDate?.dataBegin) : ''}
+                                onChange={(date) => handleInputChange("dataBegin", date)}
+                                ref={startDate}
+                            />
+                        </div>
+                        <div className='w-50 ms-2 settlement-datepicker'>
+                            <DatePicker
+                                className="form-control"
+                                dateFormat="yyyy-MM-dd"
+                                selected={searchByDate?.dataEnd ? new Date(searchByDate?.dataEnd) : ''}
+                                onChange={(date) => handleInputChange("dataEnd", date)}
+                                ref={endDate}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className='col-3 mb-3'>
+                    <h6 className="fm-poppins flex-1">Məlumat sayı</h6>
+                    <div>
+                        <Select
+                            className="settlement-pagesize basic-single"
+                            classNamePrefix="select"
+                            defaultValue={pageSize}
+                            name="pageSize"
+                            options={sizeOptions}
+                            placeholder="Məhsul sayı"
+                            onChange={value => onPageSizeChange(value)}
+                        />
+                    </div>
+                </div>
+                <div className='col-3 mb-3'>
+                    <div className='d-flex align-items-end h-100'>
+                        <button
+                            className='btn btn-success'
+                            style={{height: '40px'}}
+                            onClick={searchHandler}
+                        >Axtar</button>
+                    </div>
+                </div>
+
+                {/* <div className='col-12 my-4'>
                     <Calendar
                         value={selectedDayRange}
                         onChange={onDateChange}
@@ -177,7 +225,7 @@ export const SettlementsEmbakitchen = () => {
                         maximumDate={maximumDate}
                         locale={calendarLocaleAZ}
                     />
-                </div>
+                </div> */}
 
                 {
                     isFetching
@@ -240,33 +288,33 @@ export const SettlementsEmbakitchen = () => {
                                     </table>
                                 </div>
                             )
-                    }
+                }
 
-                    {
-                        isFetching
-                            ? null
-                            : (
-                                Object.keys(mutualCalculation).length === 0 ? null : <div className='d-flex justify-content-center'>
-                                    <ReactPaginate
-                                        previousLabel='Əvvəlki'
-                                        nextLabel='Növbəti'
-                                        previousClassName='page-item'
-                                        nextClassName='page-item'
-                                        previousLinkClassName='page-link'
-                                        nextLinkClassName='page-link'
-                                        breakLabel='...'
-                                        breakClassName='break-me'
-                                        pageCount={mutualCalculation.totalPages + 1 || 0}
-                                        marginPagesDisplayed={2}
-                                        pageRangeDisplayed={3}
-                                        onPageChange={paginate}
-                                        containerClassName='pagination'
-                                        activeClassName='active'
-                                        pageClassName='page-item'
-                                        pageLinkClassName='page-link'
-                                        forcePage={page}
-                                    />
-                                </div>
+                {
+                    isFetching
+                        ? null
+                        : (
+                            Object.keys(mutualCalculation).length === 0 ? null : <div className='d-flex justify-content-center'>
+                                <ReactPaginate
+                                    previousLabel='Əvvəlki'
+                                    nextLabel='Növbəti'
+                                    previousClassName='page-item'
+                                    nextClassName='page-item'
+                                    previousLinkClassName='page-link'
+                                    nextLinkClassName='page-link'
+                                    breakLabel='...'
+                                    breakClassName='break-me'
+                                    pageCount={mutualCalculation.totalPages + 1 || 0}
+                                    marginPagesDisplayed={2}
+                                    pageRangeDisplayed={3}
+                                    onPageChange={paginate}
+                                    containerClassName='pagination'
+                                    activeClassName='active'
+                                    pageClassName='page-item'
+                                    pageLinkClassName='page-link'
+                                    forcePage={page}
+                                />
+                            </div>
                         )
                 }
             </div>
