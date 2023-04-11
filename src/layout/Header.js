@@ -74,8 +74,8 @@ const Header = (props) => {
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container-fluid d-block">
                 <div className="row">
-                    <div className="col-lg-3 col-md-3 order-lg-1">
-                        <div className="d-flex flex-grow-1 align-items-center" id="navbarSupportedContent">
+                    <div className={authCtx.isLoggedIn ? "col-lg-3 col-md-3 order-lg-1" : 'col-12'}>
+                        <div className={`d-flex flex-grow-1 align-items-center ${authCtx.isLoggedIn ? 'justify-content-start' : 'justify-content-center'}`} id="navbarSupportedContent">
                             <Link className="navbar-brand mt-lg-0" to="/">
                                 <img
                                     src={logo}
@@ -86,9 +86,9 @@ const Header = (props) => {
                             </Link>
                         </div>
                     </div>
-                    <div className="col-lg-6 col-md-9 order-lg-3">
+                    {authCtx.isLoggedIn && <div className="col-lg-6 col-md-9 order-lg-3">
                         <div className="d-flex align-items-center justify-content-end">
-                            {authCtx.isLoggedIn && isDualUser && (
+                            {isDualUser && (
                                 <div className='me-3'>
                                     <select
                                         className="form-control form-select"
@@ -110,12 +110,12 @@ const Header = (props) => {
                                         data-placement="left"
                                         title="Özəl sifarişlərin izlənməsi"
                                     >
-                                        <i className="fas fa-truck text-body" style={{fontSize: '20px'}}></i>
+                                        <i className="fas fa-truck text-body" style={{ fontSize: '20px' }}></i>
                                     </span>
                                 </Link>
                             )}
 
-                            {authCtx.isLoggedIn && selectedBrand === 'Embawood' && (
+                            {selectedBrand === 'Embawood' && (
                                 <a href="https://embawood.az/catalog/view/theme/embawood/catalog/katalog23.pdf" target="_blank" rel="noreferrer">
                                     <span
                                         className="text-reset me-4"
@@ -124,69 +124,61 @@ const Header = (props) => {
                                         data-placement="left"
                                         title="Kataloq"
                                     >
-                                        <i className="fas fa-book-reader text-body" style={{fontSize: '23px'}}></i>
+                                        <i className="fas fa-book-reader text-body" style={{ fontSize: '23px' }}></i>
                                     </span>
                                 </a>
                             )}
 
-                            {authCtx.isLoggedIn && (
-                                <Link to="/announcements">
-                                    <span
-                                        className="text-reset me-4"
-                                        role="button"
-                                        data-toggle="tooltip"
-                                        data-placement="left"
-                                        title="Kampaniyalar"
-                                    >
-                                        <i className="fas fa-gift text-body" style={{fontSize: '23px'}}></i>
-                                    </span>
-                                </Link>
-                            )}
-
-                            {authCtx.isLoggedIn && (
-                                <Link to="/instructions">
-                                    <span
-                                        className="text-reset me-4"
-                                        role="button"
-                                        data-toggle="tooltip"
-                                        data-placement="left"
-                                        title="Təlimatlar"
-                                    >
-                                        <i className="fas fa-user-graduate text-body" style={{fontSize: '20px'}}></i>
-                                    </span>
-                                </Link>
-                            )}
-
-                            {authCtx.isLoggedIn && (
-                                <Link to="/reports">
-                                <span className="text-reset me-4" role="button">
-                                    <i className="fas fa-file-invoice text-body" style={{fontSize: '20px'}}></i>
-                                </span>
-                                </Link>
-                            )}
-
-                            {authCtx.isLoggedIn && (
-                                <div className="position-relative">
-                                    <Link to="/cart">
-                            <span
-                                className="text-reset me-4"
-                                role="button">
-                                <i className="fas fa-shopping-cart text-body" style={{fontSize: '20px'}}/>
+                            <Link to="/announcements">
                                 <span
-                                    className="badge rounded-pill badge-notification bg-danger">{numberOfCartItem}</span>
-                            </span>
-                                    </Link>
-                                </div>
-                            )}
-                            {authCtx.isLoggedIn && (
-                                <NavLink to="/allOrder"><i className="fas fa-cloud-download-alt me-4 text-body"
-                                                           style={{fontSize: '20px'}}/></NavLink>)}
+                                    className="text-reset me-4"
+                                    role="button"
+                                    data-toggle="tooltip"
+                                    data-placement="left"
+                                    title="Kampaniyalar"
+                                >
+                                    <i className="fas fa-gift text-body" style={{ fontSize: '23px' }}></i>
+                                </span>
+                            </Link>
 
-                            <div className="">
+                            <Link to="/instructions">
+                                <span
+                                    className="text-reset me-4"
+                                    role="button"
+                                    data-toggle="tooltip"
+                                    data-placement="left"
+                                    title="Təlimatlar"
+                                >
+                                    <i className="fas fa-user-graduate text-body" style={{ fontSize: '20px' }}></i>
+                                </span>
+                            </Link>
+
+                            <Link to="/reports">
+                                <span className="text-reset me-4" role="button">
+                                    <i className="fas fa-file-invoice text-body" style={{ fontSize: '20px' }}></i>
+                                </span>
+                            </Link>
+
+                            <div className="position-relative">
+                                <Link to="/cart">
+                                    <span
+                                        className="text-reset me-4"
+                                        role="button">
+                                        <i className="fas fa-shopping-cart text-body" style={{ fontSize: '20px' }} />
+                                        <span
+                                            className="badge rounded-pill badge-notification bg-danger">{numberOfCartItem}
+                                        </span>
+                                    </span>
+                                </Link>
+                            </div>
+                            <NavLink to="/allOrder"><i className="fas fa-cloud-download-alt me-4 text-body" style={{ fontSize: '20px' }} />
+                            </NavLink>
+
+                            <div>
                                 <button type="button" className="btn btn-primary" onClick={logout}>Çıxış</button>
                             </div>
                         </div>
-                    </div>
+                    </div>}
                     {authCtx.isLoggedIn && (
                         <div className="col-lg-3 col-md-12 order-lg-2">
                             <ProductSearch/>

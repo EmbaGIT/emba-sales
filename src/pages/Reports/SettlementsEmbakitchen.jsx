@@ -10,6 +10,9 @@ import Select from "react-select"
 import DatePicker from "react-datepicker"
 
 export const SettlementsEmbakitchen = () => {
+    // state for date of type string
+    const lsSavedDate = JSON.parse(localStorage.getItem(('settlementDateKitchen')))
+
     const [mutualCalculation, setMutualCalculation] = useState({})
     const [isFetching, setIsFetching] = useState(true)
     const [error, setError] = useState({})
@@ -27,8 +30,8 @@ export const SettlementsEmbakitchen = () => {
     const [pageSize, setPageSize] = useState(sizeOptions[0]);
     const today = new Date();
     const [searchByDate, setSearchByDate] = useState({
-        dataBegin: new Date(today.getMonth() === 0 && today.getDate() === 1 ? today.getFullYear() - 1 : today.getFullYear(), today.getMonth() === 0 && today.getDate() === 1 ? 11 : today.getDate() === 1 ? today.getMonth() - 1 : today.getMonth(), 1),
-        dataEnd: today
+        dataBegin: lsSavedDate?.start ? new Date(lsSavedDate.start) : new Date(today.getMonth() === 0 && today.getDate() === 1 ? today.getFullYear() - 1 : today.getFullYear(), today.getMonth() === 0 && today.getDate() === 1 ? 11 : today.getDate() === 1 ? today.getMonth() - 1 : today.getMonth(), 1),
+        dataEnd: lsSavedDate?.end ? new Date(lsSavedDate.end) : today
     });
     const startDate = useRef(null)
     const endDate = useRef(null)
@@ -50,8 +53,6 @@ export const SettlementsEmbakitchen = () => {
         end: formattedDate(endDate)
     })
 
-    // state for date of type string
-    const lsSavedDate = JSON.parse(localStorage.getItem(('settlementDateKitchen')))
     const defaultStringDateState = lsSavedDate || convertDateToString(searchByDate?.dataBegin, searchByDate?.dataEnd)
     const [stringDateState, setStringDateState] = useState(defaultStringDateState)
 
