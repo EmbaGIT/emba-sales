@@ -150,7 +150,10 @@ const OrderTracking = () => {
                               : <ol>
                                 {
                                   order.status.info.map((status, i) => (
-                                    <li key={i}>{status}</li>
+                                    <li key={i}>
+                                      <span className='order-tracking-status-period'>{status.slice(0, status.indexOf(':'))}</span>
+                                      <span>{status.slice(status.indexOf(':'))}</span>
+                                    </li>
                                   ))
                                 }
                               </ol>

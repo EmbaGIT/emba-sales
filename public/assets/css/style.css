@@ -834,3 +834,9 @@ tr.show {
 .settlement-pagesize .select__indicators {
     height: 40px;
 }
+
+.order-tracking-status-period {
+    color: green;
+    font-weight: 700;
+    font-size: 15px;
+}
