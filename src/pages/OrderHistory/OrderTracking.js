@@ -49,7 +49,7 @@ const OrderTracking = () => {
         }).then(res => {
           setGettingActiveStatus(false)
           setOrders(orders.map(order => {
-            if (order.uid_sales_order !== uid) {
+            if (order.uid_sales_order !== uid || !res.sales_group[0].uid_sales_order) {
               return order
             }
             return res.sales_group[0]
