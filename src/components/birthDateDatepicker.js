@@ -24,11 +24,12 @@ const BirthDateDatepicker = (props) => {
 
     return(
         <DatePicker
-            onChangeRaw={(e) => e.preventDefault()}
+            // onChangeRaw={(e) => e.preventDefault()}
             selected={props.selectedDate}
             disabled={props.isDisabled}
             dateFormat="yyyy-MM-dd"
             className="form-control"
+            placeholderText="Gün, ay, il"
             renderCustomHeader={({
                                      date,
                                      changeYear,
