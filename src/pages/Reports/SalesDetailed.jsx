@@ -1,14 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react'
-import Loader from 'react-loader-spinner'
-import ReactPaginate from 'react-paginate'
-import { Calendar } from "react-modern-calendar-datepicker";
-import { calendarLocaleAZ } from "../../locales/calendar-locale";
 import {post} from '../../api/Api'
 import {getHost} from '../../helpers/host'
-import {formattedDate, getSpecificDate} from '../../helpers/formattedDate'
-import jwt from 'jwt-decode'
+import Loader from 'react-loader-spinner'
+import ReactPaginate from 'react-paginate'
+import {formattedDate} from '../../helpers/formattedDate'
+import jwt from "jwt-decode";
+import Select from "react-select"
+import DatePicker from "react-datepicker"
 
 const SalesDetailed = () => {
+    // state for date of type string
+    const lsSavedDate = JSON.parse(localStorage.getItem(('salesDate')))
+
     const [sales, setSales] = useState({})
     const [classNames, setClassNames] = useState(
         Array(10)
@@ -19,6 +22,20 @@ const SalesDetailed = () => {
     const [isFetching, setIsFetching] = useState(false)
     const paginationContainer = useRef()
     const didMount = useRef(false)
+    const sizeOptions = [
+        { value: 10, label: 10 },
+        { value: 20, label: 20 },
+        { value: 50, label: 50 },
+        { value: 100, label: 100 }
+    ];
+    const [pageSize, setPageSize] = useState(sizeOptions[0]);
+    const today = new Date();
+    const [searchByDate, setSearchByDate] = useState({
+        dataBegin: lsSavedDate?.start ? new Date(lsSavedDate.start) : new Date(today.getMonth() === 0 && today.getDate() === 1 ? today.getFullYear() - 1 : today.getFullYear(), today.getMonth() === 0 && today.getDate() === 1 ? 11 : today.getDate() === 1 ? today.getMonth() - 1 : today.getMonth(), 1),
+        dataEnd: lsSavedDate?.end ? new Date(lsSavedDate.end) : today
+    });
+    const startDate = useRef(null)
+    const endDate = useRef(null)
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
@@ -46,85 +63,25 @@ const SalesDetailed = () => {
 
     const saveSelectedDate = (dateStr) => localStorage.setItem('salesDate', JSON.stringify(dateStr))
 
-    // Default start and end dates
-    const defaultStartDate = new Date(2015, 1, 1)
-    const defaultEndDate = new Date()
-
-    // Minimum and maximum date
-    const minimumDate = {
-        year: new Date(defaultStartDate).getFullYear(),
-        month: new Date(defaultStartDate).getMonth() + 1,
-        day: new Date(defaultStartDate).getDate()
-    }
-    const maximumDate = {
-        year: defaultEndDate.getFullYear(),
-        month: defaultEndDate.getMonth() + 1,
-        day: defaultEndDate.getDate()
-    }
-
     // Convert date to string to post to server
     const convertDateToString = (startDate, endDate) => ({
         start: formattedDate(startDate),
         end: formattedDate(endDate)
     })
 
-    // Convert array to react-modern-calendar-datepicker format
-    const convertArrToCalendar = (arr) => ({
-        year: Number(arr[0]),
-        month: Number(arr[1]),
-        day: Number(arr[2])
-    })
-
-    // state for date of type string
-    const lsSavedDate = JSON.parse(localStorage.getItem(('salesDate')))
-    const defaultStringDateState = lsSavedDate || convertDateToString(defaultStartDate, defaultEndDate)
+    const defaultStringDateState = lsSavedDate || convertDateToString(searchByDate?.dataBegin, searchByDate?.dataEnd)
     const [stringDateState, setStringDateState] = useState(defaultStringDateState)
-
-    // calendar dates
-    const startDateArr = stringDateState.start.split('-')
-    const endDateArr = stringDateState.end.split('-')
-
-    const defaultFrom = convertArrToCalendar(startDateArr)
-    const defaultTo = convertArrToCalendar(endDateArr)
-
-    const defaultRange = { from: defaultFrom, to: defaultTo }
-    const [selectedDayRange, setSelectedDayRange] = useState(defaultRange)
-
-    // get selected date from calendar
-    const onDateChange = async (date) => {
-        await setSelectedDayRange(date)
-        await setPage(0)
-
-        const { from, to } = date
-        if (from && to) {
-            setStringDateState(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
-            paginationContainer.current?.scrollIntoView({ behavior: 'smooth' })
-            saveSelectedDate(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)))
-        }
-    }
 
     useEffect(() => {
         const salesDate = JSON.parse(localStorage.getItem(('salesDate')))
         const user = getUser()
 
-        const start = salesDate?.start.split('-')
-        const end = salesDate?.end.split('-')
-        let defaultCalendarValue = {}
-
-        if (start && end) {
-            defaultCalendarValue = {
-                from: { day: parseInt(start[2]), month: parseInt(start[1]), year: parseInt(start[0]) },
-                to: { day: parseInt(end[2]), month: parseInt(end[1]), year: parseInt(end[0]) }
-            }
-        }
-
-        if (salesDate) {
+        if (salesDate || defaultStringDateState) {
             setIsFetching(true)
-            setSelectedDayRange(defaultCalendarValue)
 
-            post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=10&page=${page}`, {
-                "databegin": salesDate.start,
-                "dataend": salesDate.end,
+            post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=${pageSize.value}&page=${page}`, {
+                "databegin": salesDate.start || defaultStringDateState?.start,
+                "dataend": salesDate.end || defaultStringDateState?.end,
                 "uid": user.uid
             })
                 .then(response => {
@@ -144,7 +101,7 @@ const SalesDetailed = () => {
             const { start, end } = stringDateState
             const user = getUser()
 
-            post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=10&page=${page}`, {
+            post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=${pageSize.value}&page=${page}`, {
                 databegin: start,
                 dataend: end,
                 uid: user.uid
@@ -165,23 +122,96 @@ const SalesDetailed = () => {
         } else {
             didMount.current = true
         }
-    }, [page, stringDateState])
+    }, [page, stringDateState, pageSize])
+
+    const onPageSizeChange = (n) => {
+        setPageSize(n);
+        setPage(0);
+    }
+
+    const handleInputChange = (type, value) => {
+        if(type === "dataBegin" || type === "dataEnd"){
+            setSearchByDate(prevState => ({
+                ...prevState,
+                [type]: value
+            }))
+        }
+    }
+
+    const searchHandler = () => {
+        setPage(0);
+        const start = startDate?.current?.props?.selected;
+        const end = endDate?.current?.props?.selected;
+        
+        if (start && end) {
+            const startDate = {
+                year: new Date(start).getFullYear(),
+                month: new Date(start).getMonth(),
+                day: new Date(start).getDate()
+            }
+            const endDate = {
+                year: new Date(end).getFullYear(),
+                month: new Date(end).getMonth(),
+                day: new Date(end).getDate()
+            }
+
+            saveSelectedDate(convertDateToString(new Date(startDate.year, startDate.month, startDate.day), new Date(endDate.year, endDate.month, endDate.day)))
+            setStringDateState(convertDateToString(new Date(startDate.year, startDate.month, startDate.day), new Date(endDate.year, endDate.month, endDate.day)))
+        }
+    }
 
     return (
         <div className='container-fluid row'>
-            <div className='col-12 d-flex justify-content-between align-items-end'>
+            <div className='col-12 d-flex justify-content-between align-items-end mb-3'>
                 <h1>Distribütorun Mağazaya Satışı</h1>
             </div>
 
-            <div className='col-12 my-4'>
-                <Calendar
-                    value={selectedDayRange}
-                    onChange={onDateChange}
-                    shouldHighlightWeekends
-                    minimumDate={minimumDate}
-                    maximumDate={maximumDate}
-                    locale={calendarLocaleAZ}
-                />
+            <div className='col-6 mb-3'>
+                <h6 className="fm-poppins flex-1">Tarix aralığı üzrə axtarış</h6>
+                <div className='d-flex'>
+                    <div className='w-50 me-2 settlement-datepicker'>
+                        <DatePicker
+                            className="form-control"
+                            dateFormat="yyyy-MM-dd"
+                            selected={searchByDate?.dataBegin ? new Date(searchByDate?.dataBegin) : ''}
+                            onChange={(date) => handleInputChange("dataBegin", date)}
+                            ref={startDate}
+                        />
+                    </div>
+                    <div className='w-50 ms-2 settlement-datepicker'>
+                        <DatePicker
+                            className="form-control"
+                            dateFormat="yyyy-MM-dd"
+                            selected={searchByDate?.dataEnd ? new Date(searchByDate?.dataEnd) : ''}
+                            onChange={(date) => handleInputChange("dataEnd", date)}
+                            ref={endDate}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className='col-3 mb-3'>
+                <h6 className="fm-poppins flex-1">Məlumat sayı</h6>
+                <div>
+                    <Select
+                        className="settlement-pagesize basic-single"
+                        classNamePrefix="select"
+                        defaultValue={pageSize}
+                        name="pageSize"
+                        options={sizeOptions}
+                        placeholder="Məhsul sayı"
+                        onChange={value => onPageSizeChange(value)}
+                    />
+                </div>
+            </div>
+            <div className='col-3 mb-3'>
+                <div className='d-flex align-items-end h-100'>
+                    <button
+                        className='btn btn-success'
+                        style={{height: '40px'}}
+                        onClick={searchHandler}
+                    >Axtar</button>
+                </div>
             </div>
 
             <div className='col-12 d-flex justify-content-end'>
