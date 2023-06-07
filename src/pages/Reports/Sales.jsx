@@ -1,40 +1,30 @@
-import { React, useEffect, useState } from "react";
-import { get, post } from "../../api/Api";
+import { React, useEffect, useState, useRef } from "react";
+import { post } from "../../api/Api";
 import jwt from "jwt-decode";
 import { formattedDate, getSpecificDate } from "../../helpers/formattedDate";
 import "react-modern-calendar-datepicker/lib/DatePicker.css";
-import { Calendar } from "react-modern-calendar-datepicker";
-import { calendarLocaleAZ } from "../../locales/calendar-locale";
 import Loader from "react-loader-spinner";
 import { getHost } from "../../helpers/host";
+import DatePicker from "react-datepicker"
+import { addDays, subDays } from "date-fns";
 
 const Sales = () => {
     const [sale, setSale] = useState({});
     const [isFetching, setIsFetching] = useState(true);
     const [noSales, setNoSales] = useState(false)
     const [error, setError] = useState({})
+    const today = new Date();
+    const [searchByDate, setSearchByDate] = useState({
+        dataBegin: getSpecificDate(90),
+        dataEnd: today
+    });
+    const startDate = useRef(null)
+    const endDate = useRef(null)
 
     const getUser = () => {
         const token = localStorage.getItem("jwt_token");
         return jwt(token);  // decodes user from jwt and returns it
     }
-
-    // Default start and end dates:
-    const defaultStartDate = getSpecificDate(90);
-    const defaultEndDate = new Date();
-
-    // Minimum and maximum date
-    const minimumDate = {
-        year: new Date(defaultStartDate).getFullYear(),
-        month: new Date(defaultStartDate).getMonth() + 1,
-        day: new Date(defaultStartDate).getDate()
-    };
-
-    const maximumDate = {
-        year: defaultEndDate.getFullYear(),
-        month: defaultEndDate.getMonth() + 1,
-        day: defaultEndDate.getDate()
-    };
 
     // Convert date to string to post to server
     const convertDateToString = (startDate, endDate) => ({
@@ -42,35 +32,9 @@ const Sales = () => {
         end: formattedDate(endDate)
     });
 
-    // Convert array to react-modern-calendar-datepicker format
-    const convertArrToCalendar = (arr) => ({
-        year: Number(arr[0]),
-        month: Number(arr[1]),
-        day: Number(arr[2])
-    })
-
     // state for date of type string
-    const [stringDateState, setStringDateState] = useState(convertDateToString(defaultStartDate, defaultEndDate));
-
-    // calendar dates
-    const startDateArr = stringDateState.start.split('-');
-    const endDateArr = stringDateState.end.split('-');
-
-    const defaultFrom = convertArrToCalendar(startDateArr);
-    const defaultTo = convertArrToCalendar(endDateArr);
-
-    const defaultRange = { from: defaultFrom, to: defaultTo };
-    const [selectedDayRange, setSelectedDayRange] = useState(defaultRange);
-
-    // get selected date from calendar
-    const onDateChange = (date) => {
-        setSelectedDayRange(date);
-
-        const { from, to } = date;
-        if (from && to) {
-            setStringDateState(convertDateToString(new Date(from.year, from.month - 1, from.day), new Date(to.year, to.month - 1, to.day)));
-        }
-    }
+    const [stringDateState, setStringDateState] = useState(convertDateToString(searchByDate.dataBegin, searchByDate.dataEnd));
+    console.log('stringDateState', stringDateState);
 
     useEffect(() => {
         const user = getUser();
@@ -86,20 +50,75 @@ const Sales = () => {
             }).finally(() => setIsFetching(false));
     }, [stringDateState]);
 
+    const handleInputChange = (type, value) => {
+        if(type === "dataBegin" || type === "dataEnd"){
+            setSearchByDate(prevState => ({
+                ...prevState,
+                [type]: value
+            }))
+        }
+    }
+
+    const searchHandler = () => {
+        const start = startDate?.current?.props?.selected;
+        const end = endDate?.current?.props?.selected;
+        
+        if (start && end) {
+            const startDate = {
+                year: new Date(start).getFullYear(),
+                month: new Date(start).getMonth(),
+                day: new Date(start).getDate()
+            }
+            const endDate = {
+                year: new Date(end).getFullYear(),
+                month: new Date(end).getMonth(),
+                day: new Date(end).getDate()
+            }
+
+            setStringDateState(convertDateToString(new Date(startDate.year, startDate.month, startDate.day), new Date(endDate.year, endDate.month, endDate.day)))
+        }
+    }
+
     return (
         <div className='container-fluid row'>
-            <div className="col-12">
+            <div className="col-12 mb-3">
                 <h1>Mənim Satışlarım</h1>
             </div>
-            <div className='col-12 my-4'>
-                <Calendar
-                    value={selectedDayRange}
-                    onChange={onDateChange}
-                    shouldHighlightWeekends
-                    minimumDate={minimumDate}
-                    maximumDate={maximumDate}
-                    locale={calendarLocaleAZ}
-                />
+            <div className='col-6 mb-3'>
+                <h6 className="fm-poppins flex-1">Tarix aralığı üzrə axtarış</h6>
+                <div className='d-flex'>
+                    <div className='w-50 me-2 settlement-datepicker'>
+                        <DatePicker
+                            className="form-control"
+                            dateFormat="yyyy-MM-dd"
+                            selected={searchByDate?.dataBegin ? new Date(searchByDate?.dataBegin) : ''}
+                            onChange={(date) => handleInputChange("dataBegin", date)}
+                            ref={startDate}
+                            minDate={subDays(new Date(), 90)}
+                            maxDate={addDays(new Date(), 0)}
+                        />
+                    </div>
+                    <div className='w-50 ms-2 settlement-datepicker'>
+                        <DatePicker
+                            className="form-control"
+                            dateFormat="yyyy-MM-dd"
+                            selected={searchByDate?.dataEnd ? new Date(searchByDate?.dataEnd) : ''}
+                            onChange={(date) => handleInputChange("dataEnd", date)}
+                            ref={endDate}
+                            minDate={subDays(new Date(), 90)}
+                            maxDate={addDays(new Date(), 0)}
+                        />
+                    </div>
+                </div>
+            </div>
+            <div className='col-3 mb-3'>
+                <div className='d-flex align-items-end h-100'>
+                    <button
+                        className='btn btn-success'
+                        style={{height: '40px'}}
+                        onClick={searchHandler}
+                    >Axtar</button>
+                </div>
             </div>
             <div className='col-12'>
                 <div className="table-responsive">
