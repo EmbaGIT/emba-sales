@@ -364,6 +364,15 @@ const Checkout = () => {
                 setAvailableCustomer((customer_full_info.search))
                 setCustomerSelected(true)
             }
+            const d = new Date(
+                customer_full_info
+                    ?.search[0]
+                    ?.details
+                    ?.find(detail => detail?.infoTypeField?.field === 'Birthdate')
+                    ?.fieldValue
+            );
+            const age = calculateAge(d)
+            setCustomerAge(age);
         },
         onError: (error) => {
             console.log(error)
