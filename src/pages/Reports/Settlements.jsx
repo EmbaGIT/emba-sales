@@ -103,12 +103,19 @@ export const Settlements = () => {
         }
     }, [page, stringDateState, pageSize])
 
-    const getSaleInfo = (sales_uid, isRealization) => {
-        if (!isRealization) return;
+    const getSaleInfo = (sales_uid, isRealization, isReturned) => {
+        if (!isRealization && !isReturned) return;
+
+        let url = `${getHost('erp/report', 8091)}/api/mutual-calculation`
+        if (isRealization) {
+            url += '/detailed/realization';
+        } else if (isReturned) {
+            url += '/refund';
+        }
 
         setLoadingModalData(true)
         setShowModal(true)
-        post(`${getHost('erp/report', 8091)}/api/mutual-calculation/detailed/realization`, {
+        post(url, {
             sales_uid
         })
             .then(response => {
@@ -262,15 +269,16 @@ export const Settlements = () => {
                                             {
                                                 mutualCalculation.Items?.map((calculation, i) => {
                                                     const isRealization = calculation?.document?.includes('Реализация');
+                                                    const isReturned = calculation?.document?.includes('Возврат');
                                                     return (
                                                         <tr key={i}>
                                                             <td className='short'>{calculation.date}</td>
                                                             <td className='long'>
                                                                 {
                                                                     <span
-                                                                        className={isRealization ? 'text-primary text-underline cursor-pointer d-inline-block' : ''}
-                                                                        onClick={() => getSaleInfo(calculation.sales_uid, isRealization)}
-                                                                        data-toggle={isRealization ? 'modal' : ''} data-target="#infoModal"
+                                                                        className={(isRealization || isReturned) ? 'text-primary text-underline cursor-pointer d-inline-block' : ''}
+                                                                        onClick={() => getSaleInfo(calculation.sales_uid, isRealization, isReturned)}
+                                                                        data-toggle={(isRealization || isReturned) ? 'modal' : ''} data-target="#infoModal"
                                                                     >
                                                                         {calculation.document}
                                                                     </span>
