@@ -80,8 +80,8 @@ const SalesDetailed = () => {
             setIsFetching(true)
 
             post(`${getHost('erp/report', 8091)}/api/sales/report-detailed?size=${pageSize.value}&page=${page}`, {
-                "databegin": salesDate.start || defaultStringDateState?.start,
-                "dataend": salesDate.end || defaultStringDateState?.end,
+                "databegin": salesDate?.start || defaultStringDateState?.start,
+                "dataend": salesDate?.end || defaultStringDateState?.end,
                 "uid": user.uid
             })
                 .then(response => {
