@@ -71,7 +71,7 @@ const Reports = () => {
                 }
                 {
                     brand === 'Embawood' ? <div className="col-lg-3 col-md-4 mb-3">
-                        <a href='https://1drv.ms/x/s!ArrmD3gpN8JGc6afQd0dC7EsRaw?e=oO3oX6' className='d-block h-100' target='_blank'>
+                        <a href='https://embawoodllc385-my.sharepoint.com/:x:/g/personal/ramisaliev_embawoodllc385_onmicrosoft_com/EWfn_Le5mNBLiEV2M5BrfpcBmq5UxS5BgxMmQ16EuI7k_A?e=LoIih8' className='d-block h-100' target='_blank'>
                             <div className='category-box h-100 d-flex align-items-center justify-content-center'>
                                 <div className="category-hover-box">
                                     <span className='category-name'>Embawood Price List</span>
