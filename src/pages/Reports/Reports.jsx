@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import jwt from "jwt-decode";
-import {get} from "../../api/Api";
 
 const menuItems = [
     {title: 'Mənim Satışlarım', url: 'sales'},
