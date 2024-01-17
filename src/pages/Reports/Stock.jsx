@@ -5,6 +5,7 @@ import { useParams, useHistory, Link } from "react-router-dom";
 import Loader from "react-loader-spinner";
 import ReactPaginate from "react-paginate";
 import { getHost } from "../../helpers/host";
+import jwt from "jwt-decode";
 
 const buttons = [
     { title: 'Parça qalığı', key: 'fabric' },
@@ -33,6 +34,11 @@ const Stock = ({ stock }) => {
     const [page, setPage] = useState(Number(params.page));
     const [pageSize, setPageSize] = useState({value: Number(params.pageSize), label: Number(params.pageSize)});
 
+    const getUser = () => {
+        const token = localStorage.getItem("jwt_token");
+        return jwt(token);  // decodes user from jwt and returns it
+    }
+
     const paginate = (n) => {
         setPage(+n.selected);
         history.push(`/reports/${stock.key}/${n.selected}/10`);
@@ -49,11 +55,11 @@ const Stock = ({ stock }) => {
 
     useEffect(() => {
         setIsFetching(true);
-
         const { key } = stock;
         setPage(Number(params.page));
+        const user = getUser()
 
-        get(`${getHost('erp/report', 8091)}/api/${key}?page=0&size=${pageSize.value}&filter=${search}`).then((res) => {
+        get(`${getHost('erp/report', 8091)}/api/${key}?page=0&size=${pageSize.value}&filter=${search}&${key === 'fabric' ? `brand=${user?.brand}` : ''}`).then((res) => {
             if (stock.key === 'fabric') {
                 const items = {
                     ...res,
@@ -76,8 +82,9 @@ const Stock = ({ stock }) => {
     useEffect(() => {
         setIsFetching(true);
         const { key } = stock;
+        const user = getUser()
 
-        get(`${getHost('erp/report', 8091)}/api/${key}?page=${page}&size=${pageSize.value}&filter=${search}`).then((res) => {
+        get(`${getHost('erp/report', 8091)}/api/${key}?page=${page}&size=${pageSize.value}&filter=${search}&${key === 'fabric' ? `brand=${user?.brand}` : ''}`).then((res) => {
             if (stock.key === 'fabric') {
                 const items = {
                     ...res,
@@ -96,8 +103,6 @@ const Stock = ({ stock }) => {
             console.log("err", err);
         });
     }, [page, pageSize, search]);
-
-    useEffect(() => console.log(stockGoods), [stockGoods])
 
     return (
         <div className='container-fluid row'>
