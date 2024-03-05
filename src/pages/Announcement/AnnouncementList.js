@@ -50,6 +50,26 @@ const AnnouncementList = () => {
                     </div>
                 </div>
             )) : null }
+            {[
+                {
+                    title: 'Alınan ümumi məhsulların arasından hansı məhsulu hədiyyə olaraq verə biləcəyimizi tapmaq üçün',
+                    url: 'https://form.jotform.com/240623742991460'
+                },
+                {
+                    title: 'Alınan məhsul(lar)dan əlavə olaraq hansı yeni məhsulu hədiyyə olaraq verə biləcəyimizi tapmaq üçün istifadə olunur',
+                    url: 'https://form.jotform.com/240624107311442'
+                }
+            ].map(item => (
+                <div className="col-lg-3 col-md-4">
+                    <a href={item.url} className='d-block h-100' target='_blank' rel='noreferrer'>
+                        <div className='category-box h-100 d-flex align-items-center justify-content-center'>
+                            <div className="category-hover-box">
+                                <span className='category-name'>{item.title}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            ))}
         </div>
     )
 }
