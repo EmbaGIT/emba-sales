@@ -3,13 +3,22 @@ import { get } from '../../api/Api'
 import { getHost } from '../../helpers/host'
 import { NavLink } from 'react-router-dom'
 import Loader from 'react-loader-spinner'
+import jwt from "jwt-decode"
 
 const AnnouncementList = () => {
     const [activeAnnouncements, setActiveAnnouncements] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState('')
+    const [brand, setBrand] = useState("")
+
+    const getUser = () => {
+        const token = localStorage.getItem("jwt_token")
+        return token && jwt(token)
+    }
 
     useEffect(() => {
+        setBrand(getUser().brand);
+
         get(`${getHost('announcement', 8093)}/api/announcement`)
             .then(data => setActiveAnnouncements(data.content.filter(campaign => campaign.status === 'ACTIVE')))
             .catch(err => setError(err.message))
@@ -50,7 +59,7 @@ const AnnouncementList = () => {
                     </div>
                 </div>
             )) : null }
-            {[
+            {brand === 'Embawood' && [
                 {
                     title: 'Alınan ümumi məhsulların arasından hansı məhsulu hədiyyə olaraq verə biləcəyimizi tapmaq üçün',
                     url: 'https://form.jotform.com/240623742991460'
