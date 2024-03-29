@@ -39,6 +39,7 @@ import SalesReserve from "./pages/Reports/SalesReserve";
 import AnnouncementList from "./pages/Announcement/AnnouncementList";
 import AnnouncementItem from './pages/Announcement/AnnouncementItem';
 import OrderTracking from "./pages/OrderHistory/OrderTracking";
+import { Leobank } from "./pages/Leobank";
 
 export const IsAuth = createContext(null);
 
@@ -125,6 +126,7 @@ const App = () => {
                                 <PrivateRoute path='/reports/sales-detailed' exact component={SalesDetailed}/>
                                 <PrivateRoute path='/reports/settlements' exact component={Settlements}/>
                                 <PrivateRoute path='/reports/settlements/embakitchen' exact component={SettlementsEmbakitchen}/>
+                                <PrivateRoute path='/leobank' exact component={Leobank}/>
                             </>
                         )
                     }

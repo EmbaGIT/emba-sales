@@ -840,3 +840,13 @@ tr.show {
     font-weight: 700;
     font-size: 15px;
 }
+
+.leobank-button {
+    display: flex;
+    align-items: center;
+}
+
+.leobank-button svg {
+    transform: scale(1.2);
+    transform-origin: top left;
+}
