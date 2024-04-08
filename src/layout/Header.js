@@ -110,21 +110,6 @@ const Header = (props) => {
                                     </select>
                                 </div>
                             )}
-                            
-                            {isAccountant && (
-                                <Link to="/leobank">
-                                    <span
-                                        className="text-reset me-4 leobank-button"
-                                        role="button"
-                                        data-toggle="tooltip"
-                                        data-placement="left"
-                                        title="Leobank kredit yoxlanışı"
-                                        dangerouslySetInnerHTML={{
-                                            __html: leobankIcon
-                                        }}
-                                    />
-                                </Link>
-                            )}
 
                             {isAccountant && (
                                 <Link to="/order-tracking">

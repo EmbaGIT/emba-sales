@@ -1,23 +1,27 @@
 import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import InputMask from 'react-input-mask'
-import { get } from '../api/Api'
+import jwt from 'jwt-decode'
+import { v4 as uuidv4 } from 'uuid'
+import { get, post } from '../api/Api'
 import { getHost } from '../helpers/host'
+import { formattedDate } from '../helpers/formattedDate'
 
-const createArrayFromRange = ([start, end]) =>
+const createArrayFromRange = (start, end) =>
     Array(end - (start - 1))
         .fill(0)
         .map((_, i) => start + i)
 
 const validationErrorMessages = {
     phone: 'Zəhmət olmasa telefon nömrəsini daxil edin.',
-    initialSum: 'Zəhmət olmasa nağd ödəniş məbləğini daxil edin.',
+    initialSum: 'Zəhmət olmasa ilkin ödəniş məbləğini daxil edin.',
     totalSum: 'Zəhmət olmasa ümumi ödəniş məbləğini daxil edin.',
     date: 'Zəhmət olmasa sifariş tarixini daxil edin.',
     numberOfPayments: 'Zəhmət olmasa ödəniş aylarının sayını daxil edin.'
 }
 
-export const Leobank = () => {
+export const LeobankForm = ({ products }) => {
+    console.log(products)
     const [orderInfo, setOrderInfo] = useState({
         phone: '',
         initialSum: '',
@@ -31,7 +35,8 @@ export const Leobank = () => {
             {}
         )
     )
-    const [mounted, setMounted] = useState(false)
+    const [decodedToken, setDecodedToken] = useState(null)
+    const [bankOrderId, setBankOrderId] = useState(null)
 
     const validateOrderInfo = () => setValidationErrors(
         Object
@@ -39,41 +44,89 @@ export const Leobank = () => {
             .reduce((result, [key, value]) => {
                 if (!value) {
                     return { ...result, [key]: true }
-                } else if (value && validationErrors[key]) {
-                    return { ...result, [key]: false }
                 }
 
-                return { ...result, [key]: value }
+                return { ...result, [key]: false }
             }, {})
     )
 
-    const updateOrderInfo = (key, value) => {
-        console.log('orderInfo', orderInfo)
-        console.log('validationErrors', validationErrors)
+    const updateOrderInfo = (key, value) =>
         setOrderInfo({ ...orderInfo, [key]: value })
-    }
 
-    const hasValidationError = () => !!Object
+    const hasValidationError = () => Object
         .values(orderInfo)
         .filter(info => !info).length
 
     const createOrder = (e) => {
         e.preventDefault()
-        if (hasValidationError()) validateOrderInfo()
+
+        if (hasValidationError()) {
+            validateOrderInfo()
+            return
+        }
+        else {
+            setValidationErrors(
+                Object
+                    .keys(validationErrors)
+                    .reduce((result, [key]) => ({ ...result, [key]: false }))
+            )
+        }
+
+        const pointId = decodedToken ? decodedToken.uid : uuidv4()
+
+        const requestBody = {
+            initialAmount: +orderInfo.initialSum,
+            invoice: {
+                date: formattedDate(orderInfo.date),
+                number: uuidv4(),
+                pointId
+            },
+            phone: orderInfo.phone.replace(/\D/g, ''),
+            products,
+            program: {
+                numberOfPayments: orderInfo.numberOfPayments,
+                type: 'part-payment'
+            },
+            resultCallback: 'https://api.emba.store/es/payments/api/v1/lending/leo-bank/order/callback',
+            totalAmount: +orderInfo.totalSum
+        }
+
+        post(
+            `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/create`,
+            requestBody
+        )
+            .then((response) => {
+                setBankOrderId(response.bankOrderId)
+                localStorage.setItem('bankOrderId', response.bankOrderId)
+            })
+            .catch((error) => console.log(error))
     }
 
+    // const checkOrderStatus = () => {
+    //     post(
+    //         `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/check`,
+    //         { bankOrderId }
+    //     )
+    //         .then((response) => {
+    //             console.log(response)
+    //         })
+    //         .catch((error) => console.log(error))
+    // }
+
     useEffect(() => {
-        if (!mounted) setMounted(true)
-        get(`${getHost('payments', 8094)}/api/v1/query`)
-            .then((response) => console.log(response))
-            .catch((error) => console.log(error))
+        const token = jwt(localStorage.getItem('jwt_token'))
+        setDecodedToken(token);
+
+        // get(`${getHost('payments', 8094)}/api/v1/query`)
+        //     .then((response) => console.log(response))
+        //     .catch((error) => console.log(error))
     }, [])
 
     return (
         <div>
-            <form onSubmit={createOrder}>
+            <form className='leobank-form' onSubmit={createOrder}>
                 <div className='row'>
-                    <div className='col-4 mb-3'>
+                    <div className='col-6 mb-3'>
                         <label>Telefon nömrəsi</label>
                         <InputMask
                             mask='(+\9\9499) 999-99-99'
@@ -89,11 +142,11 @@ export const Leobank = () => {
                             </div>
                         )}
                     </div>
-                    <div className='col-4 mb-3'>
+                    <div className='col-6 mb-3'>
                         <label>Nağd ödəniş məbləği</label>
                         <input
                             className='form-control'
-                            placeholder='Nağd ödəniş məbləği'
+                            placeholder='İlkin ödəniş məbləği'
                             type='number'
                             value={orderInfo?.initialSum || ''}
                             onChange={(e) =>
@@ -106,7 +159,7 @@ export const Leobank = () => {
                             </div>
                         )}
                     </div>
-                    <div className='col-4 mb-3'>
+                    <div className='col-6 mb-3'>
                         <label>Ümumi məbləğ</label>
                         <input
                             className='form-control'
@@ -123,7 +176,7 @@ export const Leobank = () => {
                             </div>
                         )}
                     </div>
-                    <div className='col-4 mb-3'>
+                    <div className='col-6 mb-3'>
                         <label>Tarix</label>
                         <DatePicker
                             className='form-control'
@@ -137,7 +190,7 @@ export const Leobank = () => {
                             </div>
                         )}
                     </div>
-                    <div className='col-4 mb-3'>
+                    <div className='col-6 mb-3'>
                         <label>Ayların sayı</label>
                         <select
                             className='form-control'
@@ -155,7 +208,7 @@ export const Leobank = () => {
                             >
                                 Aylıq ödənişlərin sayını seçin
                             </option>
-                            {createArrayFromRange([3, 24]).map((m) => (
+                            {createArrayFromRange(3, 24).map((m) => (
                                 <option
                                     value={m}
                                     key={m}
@@ -170,13 +223,21 @@ export const Leobank = () => {
                             </div>
                         )}
                     </div>
-                    <div className='col-12 mt-3'>
+                    <div className='col-6'>
                         <button
                             type='submit'
-                            className='btn btn-primary'
+                            className='btn btn-block btn-primary'
                         >
-                            Sifariş yaradın
+                            Sorğu göndərin
                         </button>
+                        {/* <div className='w-50 ms-2'>
+                            <button
+                                className='btn btn-block btn-primary'
+                                onClick={checkOrderStatus}
+                            >
+                                Sorğunun statusunu yoxlayın
+                            </button>
+                        </div> */}
                     </div>
                 </div>
             </form>

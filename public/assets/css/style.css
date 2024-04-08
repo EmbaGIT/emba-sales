@@ -846,7 +846,23 @@ tr.show {
     align-items: center;
 }
 
+.leobank-button, .leobank-button:focus {
+    background-color: transparent;
+    border: none;
+    margin-right: 0.75rem;
+}
+
 .leobank-button svg {
     transform: scale(1.2);
     transform-origin: top left;
+}
+
+
+.leobank-form label::after {
+    content: '*';
+    color: red;
+}
+
+.leobank-form button {
+    margin-top: 25.59px;
 }
