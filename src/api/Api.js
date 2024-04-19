@@ -97,7 +97,8 @@ axiosInstance.interceptors.response.use((res) => {
         error?.response?.status &&
         !error?.response?.config?.url?.includes('order-track') &&
         !error?.response?.config?.url?.includes('sales/report') &&
-        !error?.response?.config?.url?.includes('mutual-calculation')
+        !error?.response?.config?.url?.includes('mutual-calculation') &&
+        !error?.response?.config?.url?.includes('/api/v1/query')
     ) {
         toast.error(<MessageComponent text={error?.response?.data?.message || 'Xəta baş verdi!'} />, {
             position: toast.POSITION.TOP_LEFT,

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
-import DatePicker from 'react-datepicker'
 import InputMask from 'react-input-mask'
 import jwt from 'jwt-decode'
 import { v4 as uuidv4 } from 'uuid'
-import { get, post } from '../api/Api'
+import { post } from '../api/Api'
 import { getHost } from '../helpers/host'
 import { formattedDate } from '../helpers/formattedDate'
 
@@ -15,19 +14,22 @@ const createArrayFromRange = (start, end) =>
 const validationErrorMessages = {
     phone: 'Zəhmət olmasa telefon nömrəsini daxil edin.',
     initialSum: 'Zəhmət olmasa ilkin ödəniş məbləğini daxil edin.',
-    totalSum: 'Zəhmət olmasa ümumi ödəniş məbləğini daxil edin.',
-    date: 'Zəhmət olmasa sifariş tarixini daxil edin.',
     numberOfPayments: 'Zəhmət olmasa ödəniş aylarının sayını daxil edin.'
 }
 
-export const LeobankForm = ({ products }) => {
-    console.log(products)
+export const LeobankForm = ({ selectedLeobankSale, setLeobankModalIsShown }) => {
+    const products = selectedLeobankSale?.goods
+        .map(({ product_price, product_quantity, product_name }) => ({
+            amount: product_price,
+            count: product_quantity,
+            name: product_name
+        }))
+
+    console.log(selectedLeobankSale)
     const [orderInfo, setOrderInfo] = useState({
-        phone: '',
-        initialSum: '',
-        totalSum: '',
-        date: '',
-        numberOfPayments: ''
+        phone: selectedLeobankSale?.bankInfo?.phone,
+        initialSum: selectedLeobankSale?.bankInfo?.initialAmount,
+        numberOfPayments: selectedLeobankSale?.bankInfo?.program?.numberOfPayments
     })
     const [validationErrors, setValidationErrors] = useState(
         Object.keys(orderInfo).reduce(
@@ -36,7 +38,6 @@ export const LeobankForm = ({ products }) => {
         )
     )
     const [decodedToken, setDecodedToken] = useState(null)
-    const [bankOrderId, setBankOrderId] = useState(null)
 
     const validateOrderInfo = () => setValidationErrors(
         Object
@@ -72,15 +73,17 @@ export const LeobankForm = ({ products }) => {
             )
         }
 
+        setLeobankModalIsShown(false)
         const pointId = decodedToken ? decodedToken.uid : uuidv4()
 
         const requestBody = {
             initialAmount: +orderInfo.initialSum,
             invoice: {
-                date: formattedDate(orderInfo.date),
+                date: formattedDate(new Date()),
                 number: uuidv4(),
                 pointId
             },
+            orderId: selectedLeobankSale?.uuid,
             phone: orderInfo.phone.replace(/\D/g, ''),
             products,
             program: {
@@ -88,7 +91,7 @@ export const LeobankForm = ({ products }) => {
                 type: 'part-payment'
             },
             resultCallback: 'https://api.emba.store/es/payments/api/v1/lending/leo-bank/order/callback',
-            totalAmount: +orderInfo.totalSum
+            totalAmount: +selectedLeobankSale?.totalPrice
         }
 
         post(
@@ -96,7 +99,6 @@ export const LeobankForm = ({ products }) => {
             requestBody
         )
             .then((response) => {
-                setBankOrderId(response.bankOrderId)
                 localStorage.setItem('bankOrderId', response.bankOrderId)
             })
             .catch((error) => console.log(error))
@@ -135,6 +137,7 @@ export const LeobankForm = ({ products }) => {
                                 updateOrderInfo('phone', e.target.value)
                             }
                             value={orderInfo?.phone || ''}
+                            disabled={!!selectedLeobankSale?.bankInfo?.phone || false}
                         />
                         {validationErrors.phone && (
                             <div className='invalid-feedback d-block position-relative mt-1'>
@@ -152,6 +155,7 @@ export const LeobankForm = ({ products }) => {
                             onChange={(e) =>
                                 updateOrderInfo('initialSum', e.target.value)
                             }
+                            disabled={!!selectedLeobankSale?.bankInfo?.initialAmount.toString() || false}
                         />
                         {validationErrors.initialSum && (
                             <div className='invalid-feedback d-block position-relative mt-1'>
@@ -165,28 +169,12 @@ export const LeobankForm = ({ products }) => {
                             className='form-control'
                             placeholder='Ümumi məbləğ'
                             type='number'
-                            value={orderInfo?.totalSum || ''}
-                            onChange={(e) =>
-                                updateOrderInfo('totalSum', e.target.value)
-                            }
+                            disabled
+                            value={selectedLeobankSale?.totalPrice || ''}
                         />
                         {validationErrors.totalSum && (
                             <div className='invalid-feedback d-block position-relative mt-1'>
                                 {validationErrorMessages.totalSum}
-                            </div>
-                        )}
-                    </div>
-                    <div className='col-6 mb-3'>
-                        <label>Tarix</label>
-                        <DatePicker
-                            className='form-control'
-                            dateFormat='yyyy-MM-dd'
-                            selected={orderInfo?.date || ''}
-                            onChange={(date) => updateOrderInfo('date', date)}
-                        />
-                        {validationErrors.date && (
-                            <div className='invalid-feedback d-block position-relative mt-1'>
-                                {validationErrorMessages.date}
                             </div>
                         )}
                     </div>
@@ -201,6 +189,7 @@ export const LeobankForm = ({ products }) => {
                                     e.target.value
                                 )
                             }
+                            disabled={!!selectedLeobankSale?.bankInfo?.program?.numberOfPayments || false}
                         >
                             <option
                                 value={''}

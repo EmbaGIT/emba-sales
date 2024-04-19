@@ -39,9 +39,10 @@ const AllOrders = () => {
     });
     const [rerender, setRerender] = useState(false);
     const [leobankModalIsShown, setLeobankModalIsShown] = useState(false)
-    const [selectedLeobankId, setSelectedLeobankId] = useState(null)
+    const [selectedLeobankSale, setSelectedLeobankSale] = useState(null)
 
     const orderList = (list, page) => {
+        console.log(list)
         const orders=[];
         list.content.forEach(order => {
             let totalPrice=0;
@@ -61,7 +62,28 @@ const AllOrders = () => {
 
     useEffect(() => {
         post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}&size=10`).then(res => {
-            orderList(res, page);
+            const bankOrderPromises = res.content.map(async (c) => {
+                if (c.uuid) {
+                    const bankInfo = await (
+                        async () => {
+                            return get(`${getHost('payments', 8094)}/api/v1/query/${c.uuid}`)
+                                .then((response) => response)
+                                .catch(() => null)
+                        }
+                    )()
+                    return { ...c, bankInfo }
+                }
+
+                return c
+            })
+            Promise.allSettled(
+                bankOrderPromises
+            ).then(values => {
+                orderList({
+                    ...res,
+                    content: values.map(v => v.value)
+                }, page);
+            })
             setPageState(res);
         })
     }, [page, rerender]);
@@ -173,6 +195,15 @@ const AllOrders = () => {
         }
     }
 
+    const checkBankStatus = uuid => {
+        post(
+            `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/check`,
+            { orderId: uuid }
+        )
+            .then((response) => console.log(response))
+            .catch((error) => console.log(error))
+    }
+
     return (
         <div>
             <div className="mb-2">
@@ -252,20 +283,47 @@ const AllOrders = () => {
                                             </td>
                                             <td>{order.createdAt} {order.creationTime}</td>
                                             <td>{order.totalPrice} AZN</td>
-                                            <td>Yoxdur!!!</td>
+                                            <td>
+                                                {
+                                                    !order.bankInfo
+                                                        ? <span className="badge leo-no-status">Kredit mövcud deyil</span>
+                                                        : (order.bankInfo.state && order.bankInfo.subState)
+                                                            ? <span className="leo-double-state">
+                                                                <span className={`badge ${order.bankInfo.state}`}>{order.bankInfo.state}</span>
+                                                                <span className={`badge ${order.bankInfo.subState}`}>{order.bankInfo.subState}</span>
+                                                            </span>
+                                                            : <span className="badge leo-in-queue">Bankdan cavab gözlənilir</span>
+                                                }
+                                            </td>
                                             {/*<td>{order.orderNum}</td>*/}
                                             <td>
                                                 <div className="d-flex align-items-center">
                                                     {
-                                                        order.status === 'SAVED' && (
+                                                        order.bankInfo && !order.bankInfo.state && !order.bankInfo.subState && <button
+                                                            className="update-leo-status"
+                                                            onClick={() => checkBankStatus(order.uuid)}
+                                                        >
+                                                            <i class="fas fa-sync-alt"></i>
+                                                        </button>
+                                                    }
+                                                    {
+                                                        order.bankInfo && order.bankInfo.subState === 'WAITING_FOR_STORE_CONFIRM' && <button
+                                                            className="update-leo-status"
+                                                            onClick={() => checkBankStatus(order.uuid)}
+                                                        >
+                                                            <i class="fas fa-check-circle"></i>
+                                                        </button>
+                                                    }
+                                                    {
+                                                        order.status === 'SAVED' && (!order.bankInfo || (order.bankInfo?.state === 'FAIL' && order.bankInfo?.subState === 'STORE_CONFIRM_TIME_EXPIRED')) && (
                                                             <button
                                                                 className="leobank-button"
                                                                 dangerouslySetInnerHTML={{
                                                                     __html: leobankIcon
                                                                 }}
                                                                 onClick={() => {
-                                                                    setSelectedLeobankId(order.id)
-                                                                    setLeobankModalIsShown(!leobankModalIsShown)
+                                                                    setLeobankModalIsShown(true)
+                                                                    setSelectedLeobankSale(order)
                                                                 }}
                                                             />
                                                         )
@@ -310,13 +368,12 @@ const AllOrders = () => {
             {
                 leobankModalIsShown && (
                     <LeobankModal
-                        leobankModalIsShown={leobankModalIsShown}
                         setLeobankModalIsShown={setLeobankModalIsShown}
+                        selectedLeobankSale={selectedLeobankSale}
                         onCloseModal={() => {
                             setLeobankModalIsShown(false)
-                            setSelectedLeobankId(null)
+                            selectedLeobankSale(null)
                         }}
-                        selectedLeobankId={selectedLeobankId}
                     />
                 )
             }
