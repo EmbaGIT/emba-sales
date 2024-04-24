@@ -900,6 +900,17 @@ tr.show {
     color: rgb(255, 255, 255);
 }
 
+.leo-double-state .ADDED,
+.leo-double-state .WAITING_VALIDATION,
+.leo-double-state .VALIDATED,
+.leo-double-state .WAITING_FOR_CLIENT,
+.leo-double-state .CLIENT_APPROVED,
+.leo-double-state .WAITING_FOR_ISSUE_INSTALLMENT,
+.leo-double-state .INSTALLMENT_ISSUED {
+    background-color: rgb(248, 225, 15);
+    color: rgb(0, 0, 0);
+}
+
 .leo-double-state .WAITING_FOR_STORE_CONFIRM {
     background-color: rgb(79, 254, 26);
     color: rgb(0, 0, 0);

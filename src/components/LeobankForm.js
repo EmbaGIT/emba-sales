@@ -17,7 +17,12 @@ const validationErrorMessages = {
     numberOfPayments: 'Zəhmət olmasa ödəniş aylarının sayını daxil edin.'
 }
 
-export const LeobankForm = ({ selectedLeobankSale, setLeobankModalIsShown }) => {
+export const LeobankForm = ({
+    selectedLeobankSale,
+    setLeobankModalIsShown,
+    rerender,
+    setRerender
+}) => {
     const products = selectedLeobankSale?.goods
         .map(({ product_price, product_quantity, product_name }) => ({
             amount: product_price,
@@ -99,6 +104,7 @@ export const LeobankForm = ({ selectedLeobankSale, setLeobankModalIsShown }) => 
             requestBody
         )
             .then((response) => {
+                setRerender(!rerender)
                 localStorage.setItem('bankOrderId', response.bankOrderId)
             })
             .catch((error) => console.log(error))

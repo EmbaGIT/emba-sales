@@ -181,7 +181,7 @@ const Header = (props) => {
                                     </span>
                                 </Link>
                             </div>
-                            <NavLink to="/allOrder"><i className="fas fa-cloud-download-alt me-4 text-body" style={{ fontSize: '20px' }} />
+                            <NavLink to="/allOrder/0"><i className="fas fa-cloud-download-alt me-4 text-body" style={{ fontSize: '20px' }} />
                             </NavLink>
 
                             <div>

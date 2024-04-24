@@ -1,7 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import {get, post, remove} from "../../api/Api";
 import AuthContext from "../../store/AuthContext";
-import {useQuery} from "../../hooks/useQuery";
 import ReactPaginate from "react-paginate";
 import OrderInfo from "./OrderInfo";
 import { confirmAlert } from 'react-confirm-alert';
@@ -10,6 +9,11 @@ import DatePicker from "react-datepicker";
 import {formattedDate} from "../../helpers/formattedDate";
 import { getHost } from "../../helpers/host";
 import { LeobankModal } from "../../components/LeobankModal";
+import { useHistory, useParams } from 'react-router-dom'
+import Loader from 'react-loader-spinner'
+import {
+    LEOBANK_ORDER_STATES, LEOBANK_ORDER_SUB_STATES
+} from '../../helpers/leobank-order-statuses'
 
 const leobankIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" width="23" height="28" viewBox="0 0 23 28" fill="none">
@@ -24,7 +28,9 @@ const leobankIcon = `
 const AllOrders = () => {
     // const query = useQuery();
     // const currentPage = query.get("page") || 0;
-    const [page, setPage] = useState(0);
+    const history = useHistory()
+    const params = useParams()
+    const [page, setPage] = useState(+params.page);
     const authCtx = useContext(AuthContext);
     const [rows, setRows] = useState(1);
     const [statusValue, setStatusValue] = useState('all');
@@ -42,7 +48,6 @@ const AllOrders = () => {
     const [selectedLeobankSale, setSelectedLeobankSale] = useState(null)
 
     const orderList = (list, page) => {
-        console.log(list)
         const orders=[];
         list.content.forEach(order => {
             let totalPrice=0;
@@ -61,6 +66,7 @@ const AllOrders = () => {
     }
 
     useEffect(() => {
+        setIsLoading(true)
         post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}&size=10`).then(res => {
             const bankOrderPromises = res.content.map(async (c) => {
                 if (c.uuid) {
@@ -83,6 +89,7 @@ const AllOrders = () => {
                     ...res,
                     content: values.map(v => v.value)
                 }, page);
+                setIsLoading(false)
             })
             setPageState(res);
         })
@@ -170,6 +177,7 @@ const AllOrders = () => {
     }
 
     const paginate = (n) => {
+        history.push(`/allOrder/${n.selected}`)
         setPage(+n.selected);
         statusFilter(statusValue, n.selected);
     }
@@ -200,7 +208,10 @@ const AllOrders = () => {
             `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/check`,
             { orderId: uuid }
         )
-            .then((response) => console.log(response))
+            .then((response) => {
+                console.log(response)
+                setRerender(!rerender)
+            })
             .catch((error) => console.log(error))
     }
 
@@ -252,7 +263,7 @@ const AllOrders = () => {
                 </div>
                 <div className="mt-3">
                     <div className=""><h4 className="fm-poppins flex-1">Satıcı sifarişləri</h4></div>
-                    {orderState.length ?
+                    {(!isLoading && orderState.length) ?
                         <div>
                             <div className="table-responsive">
                                 <table className="table bordered striped">
@@ -270,7 +281,10 @@ const AllOrders = () => {
                                     </thead>
                                     <tbody>
                                     {orderState && orderState.map((order, i) => (
-                                        <tr key={i}>
+                                        <tr
+                                            key={i}
+                                            style={{ verticalAlign: 'middle' }}
+                                        >
                                             <td>{+i + rows}</td>
                                             <td><span className="cursor-pointer text-primary font-weight-bolder" onClick={handleModuleInfo.bind(null, order.id)}>{order.client_name}</span></td>
                                             <td>
@@ -297,13 +311,21 @@ const AllOrders = () => {
                                             </td>
                                             {/*<td>{order.orderNum}</td>*/}
                                             <td>
+                                                {console.log(order.bankInfo)}
                                                 <div className="d-flex align-items-center">
                                                     {
-                                                        order.bankInfo && !order.bankInfo.state && !order.bankInfo.subState && <button
+                                                        ((
+                                                            order.bankInfo
+                                                            && !order.bankInfo.state
+                                                            && !order.bankInfo.subState
+                                                        ) || (
+                                                            order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && (order.bankInfo?.subState !== LEOBANK_ORDER_SUB_STATES.WAITING_FOR_STORE_CONFIRM && order.bankInfo?.subState !== LEOBANK_ORDER_SUB_STATES.STORE_APPROVED)
+                                                        ))
+                                                        && <button
                                                             className="update-leo-status"
                                                             onClick={() => checkBankStatus(order.uuid)}
                                                         >
-                                                            <i class="fas fa-sync-alt"></i>
+                                                            <i className="fas fa-sync-alt"></i>
                                                         </button>
                                                     }
                                                     {
@@ -311,7 +333,7 @@ const AllOrders = () => {
                                                             className="update-leo-status"
                                                             onClick={() => checkBankStatus(order.uuid)}
                                                         >
-                                                            <i class="fas fa-check-circle"></i>
+                                                            <i className="fas fa-check-double"></i>
                                                         </button>
                                                     }
                                                     {
@@ -361,7 +383,14 @@ const AllOrders = () => {
                                 />
                             </div>
                         </div>
-                        : <p className="text-center">Heç bir məlumat tapılmadı.</p>}
+                        : <div className='w-100 d-flex justify-content-center'>
+                        <Loader
+                            type="ThreeDots"
+                            color="#00BFFF"
+                            height={60}
+                            width={60}
+                        />
+                    </div>}
                 </div>
             </div>
 
@@ -374,6 +403,8 @@ const AllOrders = () => {
                             setLeobankModalIsShown(false)
                             selectedLeobankSale(null)
                         }}
+                        rerender={rerender}
+                        setRerender={setRerender}
                     />
                 )
             }

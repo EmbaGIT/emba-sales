@@ -103,7 +103,7 @@ const App = () => {
                     <PrivateRoute path='/cart' exact component={Cart}/>
                     <PrivateRoute path='/checkout' exact component={Checkout}/>
                     <PrivateRoute path='/orderPrint/:id' exact component={OrderPrint}/>
-                    <PrivateRoute path='/allOrder' exact component={AllOrders}/>
+                    <PrivateRoute path='/allOrder/:page' exact component={AllOrders}/>
                     <PrivateRoute path='/reports' exact component={Reports}/>
                     <PrivateRoute path='/reports/options' exact component={ReportOptions}/>
                     <PrivateRoute path='/reports/warehouse/:page/:pageSize' exact component={Warehouse}/>

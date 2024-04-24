@@ -171,6 +171,7 @@ const Checkout = () => {
     })
     const [lastSelectedUid, setLastSelectedUid] = useState('')
     const [customerAge, setCustomerAge] = useState('')
+    const [isLeobankSelected, setIsLeobankSelected] = useState(false)
 
     const handlePercentChange = e => {
         const { value } = e.target;
@@ -771,7 +772,7 @@ const Checkout = () => {
             setIsAddingWishlist(true);
             post(`${getHost('sales', 8087)}/api/order/wishlist`, order_data).then(res => {
                 setIsAddingWishlist(false);
-                history.push(`/allOrder`);
+                history.push(`/allOrder/0`);
                 toast.success(<MessageComponent text='Sifariş yadda saxlanıldı!'/>, {
                     position: toast.POSITION.TOP_LEFT,
                     toastId: 'success-toast-message',
@@ -1264,6 +1265,19 @@ const Checkout = () => {
                                               value={checkoutState.customerInfo && checkoutState.customerInfo.note}/>
                                 </div>
                             </div>
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id="isLeobankSelected"
+                                    onChange={e => {
+                                        setIsLeobankSelected(e.target.checked)
+                                    }}
+                                />
+                                <label className="form-check-label" htmlFor="isLeobankSelected">
+                                    Leobank kreditlə satış
+                                </label>
+                            </div>
                         </>}
                     </div>
                 </div>
@@ -1276,7 +1290,7 @@ const Checkout = () => {
                             {isAddingWishlist ? "Gözləyin" : "Yadda saxla"}
                         </button>
                         <button
-                            disabled={isSending}
+                            disabled={isSending || isLeobankSelected}
                             className="btn btn-success"
                             onClick={sendOrder.bind(this, 'ORDERED')}>
                             {isSending ? "Gözləyin" : "Göndər"}

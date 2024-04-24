@@ -4,7 +4,9 @@ import Modal from '../UI/Modal';
 export const LeobankModal = ({
     setLeobankModalIsShown,
     onCloseModal,
-    selectedLeobankSale
+    selectedLeobankSale,
+    rerender,
+    setRerender
 }) => {
     return (
         <Modal noPadding onClose={onCloseModal}>
@@ -17,6 +19,8 @@ export const LeobankModal = ({
                     <LeobankForm
                         selectedLeobankSale={selectedLeobankSale}
                         setLeobankModalIsShown={setLeobankModalIsShown}
+                        rerender={rerender}
+                        setRerender={setRerender}
                     />
                 </div>
             </div>
