@@ -16,7 +16,7 @@ export const remove = (url, data) => axiosInstance.delete(url, data).then((res) 
 export const gett = (url) => axiosInstance.get(url);
 export const postt = (url, data) => axiosInstance.post(url, data);
 
-const MessageComponent = ({ text }) => (
+export const MessageComponent = ({ text }) => (
     <span style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
     <span
         style={{

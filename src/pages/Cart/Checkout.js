@@ -768,7 +768,7 @@ const Checkout = () => {
                 console.log(err);
             })
         }
-        if (status === "SAVED" && handleNameSurnameValidation()) {
+        if (status === "SAVED" && handleValidation()) {
             setIsAddingWishlist(true);
             post(`${getHost('sales', 8087)}/api/order/wishlist`, order_data).then(res => {
                 setIsAddingWishlist(false);
@@ -1240,7 +1240,7 @@ const Checkout = () => {
                                         onChange={(date) => setPaymentDate(date)}
                                         minDate={new Date()}
                                     />
-                                    {!formValidation.delivery_date &&
+                                    {!formValidation.payment_date &&
                                         <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                                 <div className="col-md-6">
@@ -1253,7 +1253,7 @@ const Checkout = () => {
                                         onChange={(date) => setDeliveryDate(date)}
                                         minDate={new Date()}
                                     />
-                                    {!formValidation.payment_date &&
+                                    {!formValidation.delivery_date &&
                                         <small className="text-danger">Xananı doldurmaq mütləqdir.</small>}
                                 </div>
                             </div>

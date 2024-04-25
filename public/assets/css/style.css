@@ -868,6 +868,10 @@ tr.show {
     margin-top: 25.59px;
 }
 
+.leo-order-states {
+    text-transform: uppercase;
+}
+
 .leo-no-status {
     background-color: rgba(116, 116, 116, 0.33);
     color: rgba(0, 0, 0);
@@ -911,7 +915,9 @@ tr.show {
     color: rgb(0, 0, 0);
 }
 
-.leo-double-state .WAITING_FOR_STORE_CONFIRM {
+.leo-double-state .WAITING_FOR_STORE_CONFIRM,
+.leo-double-state .STORE_APPROVED,
+.leo-double-state .ACTIVE {
     background-color: rgb(79, 254, 26);
     color: rgb(0, 0, 0);
 }
@@ -928,4 +934,8 @@ tr.show {
 .update-leo-status i {
     color: green;
     font-size: 20px;
+}
+
+.Toastify__toast-container.Toastify__toast-container--top-left {
+    z-index: 11111;
 }

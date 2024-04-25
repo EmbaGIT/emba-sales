@@ -30,12 +30,12 @@ export const LeobankForm = ({
             name: product_name
         }))
 
-    console.log(selectedLeobankSale)
     const [orderInfo, setOrderInfo] = useState({
         phone: selectedLeobankSale?.bankInfo?.phone,
         initialSum: selectedLeobankSale?.bankInfo?.initialAmount,
         numberOfPayments: selectedLeobankSale?.bankInfo?.program?.numberOfPayments
     })
+
     const [validationErrors, setValidationErrors] = useState(
         Object.keys(orderInfo).reduce(
             (result, key) => ({ ...result, [key]: false }),
@@ -110,24 +110,9 @@ export const LeobankForm = ({
             .catch((error) => console.log(error))
     }
 
-    // const checkOrderStatus = () => {
-    //     post(
-    //         `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/check`,
-    //         { bankOrderId }
-    //     )
-    //         .then((response) => {
-    //             console.log(response)
-    //         })
-    //         .catch((error) => console.log(error))
-    // }
-
     useEffect(() => {
         const token = jwt(localStorage.getItem('jwt_token'))
         setDecodedToken(token);
-
-        // get(`${getHost('payments', 8094)}/api/v1/query`)
-        //     .then((response) => console.log(response))
-        //     .catch((error) => console.log(error))
     }, [])
 
     return (

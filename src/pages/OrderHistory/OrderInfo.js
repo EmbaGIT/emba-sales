@@ -397,7 +397,8 @@ const OrderInfo = (props) => {
                     delivery_date: resOrderInfo.delivery_date,
                     goods: products,
                     totalPrice: total_price,
-                    discountPrice: discount_total_price
+                    discountPrice: discount_total_price,
+                    uuid: resOrderInfo.uuid
                 }))
             })
         })
@@ -600,7 +601,8 @@ const OrderInfo = (props) => {
                 "id": orderInfo.id,
                 "payment_date": orderInfo.payment_date,
                 "payment_method": orderInfo.paymentType,
-                "user_uid": authCtx.user_uid
+                "user_uid": authCtx.user_uid,
+                "uuid": orderInfo.uuid
             }
             post(`${getHost('sales', 8087)}/api/order/update/${orderInfo.id}`, postData).then(res => {
                 setIsSending(false);
@@ -611,6 +613,7 @@ const OrderInfo = (props) => {
                     autoClose: 1500,
                     closeOnClick: true,
                 });
+                props.setRerender(!props.rerender)
             }).catch(err => {
                 setIsSending(false);
             });

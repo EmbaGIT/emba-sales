@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {get, post, remove} from "../../api/Api";
+import {get, post, remove, MessageComponent} from "../../api/Api";
 import AuthContext from "../../store/AuthContext";
 import ReactPaginate from "react-paginate";
 import OrderInfo from "./OrderInfo";
@@ -12,8 +12,10 @@ import { LeobankModal } from "../../components/LeobankModal";
 import { useHistory, useParams } from 'react-router-dom'
 import Loader from 'react-loader-spinner'
 import {
-    LEOBANK_ORDER_STATES, LEOBANK_ORDER_SUB_STATES
+    LEOBANK_ORDER_STATES, LEOBANK_ORDER_STATES_LABELS, LEOBANK_ORDER_SUB_STATES,
+    LEOBANK_ORDER_SUB_STATES_LABELS
 } from '../../helpers/leobank-order-statuses'
+import { toast } from 'react-toastify'
 
 const leobankIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" width="23" height="28" viewBox="0 0 23 28" fill="none">
@@ -208,9 +210,60 @@ const AllOrders = () => {
             `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/check`,
             { orderId: uuid }
         )
+            .then(() => setRerender(!rerender))
+            .catch((error) => console.log(error))
+    }
+
+    const confirmOrder = (order) => {
+        post(
+            `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/check`,
+            { orderId: order.uuid }
+        )
             .then((response) => {
-                console.log(response)
-                setRerender(!rerender)
+                if (
+                    response.state === LEOBANK_ORDER_STATES.FAIL &&
+                    response.subState === LEOBANK_ORDER_SUB_STATES.STORE_CONFIRM_TIME_EXPIRED
+                ) {
+                    setRerender(!rerender)
+                    toast.error(
+                        <MessageComponent
+                            text={'Taksit təsdiq vaxtı bitmişdir! Zəhmət olmasa, taksit sifarişini yenidən yaradın.'}
+                        />, {
+                            position: toast.POSITION.TOP_LEFT,
+                            toastId: 'error-toast-message',
+                            autoClose: 5000,
+                            closeOnClick: true,
+                        }
+                    );
+                    setSelectedLeobankSale(order)
+                    setLeobankModalIsShown(true)
+                } else {
+                    post(
+                        `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/confirm`,
+                        { orderId: order.uuid }
+                    )
+                        .then((confirmResponse) => {
+                            if ((
+                                confirmResponse.state === LEOBANK_ORDER_STATES.IN_PROCESS && confirmResponse.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED
+                            ) || (
+                                confirmResponse.state === LEOBANK_ORDER_STATES.SUCCESS && confirmResponse.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE
+                            )) {
+                                setRerender(!rerender)
+                                toast.success(
+                                    <MessageComponent
+                                        text={'Taksit bank tərəfindən təsdiqləndi! Zəhmət olmasa, sifarişi 1C bazasına göndərin.'}
+                                    />, {
+                                        position: toast.POSITION.TOP_LEFT,
+                                        toastId: 'success-toast-message',
+                                        autoClose: 5000,
+                                        closeOnClick: true,
+                                    }
+                                );
+                                handleModuleInfo(order.id)
+                            }
+                        })
+                        .catch((error) => console.log(error))
+                }
             })
             .catch((error) => console.log(error))
     }
@@ -297,21 +350,24 @@ const AllOrders = () => {
                                             </td>
                                             <td>{order.createdAt} {order.creationTime}</td>
                                             <td>{order.totalPrice} AZN</td>
-                                            <td>
+                                            <td className='leo-order-states'>
                                                 {
-                                                    !order.bankInfo
-                                                        ? <span className="badge leo-no-status">Kredit mövcud deyil</span>
+                                                    order.status === 'SAVED' ? (!order.bankInfo
+                                                        ? <span className="badge leo-no-status">KREDİT MÖVCUD DEYİL</span>
                                                         : (order.bankInfo.state && order.bankInfo.subState)
                                                             ? <span className="leo-double-state">
-                                                                <span className={`badge ${order.bankInfo.state}`}>{order.bankInfo.state}</span>
-                                                                <span className={`badge ${order.bankInfo.subState}`}>{order.bankInfo.subState}</span>
+                                                                <span className={`badge ${order.bankInfo.state}`}>{LEOBANK_ORDER_STATES_LABELS[order.bankInfo.state]}</span>
+                                                                <span className={`badge ${order.bankInfo.subState}`}>{LEOBANK_ORDER_SUB_STATES_LABELS[order.bankInfo.subState]}</span>
                                                             </span>
-                                                            : <span className="badge leo-in-queue">Bankdan cavab gözlənilir</span>
+                                                            : <span className="badge leo-in-queue">BANKDAN CAVAB GÖZLƏNİLİR</span>) : order.status === 'ORDERED' && ((
+                                                                order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED
+                                                            ) || (
+                                                                order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE
+                                                            )) ? <span className="badge bg-success">KREDİT UĞURLA TAMAMLANDI</span> : <span className="badge leo-no-status">KREDİT MÖVCUD DEYİL</span>
                                                 }
                                             </td>
                                             {/*<td>{order.orderNum}</td>*/}
                                             <td>
-                                                {console.log(order.bankInfo)}
                                                 <div className="d-flex align-items-center">
                                                     {
                                                         ((
@@ -331,7 +387,7 @@ const AllOrders = () => {
                                                     {
                                                         order.bankInfo && order.bankInfo.subState === 'WAITING_FOR_STORE_CONFIRM' && <button
                                                             className="update-leo-status"
-                                                            onClick={() => checkBankStatus(order.uuid)}
+                                                            onClick={() => confirmOrder(order)}
                                                         >
                                                             <i className="fas fa-check-double"></i>
                                                         </button>
@@ -360,7 +416,7 @@ const AllOrders = () => {
                                 </table>
                             </div>
                             {cartIsShown && <OrderInfo onCloseModal={hideCartHandler} info={orderInfo}
-                                                   onItemDelete={deleteGoodFromOrder}/>}
+                                                   onItemDelete={deleteGoodFromOrder} rerender={rerender} setRerender={setRerender} />}
                             <div className=" d-flex justify-content-end">
                                 <ReactPaginate
                                     previousLabel={'Əvvəlki'}
