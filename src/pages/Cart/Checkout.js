@@ -171,7 +171,7 @@ const Checkout = () => {
     })
     const [lastSelectedUid, setLastSelectedUid] = useState('')
     const [customerAge, setCustomerAge] = useState('')
-    const [isLeobankSelected, setIsLeobankSelected] = useState(false)
+    const [leobankOption, setLeobankOption] = useState(null)
 
     const handlePercentChange = e => {
         const { value } = e.target;
@@ -1265,36 +1265,57 @@ const Checkout = () => {
                                               value={checkoutState.customerInfo && checkoutState.customerInfo.note}/>
                                 </div>
                             </div>
-                            <div className="form-check">
-                                <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id="isLeobankSelected"
-                                    onChange={e => {
-                                        setIsLeobankSelected(e.target.checked)
-                                    }}
-                                />
-                                <label className="form-check-label" htmlFor="isLeobankSelected">
-                                    Leobank kreditlə satış
-                                </label>
+                            <div className='d-flex'>
+                                <div className="form-check me-3">
+                                    <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        id="leobankOptionTrue"
+                                        name="leobankOption"
+                                        onChange={() => {
+                                            setLeobankOption(true)
+                                        }}
+                                    />
+                                    <label className="form-check-label" htmlFor="leobankOptionTrue">
+                                        Leobank kreditlə satış
+                                    </label>
+                                </div>
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        id="leobankOptionFalse"
+                                        name="leobankOption"
+                                        onChange={() => {
+                                            setLeobankOption(false)
+                                        }}
+                                    />
+                                    <label className="form-check-label" htmlFor="leobankOptionFalse">
+                                        Nağd satış
+                                    </label>
+                                </div>
                             </div>
                         </>}
                     </div>
                 </div>
                 {customerSearch && (customerSelected || isNewCustomer) && <div className="row mt-3">
                     <div className="col-md-12 d-flex justify-content-end">
-                        <button
-                            disabled={isAddingWishlist}
-                            className="btn btn-warning me-2"
-                            onClick={sendOrder.bind(this, 'SAVED')}>
-                            {isAddingWishlist ? "Gözləyin" : "Yadda saxla"}
-                        </button>
-                        <button
-                            disabled={isSending || isLeobankSelected}
-                            className="btn btn-success"
-                            onClick={sendOrder.bind(this, 'ORDERED')}>
-                            {isSending ? "Gözləyin" : "Göndər"}
-                        </button>
+                        {leobankOption !== null && (
+                            <>
+                                <button
+                                    disabled={isAddingWishlist}
+                                    className="btn btn-warning me-2"
+                                    onClick={sendOrder.bind(this, 'SAVED')}>
+                                    {isAddingWishlist ? "Gözləyin" : "Yadda saxla"}
+                                </button>
+                                {leobankOption === false && <button
+                                    disabled={isSending}
+                                    className="btn btn-success"
+                                    onClick={sendOrder.bind(this, 'ORDERED')}>
+                                    {isSending ? "Gözləyin" : "Göndər"}
+                                </button>}
+                            </>
+                        )}
                     </div>
                 </div>}
             </div>

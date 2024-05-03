@@ -76,7 +76,13 @@ const AllOrders = () => {
                         async () => {
                             return get(`${getHost('payments', 8094)}/api/v1/query/${c.uuid}`)
                                 .then((response) => response)
-                                .catch(() => null)
+                                .catch(() => {
+                                    if (c.expiredUuid) {
+                                        return get(`${getHost('payments', 8094)}/api/v1/query/${c.expiredUuid}`)
+                                            .then(response => response)
+                                            .catch(err => err)
+                                    }
+                                })
                         }
                     )()
                     return { ...c, bankInfo }
@@ -224,7 +230,6 @@ const AllOrders = () => {
                     response.state === LEOBANK_ORDER_STATES.FAIL &&
                     response.subState === LEOBANK_ORDER_SUB_STATES.STORE_CONFIRM_TIME_EXPIRED
                 ) {
-                    setRerender(!rerender)
                     toast.error(
                         <MessageComponent
                             text={'Taksit təsdiq vaxtı bitmişdir! Zəhmət olmasa, taksit sifarişini yenidən yaradın.'}
@@ -235,8 +240,20 @@ const AllOrders = () => {
                             closeOnClick: true,
                         }
                     );
-                    setSelectedLeobankSale(order)
-                    setLeobankModalIsShown(true)
+                    post(
+                        `${getHost('sales', 8087)}/api/order/wishlist/${order.id}`,
+                        order
+                    )
+                    .then((saleResponse) => {
+                        setSelectedLeobankSale({
+                            ...saleResponse, bankInfo: response
+                        })
+                        setRerender(!rerender)
+                    })
+                    .catch(saleError => console.log(saleError))
+                    .finally(() => {
+                        setLeobankModalIsShown(true)
+                    })
                 } else {
                     post(
                         `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/confirm`,
@@ -393,7 +410,7 @@ const AllOrders = () => {
                                                         </button>
                                                     }
                                                     {
-                                                        order.status === 'SAVED' && (!order.bankInfo || (order.bankInfo?.state === 'FAIL' && order.bankInfo?.subState === 'STORE_CONFIRM_TIME_EXPIRED')) && (
+                                                        order.status === 'SAVED' && (!order.bankInfo || order.bankInfo?.state === LEOBANK_ORDER_STATES.FAIL) && (
                                                             <button
                                                                 className="leobank-button"
                                                                 dangerouslySetInnerHTML={{
@@ -457,7 +474,7 @@ const AllOrders = () => {
                         selectedLeobankSale={selectedLeobankSale}
                         onCloseModal={() => {
                             setLeobankModalIsShown(false)
-                            selectedLeobankSale(null)
+                            setSelectedLeobankSale(null)
                         }}
                         rerender={rerender}
                         setRerender={setRerender}

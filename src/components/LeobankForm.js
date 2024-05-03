@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { post } from '../api/Api'
 import { getHost } from '../helpers/host'
 import { formattedDate } from '../helpers/formattedDate'
+import { LEOBANK_ORDER_STATES, LEOBANK_ORDER_SUB_STATES } from '../helpers/leobank-order-statuses'
 
 const createArrayFromRange = (start, end) =>
     Array(end - (start - 1))
@@ -13,7 +14,6 @@ const createArrayFromRange = (start, end) =>
 
 const validationErrorMessages = {
     phone: 'Zəhmət olmasa telefon nömrəsini daxil edin.',
-    initialSum: 'Zəhmət olmasa ilkin ödəniş məbləğini daxil edin.',
     numberOfPayments: 'Zəhmət olmasa ödəniş aylarının sayını daxil edin.'
 }
 
@@ -31,9 +31,9 @@ export const LeobankForm = ({
         }))
 
     const [orderInfo, setOrderInfo] = useState({
-        phone: selectedLeobankSale?.bankInfo?.phone,
-        initialSum: selectedLeobankSale?.bankInfo?.initialAmount,
-        numberOfPayments: selectedLeobankSale?.bankInfo?.program?.numberOfPayments
+        phone: selectedLeobankSale?.bankInfo?.phone || '',
+        initialSum: selectedLeobankSale?.bankInfo?.initialAmount || '',
+        numberOfPayments: selectedLeobankSale?.bankInfo?.program?.numberOfPayments || ''
     })
 
     const [validationErrors, setValidationErrors] = useState(
@@ -48,7 +48,7 @@ export const LeobankForm = ({
         Object
             .entries(orderInfo)
             .reduce((result, [key, value]) => {
-                if (!value) {
+                if (key !== 'initialSum' && !value) {
                     return { ...result, [key]: true }
                 }
 
@@ -56,12 +56,13 @@ export const LeobankForm = ({
             }, {})
     )
 
-    const updateOrderInfo = (key, value) =>
+    const updateOrderInfo = (key, value) => {
         setOrderInfo({ ...orderInfo, [key]: value })
+    }
 
     const hasValidationError = () => Object
-        .values(orderInfo)
-        .filter(info => !info).length
+        .entries(orderInfo)
+        .filter(([key, value]) => key !== 'initialSum' && !value).length
 
     const createOrder = (e) => {
         e.preventDefault()
@@ -95,24 +96,29 @@ export const LeobankForm = ({
                 numberOfPayments: orderInfo.numberOfPayments,
                 type: 'part-payment'
             },
-            resultCallback: 'https://api.emba.store/es/payments/api/v1/lending/leo-bank/order/callback',
-            totalAmount: +selectedLeobankSale?.totalPrice
+            totalAmount: +selectedLeobankSale?.bankInfo?.totalAmount || +selectedLeobankSale?.totalPrice
         }
 
         post(
             `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/create`,
             requestBody
         )
-            .then((response) => {
+            .then(() => {
                 setRerender(!rerender)
-                localStorage.setItem('bankOrderId', response.bankOrderId)
             })
-            .catch((error) => console.log(error))
+            .catch(() => {
+                if (
+                    !!selectedLeobankSale?.bankInfo?.state ||
+                    !!selectedLeobankSale?.bankInfo?.subState
+                ) {
+                    setRerender(!rerender)
+                }
+            })
     }
 
     useEffect(() => {
         const token = jwt(localStorage.getItem('jwt_token'))
-        setDecodedToken(token);
+        setDecodedToken(token)
     }, [])
 
     return (
@@ -120,7 +126,7 @@ export const LeobankForm = ({
             <form className='leobank-form' onSubmit={createOrder}>
                 <div className='row'>
                     <div className='col-6 mb-3'>
-                        <label>Telefon nömrəsi</label>
+                        <label className='required'>Telefon nömrəsi</label>
                         <InputMask
                             mask='(+\9\9499) 999-99-99'
                             className='form-control'
@@ -128,7 +134,7 @@ export const LeobankForm = ({
                                 updateOrderInfo('phone', e.target.value)
                             }
                             value={orderInfo?.phone || ''}
-                            disabled={!!selectedLeobankSale?.bankInfo?.phone || false}
+                            disabled={selectedLeobankSale?.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_CONFIRM_TIME_EXPIRED || false}
                         />
                         {validationErrors.phone && (
                             <div className='invalid-feedback d-block position-relative mt-1'>
@@ -146,22 +152,17 @@ export const LeobankForm = ({
                             onChange={(e) =>
                                 updateOrderInfo('initialSum', e.target.value)
                             }
-                            disabled={!!selectedLeobankSale?.bankInfo?.initialAmount.toString() || false}
+                            disabled={selectedLeobankSale?.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_CONFIRM_TIME_EXPIRED || false}
                         />
-                        {validationErrors.initialSum && (
-                            <div className='invalid-feedback d-block position-relative mt-1'>
-                                {validationErrorMessages.initialSum}
-                            </div>
-                        )}
                     </div>
                     <div className='col-6 mb-3'>
-                        <label>Ümumi məbləğ</label>
+                        <label className='required'>Ümumi məbləğ</label>
                         <input
                             className='form-control'
                             placeholder='Ümumi məbləğ'
                             type='number'
                             disabled
-                            value={selectedLeobankSale?.totalPrice || ''}
+                            value={selectedLeobankSale?.bankInfo?.totalAmount || selectedLeobankSale?.totalPrice}
                         />
                         {validationErrors.totalSum && (
                             <div className='invalid-feedback d-block position-relative mt-1'>
@@ -170,7 +171,7 @@ export const LeobankForm = ({
                         )}
                     </div>
                     <div className='col-6 mb-3'>
-                        <label>Ayların sayı</label>
+                        <label className='required'>Ayların sayı</label>
                         <select
                             className='form-control'
                             value={orderInfo?.numberOfPayments || ''}
@@ -180,7 +181,7 @@ export const LeobankForm = ({
                                     e.target.value
                                 )
                             }
-                            disabled={!!selectedLeobankSale?.bankInfo?.program?.numberOfPayments || false}
+                            disabled={selectedLeobankSale?.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_CONFIRM_TIME_EXPIRED || false}
                         >
                             <option
                                 value={''}
@@ -210,14 +211,6 @@ export const LeobankForm = ({
                         >
                             Sorğu göndərin
                         </button>
-                        {/* <div className='w-50 ms-2'>
-                            <button
-                                className='btn btn-block btn-primary'
-                                onClick={checkOrderStatus}
-                            >
-                                Sorğunun statusunu yoxlayın
-                            </button>
-                        </div> */}
                     </div>
                 </div>
             </form>
