@@ -423,7 +423,7 @@ const AllOrders = () => {
                                                             />
                                                         )
                                                     }
-                                                    {(order.status === 'ORDER_FAILED' || order.status === 'SAVED') &&
+                                                    {(order.status === 'ORDER_FAILED' || order.status === 'SAVED') && !((order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED) || (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE)) &&
                                                     <i className="fas fa-trash-alt text-danger cursor-pointer" onClick={handleOrderDelete.bind(this, order.id)}/>}
                                                 </div>
                                             </td>
