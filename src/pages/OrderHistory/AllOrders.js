@@ -16,6 +16,8 @@ import {
     LEOBANK_ORDER_SUB_STATES_LABELS
 } from '../../helpers/leobank-order-statuses'
 import { toast } from 'react-toastify'
+import jwt from 'jwt-decode'
+import Modal from "../../UI/Modal";
 
 const leobankIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" width="23" height="28" viewBox="0 0 23 28" fill="none">
@@ -48,6 +50,11 @@ const AllOrders = () => {
     const [rerender, setRerender] = useState(false);
     const [leobankModalIsShown, setLeobankModalIsShown] = useState(false)
     const [selectedLeobankSale, setSelectedLeobankSale] = useState(null)
+    const [returnInstallmentModalIsShown, setReturnInstallmentModalIsShown] = useState(false)
+    const [password, setPassword] = useState('')
+    const [passwordMissing, setPasswordMissing] = useState(false)
+    const [selectedOrderToReturn, setSelectedOrderToReturn] = useState(null)
+    const user = localStorage.getItem('jwt_token') ? jwt(localStorage.getItem('jwt_token')) : null
 
     const orderList = (list, page) => {
         const orders=[];
@@ -68,8 +75,11 @@ const AllOrders = () => {
     }
 
     useEffect(() => {
+        const url = user?.roles?.includes('ACCOUNTANT')
+            ? `/api/order/accountant/search?size=10&page=${page}`
+            : `/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}`
         setIsLoading(true)
-        post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}&size=10`).then(res => {
+        post(`${getHost('sales', 8087)}${url}`).then(res => {
             const bankOrderPromises = res.content.map(async (c) => {
                 if (c.uuid) {
                     const bankInfo = await (
@@ -173,6 +183,7 @@ const AllOrders = () => {
                 orderList(res, 0);
                 setPage(0);
                 setPageState(res);
+                setIsLoading(false)
             }).catch(err => console.log(err))
         }else{
             setIsLoading(true);
@@ -180,6 +191,7 @@ const AllOrders = () => {
                 orderList(res, 0);
                 setPage(0);
                 setPageState(res);
+                setIsLoading(false)
             }).catch(err => console.log(err))
         }
     }
@@ -285,6 +297,34 @@ const AllOrders = () => {
             .catch((error) => console.log(error))
     }
 
+    const checkPassword = async (e) => {
+        e.preventDefault()
+        if (!password.length) {
+            setPasswordMissing(true)
+        } else {
+            try {
+                const isPasswordCorrect = await post(
+                    `${getHost('payments', 8094)}/api/v1/passcode/check?request=${password}`
+                )
+                if (isPasswordCorrect) {
+                    try {
+                        const response = await post(
+                            `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/return`,
+                            selectedOrderToReturn
+                        )
+                        console.log(response)
+                        setReturnInstallmentModalIsShown(false)
+                        setRerender(!rerender)
+                    } catch (returnError) {
+                        console.log(returnError)
+                    }
+                }
+            } catch (passwordError) {
+                console.log(passwordError)
+            }
+        }
+    }
+
     return (
         <div>
             <div className="mb-2">
@@ -332,7 +372,9 @@ const AllOrders = () => {
                     </div>
                 </div>
                 <div className="mt-3">
-                    <div className=""><h4 className="fm-poppins flex-1">Satıcı sifarişləri</h4></div>
+                    <div className="">
+                        <h4 className="fm-poppins flex-1">Satıcı sifarişləri</h4>
+                    </div>
                     {(!isLoading && orderState.length) ?
                         <div>
                             <div className="table-responsive">
@@ -356,7 +398,30 @@ const AllOrders = () => {
                                             style={{ verticalAlign: 'middle' }}
                                         >
                                             <td>{+i + rows}</td>
-                                            <td><span className="cursor-pointer text-primary font-weight-bolder" onClick={handleModuleInfo.bind(null, order.id)}>{order.client_name}</span></td>
+                                            <td>
+                                                <div style={{
+                                                    display: user?.roles?.includes('ACCOUNTANT') ? 'flex' : '',
+                                                    alignItems: 'center'
+                                                }}>    
+                                                    <span
+                                                        className="cursor-pointer text-primary font-weight-bolder" onClick={handleModuleInfo.bind(null, order.id)}
+                                                        style={{
+                                                            marginRight: user?.roles?.includes('ACCOUNTANT') ? 16 : 0,
+                                                            lineHeight: '100%',
+                                                            alignItems: 'center'
+                                                        }}
+                                                    >
+                                                        {order.client_name}
+                                                    </span>
+                                                    {
+                                                        order?.user_uid === user?.uid
+                                                            ? <span
+                                                                className="badge bg-danger"
+                                                            >Mənim satışım</span>
+                                                            : null
+                                                    }
+                                                </div>
+                                            </td>
                                             <td>
                                                 {order.status === 'ORDER_FAILED' &&
                                                 <span className="badge bg-warning text-dark">Uğursuz sifariş</span>}
@@ -425,6 +490,20 @@ const AllOrders = () => {
                                                     }
                                                     {(order.status === 'ORDER_FAILED' || order.status === 'SAVED') && !((order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED) || (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE)) &&
                                                     <i className="fas fa-trash-alt text-danger cursor-pointer" onClick={handleOrderDelete.bind(this, order.id)}/>}
+                                                    {
+                                                        ((order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED) || (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE)) && <button
+                                                            className="return-installment"
+                                                            onClick={() => {
+                                                                setSelectedOrderToReturn({
+                                                                    amount: order?.bankInfo?.totalAmount,
+                                                                    bankOrderId: order?.bankInfo?.bankOrderId
+                                                                })
+                                                                setReturnInstallmentModalIsShown(true)
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-undo"></i>
+                                                        </button>
+                                                    }
                                                 </div>
                                             </td>
                                         </tr>
@@ -433,7 +512,7 @@ const AllOrders = () => {
                                 </table>
                             </div>
                             {cartIsShown && <OrderInfo onCloseModal={hideCartHandler} info={orderInfo}
-                                                   onItemDelete={deleteGoodFromOrder} rerender={rerender} setRerender={setRerender} />}
+                                                   onItemDelete={deleteGoodFromOrder} rerender={rerender} setRerender={setRerender} orderState={orderState} />}
                             <div className=" d-flex justify-content-end">
                                 <ReactPaginate
                                     previousLabel={'Əvvəlki'}
@@ -455,6 +534,9 @@ const AllOrders = () => {
                                     forcePage={page}
                                 />
                             </div>
+                        </div>
+                        : (!isLoading && !orderState.length) ? <div className="alert alert-danger text-center py-3" role="alert">
+                            Sizin mövcud sifarişiniz yoxdur!
                         </div>
                         : <div className='w-100 d-flex justify-content-center'>
                         <Loader
@@ -481,9 +563,93 @@ const AllOrders = () => {
                     />
                 )
             }
+
+            {
+                returnInstallmentModalIsShown && (
+                    <ReturnInstallmentModal
+                        password={password}
+                        setPassword={setPassword}
+                        returnInstallmentModalIsShown={returnInstallmentModalIsShown}
+                        setReturnInstallmentModalIsShown={setReturnInstallmentModalIsShown}
+                        checkPassword={checkPassword}
+                        passwordMissing={passwordMissing}
+                        setPasswordMissing={setPasswordMissing}
+                        setSelectedOrderToReturn={setSelectedOrderToReturn}
+                    />
+                )
+            }
         </div>
     )
 
 }
+
+const ReturnInstallmentModal = ({
+    password,
+    setPassword,
+    returnInstallmentModalIsShown,
+    setReturnInstallmentModalIsShown,
+    checkPassword,
+    passwordMissing,
+    setPasswordMissing,
+    setSelectedOrderToReturn
+}) => (
+    <Modal
+        noPadding
+        onClose={() => {
+            setReturnInstallmentModalIsShown(false)
+            setPassword('')
+            setPasswordMissing(false)
+            setSelectedOrderToReturn(null)
+        }}
+    >
+        <div className='card'>
+            <div className='list-group-item list-group-item-success'>
+                Taksit ləğvi üçün şifrə
+            </div>
+
+            <div className='card-body'>
+                <form className='leobank-form' onSubmit={checkPassword}>
+                    <div className='row'>
+                        <div className='col-12'>
+                            <label className='required mb-1'>Şifrəni daxil edin:</label>
+                            <input
+                                className='form-control'
+                                placeholder='Şifrə'
+                                value={password}
+                                onChange={(e) => {
+                                    setPassword(e.target.value)
+                                    setPasswordMissing(e.target.value.length === 0)
+                                }}
+                            />
+                            {passwordMissing && (
+                            <div className='invalid-feedback d-block position-relative mt-1'>
+                                Zəhmət olmasa, şifrəni daxil edib davam edin!
+                            </div>
+                        )}
+                        </div>
+                        <div className='col-6'>
+                            <button
+                                type='submit'
+                                className='btn btn-block btn-success'
+                                onClick={checkPassword}
+                            >Təsdiq et</button>
+                        </div>
+                        <div className='col-6'>
+                            <button
+                                className='btn btn-block btn-danger'
+                                onClick={() => {
+                                    setReturnInstallmentModalIsShown(false)
+                                    setPassword('')
+                                    setPasswordMissing(false)
+                                    setSelectedOrderToReturn(null)
+                                }}
+                            >Imtina et</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </Modal>
+)
 
 export default AllOrders;

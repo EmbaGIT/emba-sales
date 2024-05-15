@@ -15,6 +15,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import CartContext from "../../store/CartContext";
 import {useHistory} from "react-router-dom";
 import { getHost } from "../../helpers/host";
+import moment from 'moment';
 
 const CUSTOMER_QUERY = gql`
     query searchCustomer($name: String, $serial: String, $finCode: String) {
@@ -47,6 +48,8 @@ const FULL_INFO_QUERY = gql`
     }`
 
 const OrderInfo = (props) => {
+    const bankInfo = props.orderState.find(o => o.id === props.info.id)?.bankInfo;
+    console.log(bankInfo)
     const [orders, setOrders] = useState(props.info);
     const authCtx = useContext(AuthContext);
     const cartCtx = useContext(CartContext);
@@ -649,6 +652,17 @@ const OrderInfo = (props) => {
                                 aria-selected="false"
                             >Müştəri məlumatı</a>
                         </li>
+                        {bankInfo && <li className="nav-item" role="presentation">
+                            <a
+                                className="nav-link"
+                                id="ex1-tab-3"
+                                data-mdb-toggle="tab"
+                                href="#installment-info"
+                                role="tab"
+                                aria-controls="ex1-tabs-3"
+                                aria-selected="false"
+                            >Taksit məlumatları</a>
+                        </li>}
                     </ul>
                     <div className="tab-content" id="ex1-content">
                         <div
@@ -930,6 +944,46 @@ const OrderInfo = (props) => {
                                 </div>
                             </div>
                         </div>
+                        {bankInfo && <div className="tab-pane fade" id="installment-info" role="tabpanel" aria-labelledby="installment-info">
+                            <div>
+                                <table className="table table-striped table-hover table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th>İlkin ödəniş</th>
+                                            <td>{bankInfo?.initialAmount}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Taksit məbləği</th>
+                                            <td>{+bankInfo?.totalAmount - +bankInfo?.initialAmount}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Telefon nömrəsi</th>
+                                            <td>+{bankInfo?.phone}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Ayların sayı</th>
+                                            <td>{bankInfo?.program?.numberOfPayments}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Mağaza</th>
+                                            <td>{bankInfo?.invoice?.pointId}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Tarix</th>
+                                            <td>{
+                                                moment(
+                                                    new Date(
+                                                        bankInfo?.invoice?.date[0],
+                                                        bankInfo?.invoice?.date[1] - 1,
+                                                        bankInfo?.invoice?.date[2],
+                                                    )
+                                                ).format('DD.MM.YYYY')
+                                            }</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>}
                     </div>
 
                 </div>

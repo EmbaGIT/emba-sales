@@ -86,14 +86,13 @@ export const LeobankForm = ({
             initialAmount: +orderInfo.initialSum,
             invoice: {
                 date: formattedDate(new Date()),
-                number: uuidv4(),
-                pointId
+                number: uuidv4()
             },
             orderId: selectedLeobankSale?.uuid,
             phone: orderInfo.phone.replace(/\D/g, ''),
             products,
             program: {
-                numberOfPayments: orderInfo.numberOfPayments,
+                numberOfPayments: +orderInfo.numberOfPayments,
                 type: 'part-payment'
             },
             totalAmount: +selectedLeobankSale?.bankInfo?.totalAmount || +selectedLeobankSale?.totalPrice

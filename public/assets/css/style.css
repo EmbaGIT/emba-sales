@@ -919,14 +919,16 @@ tr.show {
 .leo-double-state .REJECTED_BY_CLIENT,
 .leo-double-state .CLIENT_CONFIRM_TIME_EXPIRED,
 .leo-double-state .ISSUE_INSTALLMENT_TIME_EXPIRED,
-.leo-double-state .INSTALLMENT_EXISTS {
+.leo-double-state .INSTALLMENT_EXISTS,
+.leo-double-state .WAITING_RETURN {
     background-color: rgb(248, 225, 15);
     color: rgb(0, 0, 0);
 }
 
 .leo-double-state .WAITING_FOR_STORE_CONFIRM,
 .leo-double-state .STORE_APPROVED,
-.leo-double-state .ACTIVE {
+.leo-double-state .ACTIVE,
+.leo-double-state .SUCCESS {
     background-color: rgb(79, 254, 26);
     color: rgb(0, 0, 0);
 }
@@ -947,4 +949,16 @@ tr.show {
 
 .Toastify__toast-container.Toastify__toast-container--top-left {
     z-index: 11111;
+}
+
+.return-installment, .return-installment:focus {
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+
+.return-installment {
+    color: #f93154;
+    font-size: 1.1rem;
+    font-weight: 700;
 }
