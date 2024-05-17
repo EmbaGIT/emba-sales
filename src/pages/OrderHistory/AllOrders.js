@@ -53,7 +53,9 @@ const AllOrders = () => {
     const [returnInstallmentModalIsShown, setReturnInstallmentModalIsShown] = useState(false)
     const [password, setPassword] = useState('')
     const [passwordMissing, setPasswordMissing] = useState(false)
-    const [selectedOrderToReturn, setSelectedOrderToReturn] = useState(null)
+    const [returnedAmount, setReturnedAmount] = useState('')
+    const [returnedAmountMissing, setReturnedAmountMissing] = useState(false)
+    const [bankOrderIdToReturn, setBankOrderIdToReturn] = useState('')
     const user = localStorage.getItem('jwt_token') ? jwt(localStorage.getItem('jwt_token')) : null
 
     const orderList = (list, page) => {
@@ -76,8 +78,9 @@ const AllOrders = () => {
 
     useEffect(() => {
         const url = user?.roles?.includes('ACCOUNTANT')
-            ? `/api/order/accountant/search?size=10&page=${page}`
-            : `/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${page}`
+            ? `/api/order/accountant/search?sort=createdAt,desc&sort=creationTime,desc&size=10&page=${page}`
+            : `/api/order/search?user_uid.equals=${authCtx.user_uid}&sort=createdAt,desc&size=10&page=${page}`
+
         setIsLoading(true)
         post(`${getHost('sales', 8087)}${url}`).then(res => {
             const bankOrderPromises = res.content.map(async (c) => {
@@ -299,8 +302,10 @@ const AllOrders = () => {
 
     const checkPassword = async (e) => {
         e.preventDefault()
-        if (!password.length) {
+        if (!password.toString().length) {
             setPasswordMissing(true)
+        } else if (!returnedAmount.toString().length) {
+            setReturnedAmountMissing(true)
         } else {
             try {
                 const isPasswordCorrect = await post(
@@ -308,13 +313,17 @@ const AllOrders = () => {
                 )
                 if (isPasswordCorrect) {
                     try {
-                        const response = await post(
+                        await post(
                             `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/return`,
-                            selectedOrderToReturn
+                            {
+                                amount: +returnedAmount,
+                                bankOrderId: bankOrderIdToReturn
+                            }
                         )
-                        console.log(response)
                         setReturnInstallmentModalIsShown(false)
                         setRerender(!rerender)
+                        setPassword('')
+                        setReturnedAmount('')
                     } catch (returnError) {
                         console.log(returnError)
                     }
@@ -386,6 +395,7 @@ const AllOrders = () => {
                                         <th scope='col'>Sifariş statusu</th>
                                         <th scope='col'>Sifariş tarixi</th>
                                         <th scope='col'>Ümumi Qiymət</th>
+                                        <th scope='col'>Taksit məbləği</th>
                                         <th scope='col'>Kreditin statusu</th>
                                         {/*<th scope='col'>1C Sifariş Nömrəsi</th>*/}
                                         <th scope='col'>Seçimlər</th>
@@ -414,7 +424,7 @@ const AllOrders = () => {
                                                         {order.client_name}
                                                     </span>
                                                     {
-                                                        order?.user_uid === user?.uid
+                                                        user?.roles?.includes('ACCOUNTANT') && order?.user_uid === user?.uid
                                                             ? <span
                                                                 className="badge bg-danger"
                                                             >Mənim satışım</span>
@@ -431,7 +441,16 @@ const AllOrders = () => {
                                                 <span className="badge bg-primary">Yadda saxlanılan</span>}
                                             </td>
                                             <td>{order.createdAt} {order.creationTime}</td>
-                                            <td>{order.totalPrice} AZN</td>
+                                            <td>{Number(Number(order.totalPrice).toFixed(2))} AZN</td>
+                                            <td>
+                                                {
+                                                    order?.bankInfo
+                                                        ? order?.bankInfo?.returns
+                                                            ? `${+order.bankInfo?.totalAmount - +order.bankInfo?.initialAmount - (order?.bankInfo?.returns?.reduce((acc, r) => acc + r.amount, 0))} AZN`
+                                                            : `${+order.bankInfo?.totalAmount - +order.bankInfo?.initialAmount} AZN`
+                                                        : ''
+                                                }
+                                            </td>
                                             <td className='leo-order-states'>
                                                 {
                                                     order.status === 'SAVED' ? (!order.bankInfo
@@ -452,7 +471,7 @@ const AllOrders = () => {
                                             <td>
                                                 <div className="d-flex align-items-center">
                                                     {
-                                                        ((
+                                                        user?.roles?.includes('ACCOUNTANT') && ((
                                                             order.bankInfo
                                                             && !order.bankInfo.state
                                                             && !order.bankInfo.subState
@@ -467,7 +486,7 @@ const AllOrders = () => {
                                                         </button>
                                                     }
                                                     {
-                                                        order.bankInfo && order.bankInfo.subState === 'WAITING_FOR_STORE_CONFIRM' && <button
+                                                        user?.roles?.includes('ACCOUNTANT') && order.bankInfo && order.bankInfo.subState === 'WAITING_FOR_STORE_CONFIRM' && <button
                                                             className="update-leo-status"
                                                             onClick={() => confirmOrder(order)}
                                                         >
@@ -475,7 +494,7 @@ const AllOrders = () => {
                                                         </button>
                                                     }
                                                     {
-                                                        order.status === 'SAVED' && (!order.bankInfo || order.bankInfo?.state === LEOBANK_ORDER_STATES.FAIL) && (
+                                                        user?.roles?.includes('ACCOUNTANT') && order.status === 'SAVED' && (!order.bankInfo || order.bankInfo?.state === LEOBANK_ORDER_STATES.FAIL) && (
                                                             <button
                                                                 className="leobank-button"
                                                                 dangerouslySetInnerHTML={{
@@ -488,17 +507,15 @@ const AllOrders = () => {
                                                             />
                                                         )
                                                     }
-                                                    {(order.status === 'ORDER_FAILED' || order.status === 'SAVED') && !((order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED) || (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE)) &&
+                                                    {(order.status === 'ORDER_FAILED' || order.status === 'SAVED') && !((order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED) || (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE) || (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.RETURNED)) && (!(user?.roles?.includes('USER') && order?.bankInfo)) &&
                                                     <i className="fas fa-trash-alt text-danger cursor-pointer" onClick={handleOrderDelete.bind(this, order.id)}/>}
                                                     {
-                                                        ((order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED) || (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE)) && <button
+                                                        user?.roles?.includes('ACCOUNTANT') && ((order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED) || (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE)) && <button
                                                             className="return-installment"
                                                             onClick={() => {
-                                                                setSelectedOrderToReturn({
-                                                                    amount: order?.bankInfo?.totalAmount,
-                                                                    bankOrderId: order?.bankInfo?.bankOrderId
-                                                                })
+                                                                setBankOrderIdToReturn(order?.bankInfo?.bankOrderId)
                                                                 setReturnInstallmentModalIsShown(true)
+                                                                setReturnedAmount(order?.bankInfo?.returns ? (+order.bankInfo?.totalAmount - +order.bankInfo?.initialAmount - (order?.bankInfo?.returns?.reduce((acc, r) => acc + r.amount, 0))) : (+order.bankInfo?.totalAmount - +order.bankInfo?.initialAmount))
                                                             }}
                                                         >
                                                             <i className="fas fa-undo"></i>
@@ -574,7 +591,11 @@ const AllOrders = () => {
                         checkPassword={checkPassword}
                         passwordMissing={passwordMissing}
                         setPasswordMissing={setPasswordMissing}
-                        setSelectedOrderToReturn={setSelectedOrderToReturn}
+                        setBankOrderIdToReturn={setBankOrderIdToReturn}
+                        returnedAmount={returnedAmount}
+                        setReturnedAmount={setReturnedAmount}
+                        returnedAmountMissing={returnedAmountMissing}
+                        setReturnedAmountMissing={setReturnedAmountMissing}
                     />
                 )
             }
@@ -591,7 +612,11 @@ const ReturnInstallmentModal = ({
     checkPassword,
     passwordMissing,
     setPasswordMissing,
-    setSelectedOrderToReturn
+    setBankOrderIdToReturn,
+    returnedAmount,
+    setReturnedAmount,
+    returnedAmountMissing,
+    setReturnedAmountMissing
 }) => (
     <Modal
         noPadding
@@ -599,7 +624,9 @@ const ReturnInstallmentModal = ({
             setReturnInstallmentModalIsShown(false)
             setPassword('')
             setPasswordMissing(false)
-            setSelectedOrderToReturn(null)
+            setReturnedAmount('')
+            setReturnedAmountMissing(false)
+            setBankOrderIdToReturn(null)
         }}
     >
         <div className='card'>
@@ -610,12 +637,13 @@ const ReturnInstallmentModal = ({
             <div className='card-body'>
                 <form className='leobank-form' onSubmit={checkPassword}>
                     <div className='row'>
-                        <div className='col-12'>
+                        <div className='col-12 mb-3'>
                             <label className='required mb-1'>Şifrəni daxil edin:</label>
                             <input
                                 className='form-control'
                                 placeholder='Şifrə'
                                 value={password}
+                                type='password'
                                 onChange={(e) => {
                                     setPassword(e.target.value)
                                     setPasswordMissing(e.target.value.length === 0)
@@ -624,6 +652,23 @@ const ReturnInstallmentModal = ({
                             {passwordMissing && (
                             <div className='invalid-feedback d-block position-relative mt-1'>
                                 Zəhmət olmasa, şifrəni daxil edib davam edin!
+                            </div>
+                        )}
+                        </div>
+                        <div className='col-12'>
+                            <label className='required mb-1'>Qaytarılacaq məbləği daxil edin:</label>
+                            <input
+                                className='form-control'
+                                placeholder='Qaytarılacaq məbləğ'
+                                value={returnedAmount}
+                                onChange={(e) => {
+                                    setReturnedAmount(e.target.value)
+                                    setReturnedAmountMissing(e.target.value.length === 0)
+                                }}
+                            />
+                            {returnedAmountMissing && (
+                            <div className='invalid-feedback d-block position-relative mt-1'>
+                                Zəhmət olmasa, geri qaytarılacaq məbləği daxil edib davam edin!
                             </div>
                         )}
                         </div>
@@ -641,7 +686,9 @@ const ReturnInstallmentModal = ({
                                     setReturnInstallmentModalIsShown(false)
                                     setPassword('')
                                     setPasswordMissing(false)
-                                    setSelectedOrderToReturn(null)
+                                    setReturnedAmount('')
+                                    setReturnedAmountMissing(false)
+                                    setBankOrderIdToReturn(null)
                                 }}
                             >Imtina et</button>
                         </div>

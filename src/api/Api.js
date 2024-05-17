@@ -61,7 +61,7 @@ axiosInstance.interceptors.response.use((res) => {
         toast.success(<MessageComponent text='Uğurlu Əməliyyat!' />, {
             position: toast.POSITION.TOP_LEFT,
             toastId: 'success-toast-message',
-            autoClose: 1500,
+            autoClose: 5000,
             closeOnClick: true,
         });
     }
@@ -69,7 +69,7 @@ axiosInstance.interceptors.response.use((res) => {
         toast.success(<MessageComponent text='Uğurla Silindi!' />, {
             position: toast.POSITION.TOP_LEFT,
             toastId: 'success-toast-message',
-            autoClose: 2000,
+            autoClose: 5000,
             closeOnClick: true,
         });
     }
@@ -85,7 +85,7 @@ axiosInstance.interceptors.response.use((res) => {
         toast.error(<MessageComponent text={text || 'Xəta baş verdi!'} />, {
             position: toast.POSITION.TOP_LEFT,
             toastId: 'error-toast-message',
-            autoClose: 3000,
+            autoClose: 5000,
             closeOnClick: true,
         });
     }
@@ -104,7 +104,7 @@ axiosInstance.interceptors.response.use((res) => {
         toast.error(<MessageComponent text={error?.response?.data?.message || 'Xəta baş verdi!'} />, {
             position: toast.POSITION.TOP_LEFT,
             toastId: 'error-toast-message',
-            autoClose: 3000,
+            autoClose: 5000,
             closeOnClick: true,
         });
     }

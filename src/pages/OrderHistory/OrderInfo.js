@@ -49,7 +49,6 @@ const FULL_INFO_QUERY = gql`
 
 const OrderInfo = (props) => {
     const bankInfo = props.orderState.find(o => o.id === props.info.id)?.bankInfo;
-    console.log(bankInfo)
     const [orders, setOrders] = useState(props.info);
     const authCtx = useContext(AuthContext);
     const cartCtx = useContext(CartContext);

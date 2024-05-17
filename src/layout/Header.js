@@ -4,9 +4,10 @@ import CartContext from "../store/CartContext";
 import AuthContext from "../store/AuthContext";
 import {Link, NavLink, useHistory} from "react-router-dom";
 import ProductSearch from "../components/productSearch";
-import {get} from "../api/Api";
+import {get, post} from "../api/Api";
 import {getHost} from "../helpers/host";
 import jwt from "jwt-decode";
+import Modal from "../UI/Modal";
 
 const leobankIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" width="23" height="28" viewBox="0 0 23 28" fill="none">
@@ -29,6 +30,12 @@ const Header = (props) => {
     const [isDualUser, setIsDualUser] = useState(false)
     const [selectedBrand, setSelectedBrand] = useState('Embawood')
     const history = useHistory()
+
+    const [isChangePasswordModalShown, setIsChangePasswordModalIsShown] = useState(false)
+    const [oldPassword, setOldPassword] = useState('')
+    const [oldPasswordMissing, setOldPasswordMissing] = useState(false)
+    const [newPassword, setNewPassword] = useState('')
+    const [newPasswordMissing, setNewPasswordMissing] = useState(false)
 
     const {items} = cartCtx;
     const numberOfCartItem = items.reduce((curNumber, item) => {
@@ -80,6 +87,33 @@ const Header = (props) => {
             refreshToken()
     }, [isDualUser, selectedBrand])
 
+    const changePassword = async (e) => {
+        e.preventDefault()
+        if (!oldPassword.length) {
+            setOldPasswordMissing(true)
+        } else if (!newPassword.length) {
+            setNewPasswordMissing(true)
+        } else {
+            try {
+                const response = await post(
+                    `${getHost('payments', 8094)}/api/v1/passcode`,
+                    {
+                        oldPasscode: oldPassword,
+                        newPasscode: newPassword
+                    }
+                )
+                console.log(response)
+                setIsChangePasswordModalIsShown(false)
+                setOldPassword('')
+                setOldPasswordMissing(false)
+                setNewPassword('')
+                setNewPasswordMissing(false)
+            } catch (e) {
+                console.log(e)
+            }
+        }
+    }
+
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container-fluid d-block">
@@ -98,6 +132,17 @@ const Header = (props) => {
                     </div>
                     {authCtx.isLoggedIn && <div className="col-lg-6 col-md-9 order-lg-3">
                         <div className="d-flex align-items-center justify-content-end">
+                            {isAccountant && (
+                                <div>
+                                    <button
+                                        className="change-password"
+                                        onClick={() => setIsChangePasswordModalIsShown(true)}
+                                    >
+                                        <i className="fas fa-unlock"></i>
+                                    </button>
+                                </div>
+                            )}
+
                             {isDualUser && (
                                 <div className='me-3'>
                                     <select
@@ -196,8 +241,116 @@ const Header = (props) => {
                     )}
                 </div>
             </div>
+
+            {
+                isChangePasswordModalShown && (
+                    <ChangePasswordModal
+                        setIsChangePasswordModalIsShown={setIsChangePasswordModalIsShown}
+                        changePassword={changePassword}
+                        oldPassword={oldPassword}
+                        setOldPassword={setOldPassword}
+                        oldPasswordMissing={oldPasswordMissing}
+                        setOldPasswordMissing={setOldPasswordMissing}
+                        newPassword={newPassword}
+                        setNewPassword={setNewPassword}
+                        newPasswordMissing={newPasswordMissing}
+                        setNewPasswordMissing={setNewPasswordMissing}
+                    />
+                )
+            }
         </nav>
     )
 }
+
+const ChangePasswordModal = ({
+    setIsChangePasswordModalIsShown,
+    changePassword,
+    oldPassword,
+    setOldPassword,
+    oldPasswordMissing,
+    setOldPasswordMissing,
+    newPassword,
+    setNewPassword,
+    newPasswordMissing,
+    setNewPasswordMissing
+}) => (
+    <Modal
+        noPadding
+        onClose={() => {
+            setIsChangePasswordModalIsShown(false)
+            setOldPassword('')
+            setOldPasswordMissing(false)
+            setNewPassword('')
+            setNewPasswordMissing(false)
+        }}
+    >
+        <div className='card'>
+            <div className='list-group-item list-group-item-success'>
+                Taksit ləğvi üçün şifrənin dəyişilməsi
+            </div>
+
+            <div className='card-body'>
+                <form className='leobank-form' onSubmit={changePassword}>
+                    <div className='row'>
+                        <div className='col-12 mb-3'>
+                            <label className='required mb-1'>Hazırki şifrəni daxil edin:</label>
+                            <input
+                                className='form-control'
+                                placeholder='Hazırki şifrə'
+                                value={oldPassword}
+                                type='password'
+                                onChange={(e) => {
+                                    setOldPassword(e.target.value)
+                                    setOldPasswordMissing(e.target.value.length === 0)
+                                }}
+                            />
+                            {oldPasswordMissing && (
+                                <div className='invalid-feedback d-block position-relative mt-1'>
+                                    Zəhmət olmasa, hazırki şifrəni daxil edib davam edin!
+                                </div>
+                            )}
+                        </div>
+                        <div className='col-12'>
+                            <label className='required mb-1'>Yeni şifrəni daxil edin:</label>
+                            <input
+                                className='form-control'
+                                placeholder='Yeni şifrə'
+                                value={newPassword}
+                                type='password'
+                                onChange={(e) => {
+                                    setNewPassword(e.target.value)
+                                    setNewPasswordMissing(e.target.value.length === 0)
+                                }}
+                            />
+                            {newPasswordMissing && (
+                                <div className='invalid-feedback d-block position-relative mt-1'>
+                                    Zəhmət olmasa, yeni şifrəni daxil edib davam edin!
+                                </div>
+                            )}
+                        </div>
+                        <div className='col-6'>
+                            <button
+                                type='submit'
+                                className='btn btn-block btn-success'
+                            >Təsdiq et</button>
+                        </div>
+                        <div className='col-6'>
+                            <button
+                                className='btn btn-block btn-danger'
+                                onClick={() => {
+                                    setIsChangePasswordModalIsShown(false)
+                                    setOldPassword('')
+                                    setOldPasswordMissing(false)
+                                    setNewPassword('')
+                                    setNewPasswordMissing(false)
+                                }}
+                            >Imtina et</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </Modal>
+)
 
 export default Header;
