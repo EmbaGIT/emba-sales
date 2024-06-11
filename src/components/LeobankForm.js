@@ -125,12 +125,10 @@ export const LeobankForm = ({
                             setRerender(!rerender)
                         }
                     })
-
-                setRerender(!rerender)
             })
             .catch(saleError => console.log(saleError))
             .finally(() => {
-                setLeobankModalIsShown(true)
+                setLeobankModalIsShown(false)
             })
         } else {
             const requestBody = {
