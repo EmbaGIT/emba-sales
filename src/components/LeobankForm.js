@@ -82,37 +82,89 @@ export const LeobankForm = ({
         setLeobankModalIsShown(false)
         const pointId = decodedToken ? decodedToken.uid : uuidv4()
 
-        const requestBody = {
-            initialAmount: +orderInfo.initialSum,
-            invoice: {
-                date: formattedDate(new Date()),
-                number: uuidv4()
-            },
-            orderId: selectedLeobankSale?.uuid,
-            phone: orderInfo.phone.replace(/\D/g, ''),
-            products,
-            program: {
-                numberOfPayments: +orderInfo.numberOfPayments,
-                type: 'part-payment'
-            },
-            totalAmount: +selectedLeobankSale?.bankInfo?.totalAmount || +selectedLeobankSale?.totalPrice
-        }
+        if (
+            selectedLeobankSale?.bankInfo?.state === LEOBANK_ORDER_STATES.FAIL &&
+            (
+                selectedLeobankSale?.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_CONFIRM_TIME_EXPIRED ||
+                selectedLeobankSale?.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.CLIENT_CONFIRM_TIME_EXPIRED
+            )
+        ) {
+            post(
+                `${getHost('sales', 8087)}/api/order/wishlist/${selectedLeobankSale.id}`,
+                selectedLeobankSale
+            )
+            .then((saleResponse) => {
+                const requestBody = {
+                    initialAmount: +orderInfo.initialSum,
+                    invoice: {
+                        date: formattedDate(new Date()),
+                        number: uuidv4()
+                    },
+                    orderId: saleResponse?.uuid,
+                    phone: orderInfo.phone.replace(/\D/g, ''),
+                    products,
+                    program: {
+                        numberOfPayments: +orderInfo.numberOfPayments,
+                        type: 'part-payment'
+                    },
+                    totalAmount: +selectedLeobankSale?.bankInfo?.totalAmount || +selectedLeobankSale?.totalPrice
+                }
 
-        post(
-            `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/create`,
-            requestBody
-        )
-            .then(() => {
+                post(
+                    `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/create`,
+                    requestBody
+                )
+                    .then(() => {
+                        setRerender(!rerender)
+                    })
+                    .catch(() => {
+                        if (
+                            !!selectedLeobankSale?.bankInfo?.state ||
+                            !!selectedLeobankSale?.bankInfo?.subState
+                        ) {
+                            setRerender(!rerender)
+                        }
+                    })
+
                 setRerender(!rerender)
             })
-            .catch(() => {
-                if (
-                    !!selectedLeobankSale?.bankInfo?.state ||
-                    !!selectedLeobankSale?.bankInfo?.subState
-                ) {
-                    setRerender(!rerender)
-                }
+            .catch(saleError => console.log(saleError))
+            .finally(() => {
+                setLeobankModalIsShown(true)
             })
+        } else {
+            const requestBody = {
+                initialAmount: +orderInfo.initialSum,
+                invoice: {
+                    date: formattedDate(new Date()),
+                    number: uuidv4()
+                },
+                orderId: selectedLeobankSale?.uuid,
+                phone: orderInfo.phone.replace(/\D/g, ''),
+                products,
+                program: {
+                    numberOfPayments: +orderInfo.numberOfPayments,
+                    type: 'part-payment'
+                },
+                totalAmount: +selectedLeobankSale?.bankInfo?.totalAmount || +selectedLeobankSale?.totalPrice
+            }
+
+            post(
+                `${getHost('payments', 8094)}/api/v1/lending/leo-bank/order/create`,
+                requestBody
+            )
+                .then(() => {
+                    setRerender(!rerender)
+                })
+                .catch(() => {
+                    if (
+                        !!selectedLeobankSale?.bankInfo?.state ||
+                        !!selectedLeobankSale?.bankInfo?.subState
+                    ) {
+                        setRerender(!rerender)
+                    }
+                })
+        }
     }
 
     useEffect(() => {
