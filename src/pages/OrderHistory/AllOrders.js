@@ -243,7 +243,7 @@ const AllOrders = () => {
             .then((response) => {
                 if (
                     response.state === LEOBANK_ORDER_STATES.FAIL &&
-                    response.subState === LEOBANK_ORDER_SUB_STATES.STORE_CONFIRM_TIME_EXPIRED
+                    (response.subState === LEOBANK_ORDER_SUB_STATES.STORE_CONFIRM_TIME_EXPIRED || response.subState === LEOBANK_ORDER_SUB_STATES.CLIENT_CONFIRM_TIME_EXPIRED)
                 ) {
                     toast.error(
                         <MessageComponent
