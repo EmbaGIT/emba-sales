@@ -453,18 +453,51 @@ const AllOrders = () => {
                                             </td>
                                             <td className='leo-order-states'>
                                                 {
-                                                    order.status === 'SAVED' ? (!order.bankInfo
-                                                        ? <span className="badge leo-no-status">KREDİT MÖVCUD DEYİL</span>
-                                                        : (order.bankInfo.state && order.bankInfo.subState)
-                                                            ? <span className="leo-double-state">
-                                                                <span className={`badge ${order.bankInfo.state}`}>{LEOBANK_ORDER_STATES_LABELS[order.bankInfo.state]}</span>
-                                                                <span className={`badge ${order.bankInfo.subState}`}>{LEOBANK_ORDER_SUB_STATES_LABELS[order.bankInfo.subState]}</span>
+                                                    order.status === 'SAVED' ? (
+                                                        !order.bankInfo ? (
+                                                            <span className='badge leo-no-status'>KREDİT MÖVCUD DEYİL</span>
+                                                        ) : order.bankInfo.state && order.bankInfo.subState ? (
+                                                            <span className='leo-double-state'>
+                                                                <span className={`badge ${order.bankInfo.state}`}>
+                                                                    {LEOBANK_ORDER_STATES_LABELS[order.bankInfo.state]}
+                                                                </span>
+                                                                <span className={`badge ${order.bankInfo.subState}`}>
+                                                                    {LEOBANK_ORDER_SUB_STATES_LABELS[order.bankInfo.subState]}
+                                                                </span>
                                                             </span>
-                                                            : <span className="badge leo-in-queue">BANKDAN CAVAB GÖZLƏNİLİR</span>) : order.status === 'ORDERED' && ((
-                                                                order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED
-                                                            ) || (
-                                                                order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS && order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE
-                                                            )) ? <span className="badge bg-success">KREDİT UĞURLA TAMAMLANDI</span> : <span className="badge leo-no-status">KREDİT MÖVCUD DEYİL</span>
+                                                        ) : (
+                                                            <span className='badge leo-in-queue'>BANKDAN CAVAB GÖZLƏNİLİR</span>
+                                                        )
+                                                    ) : order.status === 'ORDERED' ? (
+                                                        (order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS &&
+                                                            order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED) ||
+                                                        (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS &&
+                                                            order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE) ? (
+                                                            <span className='badge bg-success'>KREDİT UĞURLA TAMAMLANDI</span>
+                                                        ) : (
+                                                            <span className='badge leo-no-status'>KREDİT MÖVCUD DEYİL</span>
+                                                        )
+                                                    ) : (
+                                                        order.status === 'ORDER_FAILED' &&
+                                                        ((order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS &&
+                                                            order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.STORE_APPROVED) ||
+                                                        (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS &&
+                                                            order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE) ? (
+                                                            <span className='badge bg-success'>KREDİT UĞURLA TAMAMLANDI</span>
+                                                        ) : order.bankInfo.state && order.bankInfo.subState ? (
+                                                            <span className='leo-double-state'>
+                                                                <span className={`badge ${order.bankInfo.state}`}>
+                                                                    {LEOBANK_ORDER_STATES_LABELS[order.bankInfo.state]}
+                                                                </span>
+                                                                <span className={`badge ${order.bankInfo.subState}`}>
+                                                                    {LEOBANK_ORDER_SUB_STATES_LABELS[order.bankInfo.subState]}
+                                                                </span>
+                                                            </span>
+                                                        ) : (
+                                                            <span className='badge leo-no-status'>KREDİT MÖVCUD DEYİL</span>
+                                                        ))
+                                                    )
+                                                    
                                                 }
                                             </td>
                                             {/*<td>{order.orderNum}</td>*/}
