@@ -456,13 +456,13 @@ const AllOrders = () => {
                                                     order.status === 'SAVED' ? (
                                                         !order.bankInfo ? (
                                                             <span className='badge leo-no-status'>KREDİT MÖVCUD DEYİL</span>
-                                                        ) : order.bankInfo.state && order.bankInfo.subState ? (
+                                                        ) : order?.bankInfo?.state && order?.bankInfo?.subState ? (
                                                             <span className='leo-double-state'>
-                                                                <span className={`badge ${order.bankInfo.state}`}>
-                                                                    {LEOBANK_ORDER_STATES_LABELS[order.bankInfo.state]}
+                                                                <span className={`badge ${order.bankInfo?.state}`}>
+                                                                    {LEOBANK_ORDER_STATES_LABELS[order.bankInfo?.state]}
                                                                 </span>
-                                                                <span className={`badge ${order.bankInfo.subState}`}>
-                                                                    {LEOBANK_ORDER_SUB_STATES_LABELS[order.bankInfo.subState]}
+                                                                <span className={`badge ${order.bankInfo?.subState}`}>
+                                                                    {LEOBANK_ORDER_SUB_STATES_LABELS[order.bankInfo?.subState]}
                                                                 </span>
                                                             </span>
                                                         ) : (
@@ -484,13 +484,13 @@ const AllOrders = () => {
                                                         (order.bankInfo?.state === LEOBANK_ORDER_STATES.SUCCESS &&
                                                             order.bankInfo?.subState === LEOBANK_ORDER_SUB_STATES.ACTIVE) ? (
                                                             <span className='badge bg-success'>KREDİT UĞURLA TAMAMLANDI</span>
-                                                        ) : order.bankInfo.state && order.bankInfo.subState ? (
+                                                        ) : order.bankInfo?.state && order.bankInfo?.subState ? (
                                                             <span className='leo-double-state'>
-                                                                <span className={`badge ${order.bankInfo.state}`}>
-                                                                    {LEOBANK_ORDER_STATES_LABELS[order.bankInfo.state]}
+                                                                <span className={`badge ${order.bankInfo?.state}`}>
+                                                                    {LEOBANK_ORDER_STATES_LABELS[order.bankInfo?.state]}
                                                                 </span>
-                                                                <span className={`badge ${order.bankInfo.subState}`}>
-                                                                    {LEOBANK_ORDER_SUB_STATES_LABELS[order.bankInfo.subState]}
+                                                                <span className={`badge ${order.bankInfo?.subState}`}>
+                                                                    {LEOBANK_ORDER_SUB_STATES_LABELS[order.bankInfo?.subState]}
                                                                 </span>
                                                             </span>
                                                         ) : (
@@ -506,8 +506,8 @@ const AllOrders = () => {
                                                     {
                                                         user?.roles?.includes('ACCOUNTANT') && ((
                                                             order.bankInfo
-                                                            && !order.bankInfo.state
-                                                            && !order.bankInfo.subState
+                                                            && !order.bankInfo?.state
+                                                            && !order.bankInfo?.subState
                                                         ) || (
                                                             order.bankInfo?.state === LEOBANK_ORDER_STATES.IN_PROCESS && (order.bankInfo?.subState !== LEOBANK_ORDER_SUB_STATES.WAITING_FOR_STORE_CONFIRM && order.bankInfo?.subState !== LEOBANK_ORDER_SUB_STATES.STORE_APPROVED)
                                                         ))
@@ -519,7 +519,7 @@ const AllOrders = () => {
                                                         </button>
                                                     }
                                                     {
-                                                        user?.roles?.includes('ACCOUNTANT') && order.bankInfo && order.bankInfo.subState === 'WAITING_FOR_STORE_CONFIRM' && <button
+                                                        user?.roles?.includes('ACCOUNTANT') && order.bankInfo && order.bankInfo?.subState === 'WAITING_FOR_STORE_CONFIRM' && <button
                                                             className="update-leo-status"
                                                             onClick={() => confirmOrder(order)}
                                                         >
