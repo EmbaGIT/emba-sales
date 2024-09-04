@@ -2,7 +2,7 @@ const Footer = () => (
     <footer className='container-fluid bg-light py-3'>
         <div className='row'>
             <div className='col-12'>
-                <div className='text-center'>Emba Sale 2021 | Embawood &copy; </div>
+                <div className='text-center'>Emba Sale ©{new Date().getFullYear()} | Embawood &copy; </div>
             </div>
         </div>
         <div className="wish-box-wrapper">
