@@ -74,7 +74,7 @@ const Header = (props) => {
             if (decodedToken.brand.includes('/'))
                 setIsDualUser(true)
 
-            if ((jwt(lsToken)).roles.includes('ACCOUNTANT')) {
+            if ((jwt(lsToken)).roles.includes('ACCOUNTANT') || (jwt(lsToken)).roles.includes('SELLER')) {
                 setIsAccountant(true);
             }
         }
