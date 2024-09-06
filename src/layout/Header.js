@@ -73,10 +73,13 @@ const Header = (props) => {
 
             if (decodedToken.brand.includes('/'))
                 setIsDualUser(true)
-
-            if ((jwt(lsToken)).roles.includes('ACCOUNTANT') || (jwt(lsToken)).roles.includes('SELLER')) {
+            // if ((jwt(lsToken)).roles.includes('ACCOUNTANT') || (jwt(lsToken)).roles.includes('USER')) {
+            //     setIsAccountant(true);
+            // }
+            if ((jwt(lsToken)).roles.includes('ACCOUNTANT')) {
                 setIsAccountant(true);
             }
+
         }
 
         return () => setIsAccountant(false);
@@ -156,7 +159,7 @@ const Header = (props) => {
                                 </div>
                             )}
 
-                          
+                            {/* {isAccountant && ( */}
                             <Link to="/order-tracking">
                                 <span
                                     className="text-reset me-4"
@@ -168,7 +171,7 @@ const Header = (props) => {
                                     <i className="fas fa-truck text-body" style={{ fontSize: '20px' }}></i>
                                 </span>
                             </Link>
-                            
+                            {/* )} */}
 
                             {selectedBrand === 'Embawood' && (
                                 <a href="https://embawood.az/catalog/view/theme/embawood/catalog/katalog23.pdf" target="_blank" rel="noreferrer">
@@ -183,7 +186,7 @@ const Header = (props) => {
                                     </span>
                                 </a>
                             )}
-
+                            
                             <Link to="/announcements">
                                 <span
                                     className="text-reset me-4"
@@ -195,7 +198,7 @@ const Header = (props) => {
                                     <i className="fas fa-gift text-body" style={{ fontSize: '23px' }}></i>
                                 </span>
                             </Link>
-
+                            
                             <Link to="/instructions">
                                 <span
                                     className="text-reset me-4"
