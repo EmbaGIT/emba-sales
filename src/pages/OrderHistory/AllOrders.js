@@ -173,6 +173,7 @@ const AllOrders = () => {
     const onSearchDate = () => {
         if(searchByDate.start_date || searchByDate.end_date){
             post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&creationDate.greaterThan=${formattedDate(searchByDate.start_date)}&creationDate.lessThan=${formattedDate(searchByDate.end_date)}&size=10&page=${page}&size=10`).then(res =>{
+                
                 orderList(res, 0);
                 setPageState(res);
             }).catch(err => console.log(err))

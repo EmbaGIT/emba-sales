@@ -43,6 +43,7 @@ const Sales = () => {
         setIsFetching(true);
         post(`${getHost('erp/report', 8091)}/api/sales/report`, { databegin: start, dataend: end, uid: user.uid })
             .then((res) => {
+                console.log("sales", res)
                 setSale(res);
             }).catch((err) => {
                 setError(err?.response?.data)
