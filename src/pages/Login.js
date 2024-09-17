@@ -13,10 +13,10 @@ const Login = () => {
     const handleForm = (event) => {
         event.preventDefault();
         setIsFetching(true);
-        const enteredName = usernameInputRef.current.value;
-        const enteredPassword = passwordInputRef.current.value;
+        const enteredName = usernameInputRef.current.value.trim();
+        const enteredPassword = passwordInputRef.current.value.trim();
 
-        if (enteredPassword.trim().length && enteredName.trim().length) {
+        if (enteredPassword.length && enteredName.length) {
             post(`${getHost('user', 8081)}/api/auth/login`, { username: enteredName, password: enteredPassword })
                 .then((res) => {
                     setIsFetching(false);
@@ -27,7 +27,7 @@ const Login = () => {
                 setIsFetching(false);
                 setErrorMessage(err?.response?.data?.message || 'Xəta baş verdi');
             })
-        } else if (!enteredPassword.trim().length) {
+        } else if (!enteredPassword.length) {
 
         }
     };

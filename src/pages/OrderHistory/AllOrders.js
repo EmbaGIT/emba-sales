@@ -18,7 +18,6 @@ import {
 import { toast } from 'react-toastify'
 import jwt from 'jwt-decode'
 import Modal from "../../UI/Modal";
-
 const leobankIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" width="23" height="28" viewBox="0 0 23 28" fill="none">
     <path d="M10.1295 17.9923C7.54447 20.0862 5.82902 18.646 3.65995 16.1505C1.49089 13.6551 -0.310404 11.0495 2.27459 8.95554C4.85957 6.86164 8.7135 7.18713 10.8826 9.68255C13.0516 12.178 12.7144 15.8984 10.1295 17.9923Z" fill="#4f4f4f"/>
@@ -78,9 +77,9 @@ const AllOrders = () => {
 
     useEffect(() => {
         const url = user?.roles?.includes('ACCOUNTANT')
-            ? `/api/order/accountant/search?sort=createdAt,desc&sort=creationTime,desc&size=10&page=${page}`
-            : `/api/order/search?user_uid.equals=${authCtx.user_uid}&sort=createdAt,desc&size=10&page=${page}`
-
+            ? `/api/order/accountant/search?sort=createdAt,desc&sort=creationTime,desc&creationDate.greaterThanOrEqual=${searchByDate.start_date ? formattedDate(searchByDate.start_date) : formattedDate(new Date(1970,0,1))}&creationDate.lessThanOrEqual=${searchByDate.end_date ? formattedDate(searchByDate.end_date) : formattedDate(new Date())}&size=10&page=${page}`
+            : `/api/order/search?user_uid.equals=${authCtx.user_uid}&creationDate.greaterThanOrEqual=${searchByDate.start_date ? formattedDate(searchByDate.start_date) : formattedDate(new Date(1970,0,1))}&creationDate.lessThanOrEqual=${searchByDate.end_date ? formattedDate(searchByDate.end_date) : formattedDate(new Date())}&sort=createdAt,desc&size=10&page=${page}`
+            
         setIsLoading(true)
         post(`${getHost('sales', 8087)}${url}`).then(res => {
             const bankOrderPromises = res.content.map(async (c) => {
@@ -109,7 +108,7 @@ const AllOrders = () => {
                 orderList({
                     ...res,
                     content: values.map(v => v.value)
-                }, page);
+                }, page, "useEffect");
                 setIsLoading(false)
             })
             setPageState(res);
@@ -172,9 +171,11 @@ const AllOrders = () => {
 
     const onSearchDate = () => {
         if(searchByDate.start_date || searchByDate.end_date){
-            post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&creationDate.greaterThan=${formattedDate(searchByDate.start_date)}&creationDate.lessThan=${formattedDate(searchByDate.end_date)}&size=10&page=${page}&size=10`).then(res =>{
-                
-                orderList(res, 0);
+            const url = user?.roles?.includes('ACCOUNTANT')
+            ? `/api/order/accountant/search?sort=createdAt,desc&sort=creationTime,desc&creationDate.greaterThanOrEqual=${searchByDate.start_date ? formattedDate(searchByDate.start_date) : formattedDate(new Date(1970,0,1))}&creationDate.lessThanOrEqual=${searchByDate.end_date ? formattedDate(searchByDate.end_date) : formattedDate(new Date())}&size=10&page=0`
+            : `/api/order/search?user_uid.equals=${authCtx.user_uid}&creationDate.greaterThanOrEqual=${searchByDate.start_date ? formattedDate(searchByDate.start_date) : formattedDate(new Date(1970,0,1))}&creationDate.lessThanOrEqual=${searchByDate.end_date ? formattedDate(searchByDate.end_date) : formattedDate(new Date())}&sort=createdAt,desc&size=10&page=0`
+            post(`${getHost('sales', 8087)}${url}`).then(res =>{ 
+                orderList(res, 0, "searchdate");
                 setPageState(res);
             }).catch(err => console.log(err))
         }
@@ -184,7 +185,7 @@ const AllOrders = () => {
         if(value.trim().length > 3){
             setIsLoading(true);
             post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&client_name.contains=${value}&page=0&size=10`).then(res => {
-                orderList(res, 0);
+                orderList(res, 0, "namesearch");
                 setPage(0);
                 setPageState(res);
                 setIsLoading(false)
@@ -192,7 +193,7 @@ const AllOrders = () => {
         }else{
             setIsLoading(true);
             post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&&page=0&size=10`).then(res => {
-                orderList(res, 0);
+                orderList(res, 0, "namesearch");
                 setPage(0);
                 setPageState(res);
                 setIsLoading(false)
@@ -201,9 +202,9 @@ const AllOrders = () => {
     }
 
     const paginate = (n) => {
-        history.push(`/allOrder/${n.selected}`)
+        history.push(`/allOrder/${n.selected}`);
         setPage(+n.selected);
-        statusFilter(statusValue, n.selected);
+        //statusFilter(statusValue, n.selected);
     }
 
     const onStatusFilter = (value) => {
@@ -216,13 +217,13 @@ const AllOrders = () => {
             post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${pageNumber}`).then(res => {
                 setPageState(res);
                 setPage(pageNumber);
-                orderList(res, pageNumber);
+                orderList(res, pageNumber, "filter");
             })
         }else{
             post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&status.equals=${value}&size=10&page=${pageNumber}`).then(res => {
                 setPageState(res);
                 setPage(pageNumber);
-                orderList(res, pageNumber);
+                orderList(res, pageNumber,"filter");
             })
         }
     }
