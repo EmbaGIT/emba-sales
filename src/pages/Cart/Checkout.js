@@ -535,14 +535,14 @@ const Checkout = () => {
                 [type]: value
             }))
 
-            if (type === 'surname' || type === 'name') {
-                !alldata.name && !alldata.surname
-                    ? setFormValidation(prevState => ({
-                        ...prevState, name: false, surname: false
-                    }))
-                    : setFormValidation(prevState => ({
-                        ...prevState, name: true, surname: true
-                    }))
+            if (type === 'name') {
+                setFormValidation(prevState => ({
+                    ...prevState, name: !!alldata.name.trim()
+                }))
+            } else if (type === 'surname') {
+                setFormValidation(prevState => ({
+                    ...prevState, surname: !!alldata.surname.trim()
+                }))
             }
         }
         setCheckoutState(prevState => ({
@@ -621,7 +621,7 @@ const Checkout = () => {
     }
 
     const handleValidation = () => {
-        !checkoutState.customerInfo.name ? setFormValidation(prevState => ({
+        !checkoutState.customerInfo.name.trim() ? setFormValidation(prevState => ({
             ...prevState,
             name: false
         })) : setFormValidation(prevState => ({...prevState, name: true}))
@@ -679,8 +679,7 @@ const Checkout = () => {
             birthdate: false
         })) : setFormValidation(prevState => ({ ...prevState, birthdate: true}))
 
-        return !(!checkoutState.customerInfo.name || !checkoutState.customerInfo.surname || !checkoutState.customerInfo.city || !checkoutState.customerInfo.address ||
-            !checkoutState.customerInfo.mobile_phone || !deliveryDate || !paymentDate || (!checkoutState.customerInfo.client_pur && checkoutState.customerInfo.client_pur !== 0) || (!checkoutState.customerInfo.client_inter && checkoutState.customerInfo.client_inter !== 0) || (!checkoutState.customerInfo.gender && checkoutState.customerInfo.gender !== 0) || !checkoutState.customerInfo.birthdate || (customerAge <= 16));
+        return (!!checkoutState.customerInfo.name && !!checkoutState.customerInfo.surname && !!checkoutState.customerInfo.city && !!checkoutState.customerInfo.address && !!checkoutState.customerInfo.mobile_phone && !!deliveryDate && !!paymentDate && checkoutState.customerInfo.client_pur !== undefined && checkoutState.customerInfo.client_inter !== undefined && !!(checkoutState.customerInfo.gender && checkoutState.customerInfo.gender !== 0) && !!checkoutState.customerInfo.birthdate && customerAge > 16);
     }
 
     const onPriceChange = (event) => {
