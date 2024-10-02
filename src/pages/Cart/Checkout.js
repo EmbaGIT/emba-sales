@@ -739,7 +739,8 @@ const Checkout = () => {
             bank_cash: bankCommission,
             client_pur: checkoutState.customerInfo.client_pur,
             client_inter: checkoutState.customerInfo.client_inter
-        }
+        };
+        
         if (status === "ORDERED" && handleValidation()) {
             setIsSending(true);
             post(`${getHost('sales', 8087)}/api/order/send`, order_data).then(res => {
