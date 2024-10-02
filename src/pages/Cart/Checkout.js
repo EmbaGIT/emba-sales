@@ -679,7 +679,7 @@ const Checkout = () => {
             birthdate: false
         })) : setFormValidation(prevState => ({ ...prevState, birthdate: true}))
 
-        return (!!checkoutState.customerInfo.name.trim() && !!checkoutState.customerInfo.surname.trim() && !!checkoutState.customerInfo.city && !!checkoutState.customerInfo.address && !!checkoutState.customerInfo.mobile_phone && !!deliveryDate && !!paymentDate && checkoutState.customerInfo.client_pur !== undefined && checkoutState.customerInfo.client_inter !== undefined && !!checkoutState.customerInfo.birthdate && customerAge > 16);
+        return (!!checkoutState.customerInfo.name.trim() && !!checkoutState.customerInfo.surname.trim() && !!checkoutState.customerInfo.city && !!checkoutState.customerInfo.address && !!checkoutState.customerInfo.mobile_phone && !!deliveryDate && !!paymentDate && checkoutState.customerInfo.client_pur !== undefined && checkoutState.customerInfo.client_inter !== undefined && !!checkoutState.customerInfo.birthdate);
     }
 
     const onPriceChange = (event) => {
