@@ -1,5 +1,5 @@
 import getYear from "date-fns/getYear";
-import getMonth from "date-fns/getYear";
+import getMonth from "date-fns/getMonth";
 import DatePicker from "react-datepicker";
 
 const BirthDateDatepicker = (props) => {
