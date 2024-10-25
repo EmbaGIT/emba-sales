@@ -792,8 +792,8 @@ const Checkout = () => {
       !!checkoutState.customerInfo.mobile_phone &&
       !!deliveryDate &&
       !!paymentDate &&
-      checkoutState.customerInfo.client_pur !== undefined &&
-      checkoutState.customerInfo.client_inter !== undefined &&
+      checkoutState.customerInfo.client_pur !== null &&
+      checkoutState.customerInfo.client_inter !== null &&
       !!checkoutState.customerInfo.birthdate &&
       customerAge > 16
     );
