@@ -144,7 +144,7 @@ export const LeobankForm = ({
                     numberOfPayments: +orderInfo.numberOfPayments,
                     type: 'part-payment'
                 },
-                totalAmount: +selectedLeobankSale?.bankInfo?.totalAmount || +selectedLeobankSale?.totalPrice
+                totalAmount: +selectedLeobankSale?.bankInfo?.totalAmount || parseFloat(selectedLeobankSale?.totalPrice?.toFixed(2))
             }
 
             post(
@@ -211,7 +211,7 @@ export const LeobankForm = ({
                             placeholder='Ümumi məbləğ'
                             type='number'
                             disabled
-                            value={selectedLeobankSale?.bankInfo?.totalAmount || selectedLeobankSale?.totalPrice}
+                            value={selectedLeobankSale?.bankInfo?.totalAmount || parseFloat(selectedLeobankSale?.totalPrice?.toFixed(2))}
                         />
                         {validationErrors.totalSum && (
                             <div className='invalid-feedback d-block position-relative mt-1'>
