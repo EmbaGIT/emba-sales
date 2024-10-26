@@ -182,6 +182,12 @@ const Checkout = () => {
   const [lastSelectedUid, setLastSelectedUid] = useState("");
   const [customerAge, setCustomerAge] = useState("");
   const [leobankOption, setLeobankOption] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState({
+    visible: false,
+    status: "",
+  });
+  const [productsRemovedFromProd, setProductsRemovedFromProd] = useState([]);
+  const [statusOrder, setStatusOrder] = useState("");
 
   const handlePercentChange = (e) => {
     const { value } = e.target;
@@ -397,7 +403,7 @@ const Checkout = () => {
         .reverse()
         .join("-");
       const d = new Date(`${formattedDate}T00:00:00`);
-      
+
       const age = calculateAge(d);
       setCustomerAge(age);
     },
@@ -807,6 +813,18 @@ const Checkout = () => {
   };
 
   const sendOrder = (status) => {
+    const removedProducts = checkProductProductionState();
+    setProductsRemovedFromProd(checkProductProductionState());
+    setStatusOrder(status);
+    if (removedProducts.length) {
+      setShowConfirmModal({ visible: true, status });
+    } else {
+      processOrder(status);
+    }
+
+  };
+
+  const processOrder = (status) => {
     const order_goods = [];
     cartCtx.items.forEach((item) => {
       order_goods.push({
@@ -921,6 +939,24 @@ const Checkout = () => {
           console.log(err);
         });
     }
+  }
+
+  function checkProductProductionState() {
+    const cartItems = cartCtx.items;
+    return cartItems.filter((item) => {
+      const itemWithCharacteristics = item.characteristic_code;
+      return !itemWithCharacteristics
+        ? !!item.production
+        : !!item.production ||
+            !!item.characteristics.find(
+              (ch) => ch.code === itemWithCharacteristics
+            ).production;
+    });
+  }
+
+  const handleConfirm = () => {
+    setShowConfirmModal({ visible: false, status: "" });
+    processOrder(statusOrder);
   };
 
   if (isFetchingData) {
@@ -953,6 +989,7 @@ const Checkout = () => {
                 <tbody className="">
                   {checkoutState.items?.map((product) => (
                     <tr key={product.id}>
+                      {/* {console.log(product)} */}
                       {/*<td>*/}
                       {/*    <input*/}
                       {/*        className="form-check-input me-2"*/}
@@ -1719,6 +1756,50 @@ const Checkout = () => {
           </div>
         )}
       </div>
+
+      {/* Confirm modal */}
+      {showConfirmModal.visible && (
+        <div className="modal" style={{ display: "block" }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Təsdiq</h5>
+                <button
+                  type="button"
+                  className="close"
+                  onClick={() => setShowConfirmModal(false)}
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="modal-body">
+                <h5>Aşağıda qeyd olunmuş məhsullar istehsaldan çıxıb:</h5>
+                <ol>
+                  {productsRemovedFromProd.map((prod, i) => (
+                    <li key={i} style={{ fontSize: 14 }}>
+                      {prod.name}
+                      {prod.characteristic_code ? ", " : ""}
+                      {prod.characteristic_code} istehsaldan çıxıb.
+                    </li>
+                  ))}
+                </ol>
+                Bu əməliyyatı davam etmək istəyirsinizmi?
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="btn btn-warning"
+                  onClick={() => setShowConfirmModal(false)}
+                >
+                  İmtina et
+                </button>
+                <button className="btn btn-success" onClick={handleConfirm}>
+                  Təsdiq et
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

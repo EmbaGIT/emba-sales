@@ -68,7 +68,10 @@ const SubProductItem = (props) => {
                 characteristic_uid: charUID,
                 characteristic_code: charCode,
                 product_createsales: false,
-                product_reserve: false
+                product_reserve: false,
+                characteristics: props.characteristics,
+                production: props.production,
+                test: 'test'
             });
         }
     }
