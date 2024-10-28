@@ -41,7 +41,8 @@ const CartItem = (props) =>{
             </div>
             <div className="basket-product-name-row">
                 <p className="fm-poppins_bold mb-0">{props.product.name}</p>
-                {props.product.characteristic_code && <p className="mb-0"><span className="text-warning">Xar.Code: {props.product.characteristic_code}</span></p>}
+                {props.product.characteristic_code && <p className="mb-0 text-muted">Xar.Code: {props.product.characteristic_code}</p>}
+                {props.product.characteristic_name && <p className="mb-0 text-muted">Xar.Name: {props.product.characteristic_name}</p>}
                 <span className="text-success">Qiymət: {props.product.price} ₼</span>
             </div>
             <div>

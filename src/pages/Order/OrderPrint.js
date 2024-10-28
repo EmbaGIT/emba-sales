@@ -19,6 +19,7 @@ const OrderPrint = () => {
                 total_price += item.product_price*item.product_quantity;
                 discount_total_price += item.product_price*item.product_quantity - item.product_quantity* item.product_price * item.product_discount/100;
                 get(`/products/uid/${item.product_uid}`).then(res => {
+                    console.log(res)
                     products.push({
                         ...item,
                         product_name: res.name

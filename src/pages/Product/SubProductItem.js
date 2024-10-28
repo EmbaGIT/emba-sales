@@ -16,6 +16,7 @@ const SubProductItem = (props) => {
     const [isAmountValid, setIsAmountValid] = useState(true);
     const [charUID, setCharUID] = useState('');
     const [charCode, setCharCode] = useState('');
+    const [charName, setCharName] = useState('');
     const [price, setPrice] = useState(props.price);
     const [options, setOptions] = useState(props.stock)
     const [allSelected, setAllSelected] = useState(true)
@@ -32,11 +33,12 @@ const SubProductItem = (props) => {
     }, []);
 
     const handleInputChange = async (value) => {
-        const selectValue=value.split(',');
+        const selectValue=value.split('|');
         setCharUID(selectValue[0]);
         setCharCode(selectValue[1]);
-        setPrice(selectValue[2]);
-        setSelectedPrice(selectValue[2]);
+        setCharName(selectValue[2]);
+        setPrice(selectValue[3]);
+        setSelectedPrice(selectValue[3]);
 
         const newOptions = await props.characteristicsChangeHandler(props.uid, selectValue[0])
         setOptions(newOptions[0].stock)
@@ -67,6 +69,7 @@ const SubProductItem = (props) => {
                 uid: props.uid,
                 characteristic_uid: charUID,
                 characteristic_code: charCode,
+                characteristic_name: charName,
                 product_createsales: false,
                 product_reserve: false
             });
@@ -96,7 +99,7 @@ const SubProductItem = (props) => {
                         <select className="form-control form-select" onChange={e => handleInputChange(e.target.value)}>
                             {allSelected ? <option value=''>Ümumü Xarakteristikalar</option> : null}
                             {props.characteristics.map(characteristic  => (
-                                <option key={characteristic.id} value={`${characteristic.uid},${characteristic.code}, ${characteristic.price ? characteristic.price : 0}`}>{characteristic.name} - ({characteristic.code}) - {characteristic.price ? characteristic.price : 0} AZN</option>
+                                <option key={characteristic.id} value={`${characteristic.uid}|${characteristic.code}|${characteristic.name}|${characteristic.price ? characteristic.price : 0}`}>{characteristic.name} - ({characteristic.code}) - {characteristic.price ? characteristic.price : 0} AZN</option>
                             ))}
                         </select>
                         : ''

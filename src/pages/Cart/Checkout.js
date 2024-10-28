@@ -979,7 +979,8 @@ const Checkout = () => {
                       {/*</td>*/}
 
                       <td>
-                        {product.name}
+                        <div>{product.name}</div>
+                        <p className="text-muted">{product.characteristic_name}</p>
                         <div className="text-success font-weight-bold">
                           Sayı: {product.amount}
                         </div>
