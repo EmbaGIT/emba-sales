@@ -101,8 +101,7 @@ const Product = () => {
                         items,
                         stock,
                         files,
-                        characteristic,
-                        production: results[2].production
+                        characteristic
                     });
                     subProductIncludedArr.sort(
                         (a, b) => parseInt(a.id) - parseInt(b.id)
@@ -317,7 +316,6 @@ const Product = () => {
                                             price={item.price}
                                             files={item.files || []}
                                             characteristics={item.characteristics}
-                                            production={item.production}
                                             defaultValue={1}
                                             parent={item.parentName}
                                             parent_id={209}
@@ -349,7 +347,6 @@ const Product = () => {
                         price={item.items[0].price}
                         files={item.files}
                         characteristics={item.characteristic}
-                        production={item.production}
                         defaultValue={1}
                         parent={item.items[0].parentName}
                         parent_id={parent_id}
@@ -374,7 +371,6 @@ const Product = () => {
                                     price={item.items[0].price}
                                     files={item.files}
                                     characteristics={item.characteristic}
-                                    production={item.production}
                                     defaultValue={1}
                                     parent={item.items[0].parentName}
                                     parent_id={parent_id}
