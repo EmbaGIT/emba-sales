@@ -948,7 +948,7 @@ const Checkout = () => {
       return !itemWithCharacteristics
         ? !!item.production
         : !!item.production ||
-            !!item.characteristics.find(
+            !!item.characteristics?.find(
               (ch) => ch.code === itemWithCharacteristics
             ).production;
     });
