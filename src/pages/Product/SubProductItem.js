@@ -73,8 +73,7 @@ const SubProductItem = (props) => {
                 product_createsales: false,
                 product_reserve: false,
                 characteristics: props.characteristics,
-                production: props.production,
-                test: 'test'
+                production: props.production
             });
         }
     }

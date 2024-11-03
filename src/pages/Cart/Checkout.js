@@ -987,8 +987,8 @@ const Checkout = () => {
                   </tr>
                 </thead>
                 <tbody className="">
-                  {checkoutState.items?.map((product) => (
-                    <tr key={product.id}>
+                  {checkoutState.items?.map((product,i) => (
+                    <tr key={i}>
                       {/* {console.log(product)} */}
                       {/*<td>*/}
                       {/*    <input*/}

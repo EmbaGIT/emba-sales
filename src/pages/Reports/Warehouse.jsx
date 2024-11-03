@@ -121,7 +121,7 @@ const Warehouse = () => {
       (ch) => ch.name === characteristics
     );
     const price = isPrice?.price ?? product.price;
-    const { id, name } = product;
+    const { id, name, production, characteristics: allCharacteristics } = product;
     const brand = product.attributes.find(
       (a) => a.groups.name === "Brand"
     ).name;
@@ -166,12 +166,14 @@ const Warehouse = () => {
       category,
       uid,
       characteristic_uid,
-      characteristic_code,
+      characteristic_code, 
       color_id,
       files,
       discount_price: price,
       product_createsales: false,
       product_reserve: false,
+      characteristics: allCharacteristics,
+      production
     });
   };
 
