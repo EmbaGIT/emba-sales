@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import styles from "./survey.module.css";
 
 const Survey = () => {
@@ -13,13 +12,13 @@ const Survey = () => {
                 Yeni məhsul dəyərləndirmə anketi
               </h2>
             </div>
-            <Link
-              to="https://docs.google.com/forms/d/1mXi_HSL49sDlv9YuXkVVu68C1lPJ_TU6LgnpJojqBRA/edit"
+            <a
+              href="https://docs.google.com/forms/d/1mXi_HSL49sDlv9YuXkVVu68C1lPJ_TU6LgnpJojqBRA/edit"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Yeni məhsul dəyərləndirmə anketi
-            </Link>
+            </a>
           </div>
 
           <div className={styles.card}>
@@ -28,13 +27,13 @@ const Survey = () => {
                 Kampaniya məmnunluq anketi
               </h2>
             </div>
-            <Link
-              to="https://docs.google.com/forms/d/1qzf0-2AQow5bYWD6qAV4teio8k6My6PB2B0zjtFqUQ0/edit"
+            <a
+              href="https://docs.google.com/forms/d/1qzf0-2AQow5bYWD6qAV4teio8k6My6PB2B0zjtFqUQ0/edit"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Kampaniya məmnunluq anketi
-            </Link>
+            </a>
           </div>
 
           <div className={styles.card}>
@@ -43,13 +42,13 @@ const Survey = () => {
                 Distribitor xidmət dəyərləndirmə anketi
               </h2>
             </div>
-            <Link
-              to="https://docs.google.com/forms/d/1-HBAY8ZibdEXNZb3of0z5zqpCQ_wxCohTNV3CXg6CSI/edit"
+            <a
+              href="https://docs.google.com/forms/d/1-HBAY8ZibdEXNZb3of0z5zqpCQ_wxCohTNV3CXg6CSI/edit"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Distribitor xidmət dəyərləndirmə anketi
-            </Link>
+            </a>
           </div>
 
           <div className={styles.card}>
@@ -58,13 +57,13 @@ const Survey = () => {
                 Mövcud məhsul dəyərləndirmə anketi
               </h2>
             </div>
-            <Link
-              to="https://docs.google.com/forms/d/1CYakDsuKENPT-4QGHcZoDBDt3Zx5xyvGXgQ7KZxd16U/edit"
+            <a
+              href="https://docs.google.com/forms/d/1CYakDsuKENPT-4QGHcZoDBDt3Zx5xyvGXgQ7KZxd16U/edit"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Mövcud məhsul dəyərləndirmə anketi
-            </Link>
+            </a>
           </div>
         </div>
       </div>
