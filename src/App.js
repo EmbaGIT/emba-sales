@@ -39,6 +39,7 @@ import SalesReserve from "./pages/Reports/SalesReserve";
 import AnnouncementList from "./pages/Announcement/AnnouncementList";
 import AnnouncementItem from './pages/Announcement/AnnouncementItem';
 import OrderTracking from "./pages/OrderHistory/OrderTracking";
+import Survey from "./pages/Survey/survey";
 
 export const IsAuth = createContext(null);
 
@@ -119,6 +120,7 @@ const App = () => {
                     <PrivateRoute path='/announcements' exact component={AnnouncementList}/>
                     <PrivateRoute path='/announcements/:id' exact component={AnnouncementItem}/>
                     <PrivateRoute path='/order-tracking' exact component={OrderTracking}/>
+                    <PrivateRoute path='/survey' exact component={Survey}/>
                     {
                         isAccountant && (
                             <>

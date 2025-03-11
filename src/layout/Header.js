@@ -159,7 +159,17 @@ const Header = (props) => {
                                 </div>
                             )}
 
-                            {/* {isAccountant && ( */}
+                            <Link to="/survey">
+                                <span
+                                    className="text-reset me-4"
+                                    role="button"
+                                    data-toggle="tooltip"
+                                    data-placement="left"
+                                    title="Anket"
+                                >   
+                                    <i className="fas fa-edit text-body" style={{ fontSize: '20px' }}></i>
+                                </span>
+                            </Link>
                             <Link to="/order-tracking">
                                 <span
                                     className="text-reset me-4"
@@ -170,8 +180,7 @@ const Header = (props) => {
                                 >
                                     <i className="fas fa-truck text-body" style={{ fontSize: '20px' }}></i>
                                 </span>
-                            </Link>
-                            {/* )} */}
+                            </Link>             
 
                             {selectedBrand === 'Embawood' && (
                                 <a href="https://embawood.az/catalog/view/theme/embawood/catalog/katalog23.pdf" target="_blank" rel="noreferrer">
