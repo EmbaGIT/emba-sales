@@ -186,6 +186,11 @@ const Checkout = () => {
     visible: false,
     status: "",
   });
+
+  const [dsmfBarcode, setDsmfBarcode] = useState("");
+  const [barcodeLoading, setBarcodeLoading] = useState(false);
+  const [barcodeError, setBarcodeError] = useState(null);
+
   const [productsRemovedFromProd, setProductsRemovedFromProd] = useState([]);
   const [statusOrder, setStatusOrder] = useState("");
 
@@ -821,7 +826,6 @@ const Checkout = () => {
     } else {
       processOrder(status);
     }
-
   };
 
   const processOrder = (status) => {
@@ -939,7 +943,7 @@ const Checkout = () => {
           console.log(err);
         });
     }
-  }
+  };
 
   function checkProductProductionState() {
     const cartItems = cartCtx.items;
@@ -957,6 +961,46 @@ const Checkout = () => {
   const handleConfirm = () => {
     setShowConfirmModal({ visible: false, status: "" });
     processOrder(statusOrder);
+  };
+
+  const generateRequestNumber = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
+  const checkBarcode = async () => {
+    if (!dsmfBarcode.trim()) {
+      setBarcodeError("Zəhmət olmasa barkod daxil edin");
+      return;
+    }
+
+    setBarcodeLoading(true);
+    setBarcodeError(null);
+
+    try {
+      const res = await fetch(
+        "https://api.sosial.gov.az/dispatcher/gateway/v2/esosial/checkBarcodeForSocialPartners",
+        {
+          method: "POST",
+          headers: {
+            "api-token": "b4d833b91a2bbf1c9972b04707e45260",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            compId: "embawood",
+            requestNumber: generateRequestNumber(),
+            barcode: dsmfBarcode.trim(),
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+      setDsmfBarcode("");
+    } catch (err) {
+      setBarcodeError(err.message);
+    } finally {
+      setBarcodeLoading(false);
+    }
   };
 
   if (isFetchingData) {
@@ -987,7 +1031,7 @@ const Checkout = () => {
                   </tr>
                 </thead>
                 <tbody className="">
-                  {checkoutState.items?.map((product,i) => (
+                  {checkoutState.items?.map((product, i) => (
                     <tr key={i}>
                       {/* {console.log(product)} */}
                       {/*<td>*/}
@@ -1017,7 +1061,9 @@ const Checkout = () => {
 
                       <td>
                         <div>{product.name}</div>
-                        <p className="text-muted">{product.characteristic_name}</p>
+                        <p className="text-muted">
+                          {product.characteristic_name}
+                        </p>
                         <div className="text-success font-weight-bold">
                           Sayı: {product.amount}
                         </div>
@@ -1110,6 +1156,37 @@ const Checkout = () => {
                     Müştəri
                   </label>
                 </span>
+              </div>
+            </div>
+            {/* Check DSMF Barcode  */}
+            <div className="mt-3 row align-items-end">
+              <div className="col-md-8">
+                <label>DSMF Barcode Yoxlanış</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={dsmfBarcode}
+                  onChange={(e) => setDsmfBarcode(e.target.value)}
+                />
+              </div>
+              <div className="col-md-4">
+                <button
+                  type="button"
+                  className="btn btn-info ripple-surface"
+                  onClick={checkBarcode}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-search me-2"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                  </svg>
+                  Yoxla
+                </button>
               </div>
             </div>
           </div>
