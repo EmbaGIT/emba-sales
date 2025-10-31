@@ -1167,7 +1167,7 @@ const Checkout = () => {
               </div>
             </div>
             {/* Check DSMF Barcode  */}
-            <div className="mt-3 row align-items-end">
+            {/* <div className="mt-3 row align-items-end">
               <div className="col-md-8">
                 <label>DSMF Barcode Yoxlanış</label>
                 <input
@@ -1196,7 +1196,7 @@ const Checkout = () => {
                   Yoxla
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="card-footer">
             <ul className="ps-0">
