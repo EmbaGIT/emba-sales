@@ -973,34 +973,42 @@ const Checkout = () => {
       return;
     }
 
+    const requestBody={
+      compId: "Embawood",
+      requestNumber: Date.now()%1000000,
+      barcode: dsmfBarcode.trim()
+    }
+
     setBarcodeLoading(true);
     setBarcodeError(null);
 
-    try {
-      const res = await fetch(
-        "https://api.sosial.gov.az/dispatcher/gateway/v2/esosial/checkBarcodeForSocialPartners",
-        {
-          method: "POST",
-          headers: {
-            "api-token": "b4d833b91a2bbf1c9972b04707e45260",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            compId: "embawood",
-            requestNumber: generateRequestNumber(),
-            barcode: dsmfBarcode.trim(),
-          }),
+   post("https://api.sosial.gov.az/dispatcher/gateway/v2/esosial/checkBarcodeForSocialPartners", requestBody)
+      .then((res) => {
+        const response = res.response;
+        const {message} = res;
+        if(message === "ok"){
+          toast.success(<MessageComponent text="Məbləğə 15% endirim tətbiq edildi." />, {
+            position: toast.POSITION.TOP_CENTER,
+            toastId: "success-toast-message",
+            autoClose: 1000,
+            closeOnClick: true,
+          });
+          setDsmfBarcode("");
+        }else if(message = "DATA_NOT_FOUND_ERROR"){
+          toast.error(<MessageComponent text="Barkod düzgün daxil edilməyib" />, {
+            position: toast.POSITION.TOP_CENTER,
+            toastId: "error-toast-message",
+            autoClose: 1000,
+            closeOnClick: true,
+          });
         }
-      );
+      })
+      .catch((err) => {
+          setBarcodeError(err.message);
+      }).finally(()=>{
+          setBarcodeLoading(false);
+      })
 
-      const data = await res.json();
-      console.log(data);
-      setDsmfBarcode("");
-    } catch (err) {
-      setBarcodeError(err.message);
-    } finally {
-      setBarcodeLoading(false);
-    }
   };
 
   if (isFetchingData) {
