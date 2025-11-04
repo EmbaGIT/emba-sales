@@ -817,65 +817,6 @@ const Checkout = () => {
     });
   };
 
-    const checkBarcode = async () => {
-    if (!dsmfBarcode.trim()) {
-      setBarcodeError("Zəhmət olmasa barkod daxil edin");
-      return;
-    }
-
-    const requestBody={
-      compId: "Embawood",
-      requestNumber: Date.now()%1000000,
-      barcode: dsmfBarcode.trim()
-    }
-
-    setBarcodeLoading(true);
-    setBarcodeError(null);
-
-    try {
-      const response = await fetch("https://api.sosial.gov.az/dispatcher/gateway/v2/esosial/checkBarcodeForSocialPartners", {
-        method: 'POST',
-        headers: {
-          'api-token':"b4d833b91a2bbf1c9972b04707e45260",
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      const data = await response.json();
-      console.log(data)
-      // const response = res.response;
-      //   const {message} = res;
-      //   if(message === "ok"){
-      //     toast.success(<MessageComponent text="Məbləğə 15% endirim tətbiq edildi." />, {
-      //       position: toast.POSITION.TOP_CENTER,
-      //       toastId: "success-toast-message",
-      //       autoClose: 1000,
-      //       closeOnClick: true,
-      //     });
-      //     cartCtx.discountHandler({
-      //           discountType: "all",
-      //           discountData: {discount: 15}
-      //       });
-      //     setDsmfBarcode("");
-      //   }else if(message = "DATA_NOT_FOUND_ERROR"){
-      //     toast.error(<MessageComponent text="Barkod düzgün daxil edilməyib" />, {
-      //       position: toast.POSITION.TOP_CENTER,
-      //       toastId: "error-toast-message",
-      //       autoClose: 1000,
-      //       closeOnClick: true,
-      //     });
-      //   }
-
-      if (!response.ok && response.status !== 200) {
-        setBarcodeError('API sorğusu uğursuz oldu');
-      }
-    } catch (err) {
-      setBarcodeError('Xəta baş verdi: ' + err.message);
-    } finally {
-      setBarcodeLoading(false);
-    }
-  };
 
   const sendOrder = (status) => {
     const removedProducts = checkProductProductionState();
