@@ -187,10 +187,6 @@ const Checkout = () => {
     status: "",
   });
 
-  const [dsmfBarcode, setDsmfBarcode] = useState("");
-  const [barcodeLoading, setBarcodeLoading] = useState(false);
-  const [barcodeError, setBarcodeError] = useState(null);
-
   const [productsRemovedFromProd, setProductsRemovedFromProd] = useState([]);
   const [statusOrder, setStatusOrder] = useState("");
 
@@ -1120,21 +1116,20 @@ const Checkout = () => {
               </div>
             </div>
             {/* Check DSMF Barcode  */}
-            {/* <div className="mt-3 row align-items-end">
+
+            <div className="mt-3 row align-items-end">
               <div className="col-md-8">
                 <label>DSMF Barcode Yoxlanış</label>
                 <input
                   type="text"
-                  className="form-control"
-                  value={dsmfBarcode}
-                  onChange={(e) => setDsmfBarcode(e.target.value)}
+                  className="form-control"  
+                  name="barcodeInput"                
                 />
               </div>
               <div className="col-md-4">
                 <button
                   type="button"
-                  className="btn btn-info ripple-surface"
-                  onClick={checkBarcode}
+                  className="btn btn-info ripple-surface"                  
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1149,7 +1144,8 @@ const Checkout = () => {
                   Yoxla
                 </button>
               </div>
-            </div> */}
+            </div>
+            
           </div>
           <div className="card-footer">
             <ul className="ps-0">
