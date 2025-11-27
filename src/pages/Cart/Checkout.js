@@ -123,6 +123,7 @@ const Checkout = () => {
       note: "",
       client_pur: null,
       client_inter: null,
+      dsmf_barcode: "",
     },
   });
   const [paymentType, setPaymentType] = useState(0);
@@ -186,10 +187,6 @@ const Checkout = () => {
     visible: false,
     status: "",
   });
-
-  const [dsmfBarcode, setDsmfBarcode] = useState("");
-  const [barcodeLoading, setBarcodeLoading] = useState(false);
-  const [barcodeError, setBarcodeError] = useState(null);
 
   const [productsRemovedFromProd, setProductsRemovedFromProd] = useState([]);
   const [statusOrder, setStatusOrder] = useState("");
@@ -817,7 +814,6 @@ const Checkout = () => {
     });
   };
 
-
   const sendOrder = (status) => {
     const removedProducts = checkProductProductionState();
     setProductsRemovedFromProd(checkProductProductionState());
@@ -890,7 +886,10 @@ const Checkout = () => {
       bank_cash: bankCommission,
       client_pur: checkoutState.customerInfo.client_pur,
       client_inter: checkoutState.customerInfo.client_inter,
+      dsmf_barcode: checkoutState.customerInfo.dsmf_barcode,
     };
+
+    console.log("order_data", order_data);
 
     if (status === "ORDERED" && handleValidation()) {
       setIsSending(true);
@@ -1119,37 +1118,6 @@ const Checkout = () => {
                 </span>
               </div>
             </div>
-            {/* Check DSMF Barcode  */}
-            {/* <div className="mt-3 row align-items-end">
-              <div className="col-md-8">
-                <label>DSMF Barcode Yoxlanış</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={dsmfBarcode}
-                  onChange={(e) => setDsmfBarcode(e.target.value)}
-                />
-              </div>
-              <div className="col-md-4">
-                <button
-                  type="button"
-                  className="btn btn-info ripple-surface"
-                  onClick={checkBarcode}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    class="bi bi-search me-2"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                  </svg>
-                  Yoxla
-                </button>
-              </div>
-            </div> */}
           </div>
           <div className="card-footer">
             <ul className="ps-0">
@@ -1404,6 +1372,22 @@ const Checkout = () => {
             {customerSearch && (customerSelected || isNewCustomer) && (
               <>
                 <div className="row mb-3">
+                  <div className="col-md-12">
+                    <label className="fw-bolder">DSMF Barcode</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={
+                        checkoutState.customerInfo &&
+                        checkoutState.customerInfo.dsmf_barcode
+                      }
+                      onChange={(e) =>
+                        handleInputChange("dsmf_barcode", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
                   <div className="col-md-6">
                     <label htmlFor="birthdate">Doğum tarixi</label>
                     <BirthDateDatepicker
@@ -1553,7 +1537,7 @@ const Checkout = () => {
                   </div>
                 </div>
                 <div className="row mb-3">
-                  <div className="col-md-12">
+                  <div className="col-md-6">
                     <label>Email</label>
                     <input
                       className="form-control"
