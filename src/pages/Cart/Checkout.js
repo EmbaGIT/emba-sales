@@ -889,8 +889,6 @@ const Checkout = () => {
       dsmf_barcode: checkoutState.customerInfo.dsmf_barcode,
     };
 
-    console.log("order_data", order_data);
-
     if (status === "ORDERED" && handleValidation()) {
       setIsSending(true);
       post(`${getHost("sales", 8087)}/api/order/send`, order_data)
