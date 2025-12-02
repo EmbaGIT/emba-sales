@@ -355,6 +355,14 @@ const Checkout = () => {
                 email: detail.fieldValue,
               },
             }));
+          } else if (detail.infoTypeField.field === "DSMFBarcode") {
+            setCheckoutState((prevState) => ({
+              ...prevState,
+              customerInfo: {
+                ...prevState.customerInfo,
+                dsmf_barcode: detail.fieldValue,
+              },
+            }));
           } else if (detail.infoTypeField.field === "PhysicalAddress") {
             setCheckoutState((prevState) => ({
               ...prevState,
@@ -465,6 +473,7 @@ const Checkout = () => {
             gender: resOrderInfo.content[0].client_gender,
             email: resOrderInfo.content[0].client_mail,
             note: resOrderInfo.content[0].comment,
+            dsmf_barcode: resOrderInfo.content[0].dsmf_barcode,
           },
         }));
         setBankCommission(resOrderInfo.content[0].bank_cash);
@@ -632,6 +641,7 @@ const Checkout = () => {
         gender: "",
         email: "",
         note: "",
+        dsmf_barcode: "",
       },
     }));
     setOldCustomerInfo({
@@ -886,7 +896,7 @@ const Checkout = () => {
       bank_cash: bankCommission,
       client_pur: checkoutState.customerInfo.client_pur,
       client_inter: checkoutState.customerInfo.client_inter,
-      dsmf_barcode: checkoutState.customerInfo.dsmf_barcode,
+      dsmf_barcode: checkoutState.customerInfo.dsmf_barcode || "",
     };
 
     if (status === "ORDERED" && handleValidation()) {
