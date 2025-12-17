@@ -422,6 +422,7 @@ const AllOrders = () => {
                                         <th scope='col'>Ümumi Qiymət</th>
                                         <th scope='col'>Taksit məbləği</th>
                                         <th scope='col'>Kreditin statusu</th>
+                                        <th scope='col'>DSMF Barkodu</th>
                                         {/*<th scope='col'>1C Sifariş Nömrəsi</th>*/}
                                         <th scope='col'>Seçimlər</th>
                                     </tr>
@@ -522,11 +523,12 @@ const AllOrders = () => {
                                                             <span className='badge leo-no-status'>KREDİT MÖVCUD DEYİL</span>
                                                         ))
                                                     )
-                                                    
-                                                }
-                                            </td>
-                                            {/*<td>{order.orderNum}</td>*/}
-                                            <td>
+                                                    }
+    
+                                                </td>
+                                                <td>{order.dsmf_barcode}</td>
+                                                {/*<td>{order.orderNum}</td>*/}
+                                                <td>
                                                 <div className="d-flex align-items-center">
                                                     {
                                                         user?.roles?.includes('ACCOUNTANT') && ((
