@@ -171,6 +171,7 @@ const Checkout = () => {
     client_gender: true,
     birthdate: true,
     isYounger: true,
+    discount: true,
   });
   const [creditPercent, setCreditPercent] = useState(2);
   const [customerSelected, setCustomerSelected] = useState(false);
@@ -355,6 +356,14 @@ const Checkout = () => {
                 email: detail.fieldValue,
               },
             }));
+          } else if (detail.infoTypeField.field === "DSMFBarcode") {
+            setCheckoutState((prevState) => ({
+              ...prevState,
+              customerInfo: {
+                ...prevState.customerInfo,
+                dsmf_barcode: detail.fieldValue,
+              },
+            }));
           } else if (detail.infoTypeField.field === "PhysicalAddress") {
             setCheckoutState((prevState) => ({
               ...prevState,
@@ -465,6 +474,7 @@ const Checkout = () => {
             gender: resOrderInfo.content[0].client_gender,
             email: resOrderInfo.content[0].client_mail,
             note: resOrderInfo.content[0].comment,
+            dsmf_barcode: resOrderInfo.content[0].dsmf_barcode,
           },
         }));
         setBankCommission(resOrderInfo.content[0].bank_cash);
@@ -632,6 +642,7 @@ const Checkout = () => {
         gender: "",
         email: "",
         note: "",
+        dsmf_barcode: "",
       },
     }));
     setOldCustomerInfo({
@@ -686,6 +697,14 @@ const Checkout = () => {
   };
 
   const handleValidation = () => {
+    const isBarcodeFilled = !!checkoutState.customerInfo.dsmf_barcode
+      ?.toString()
+      .trim();
+    const hasDiscountApplied =
+      cartCtx.items?.some((item) => Number(item?.discount || 0) > 0) ||
+      Number(cartCtx.totalDiscount || 0) > 0;
+    const isDiscountValid = !isBarcodeFilled || hasDiscountApplied;
+
     !checkoutState.customerInfo.name.trim()
       ? setFormValidation((prevState) => ({
           ...prevState,
@@ -792,6 +811,16 @@ const Checkout = () => {
         }))
       : setFormValidation((prevState) => ({ ...prevState, birthdate: true }));
 
+    !isDiscountValid
+      ? setFormValidation((prevState) => ({
+          ...prevState,
+          discount: false,
+        }))
+      : setFormValidation((prevState) => ({
+          ...prevState,
+          discount: true,
+        }));
+
     return (
       !!checkoutState.customerInfo.name.trim() &&
       !!checkoutState.customerInfo.surname.trim() &&
@@ -803,7 +832,8 @@ const Checkout = () => {
       checkoutState.customerInfo.client_pur !== null &&
       checkoutState.customerInfo.client_inter !== null &&
       !!checkoutState.customerInfo.birthdate &&
-      customerAge > 16
+      customerAge > 16 &&
+      isDiscountValid
     );
   };
 
@@ -886,7 +916,7 @@ const Checkout = () => {
       bank_cash: bankCommission,
       client_pur: checkoutState.customerInfo.client_pur,
       client_inter: checkoutState.customerInfo.client_inter,
-      dsmf_barcode: checkoutState.customerInfo.dsmf_barcode,
+      dsmf_barcode: checkoutState.customerInfo.dsmf_barcode || "",
     };
 
     if (status === "ORDERED" && handleValidation()) {
@@ -1135,6 +1165,12 @@ const Checkout = () => {
                     onBlur={onPriceChange}
                     style={{ width: "80px" }}
                   />
+                  {!formValidation.discount &&
+                    checkoutState.customerInfo.dsmf_barcode && (
+                      <small className="text-danger d-block text-end mt-1">
+                        bu xana mutleq doldurulmalidir
+                      </small>
+                    )}
                 </div>
               </li>
               <li className="d-flex align-content-center justify-content-between mb-2">
@@ -1383,6 +1419,12 @@ const Checkout = () => {
                         handleInputChange("dsmf_barcode", e.target.value)
                       }
                     />
+                    {!formValidation.discount &&
+                      checkoutState.customerInfo.dsmf_barcode && (
+                        <small className="text-danger">
+                          bu xana mutleq doldurulmalidir
+                        </small>
+                      )}
                   </div>
                 </div>
                 <div className="row mb-3">

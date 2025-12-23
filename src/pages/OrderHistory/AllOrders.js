@@ -55,6 +55,8 @@ const AllOrders = () => {
     const [returnedAmount, setReturnedAmount] = useState('')
     const [returnedAmountMissing, setReturnedAmountMissing] = useState(false)
     const [bankOrderIdToReturn, setBankOrderIdToReturn] = useState('')
+    const [barcode, setBarcode] = useState('')
+    const [barcodeSpecified, setBarcodeSpecified] = useState(false)
     const user = localStorage.getItem('jwt_token') ? jwt(localStorage.getItem('jwt_token')) : null
 
     const orderList = (list, page) => {
@@ -76,10 +78,13 @@ const AllOrders = () => {
     }
 
     useEffect(() => {
-        const url = user?.roles?.includes('ACCOUNTANT')
+        let url = user?.roles?.includes('ACCOUNTANT')
             ? `/api/order/accountant/search?sort=createdAt,desc&sort=creationTime,desc&creationDate.greaterThanOrEqual=${searchByDate.start_date ? formattedDate(searchByDate.start_date) : formattedDate(new Date(1970,0,1))}&creationDate.lessThanOrEqual=${searchByDate.end_date ? formattedDate(searchByDate.end_date) : formattedDate(new Date())}&size=10&page=${page}`
             : `/api/order/search?user_uid.equals=${authCtx.user_uid}&creationDate.greaterThanOrEqual=${searchByDate.start_date ? formattedDate(searchByDate.start_date) : formattedDate(new Date(1970,0,1))}&creationDate.lessThanOrEqual=${searchByDate.end_date ? formattedDate(searchByDate.end_date) : formattedDate(new Date())}&sort=createdAt,desc&size=10&page=${page}`
-            
+
+        if (barcodeSpecified) url += '&dsmf_barcode.specified=true'
+        if (barcode) url += `&dsmf_barcode.contains=${barcode}`
+
         setIsLoading(true)
         post(`${getHost('sales', 8087)}${url}`).then(res => {
             const bankOrderPromises = res.content.map(async (c) => {
@@ -113,7 +118,7 @@ const AllOrders = () => {
             })
             setPageState(res);
         })
-    }, [page, rerender]);
+    }, [page, rerender, barcode, barcodeSpecified]);
 
     const handleModuleInfo = (id) => {
         post(`${getHost('sales', 8087)}/api/order/search?id.equals=${id}`).then(resOrderInfo => {
@@ -171,10 +176,14 @@ const AllOrders = () => {
 
     const onSearchDate = () => {
         if(searchByDate.start_date || searchByDate.end_date){
-            const url = user?.roles?.includes('ACCOUNTANT')
+            let url = user?.roles?.includes('ACCOUNTANT')
             ? `/api/order/accountant/search?sort=createdAt,desc&sort=creationTime,desc&creationDate.greaterThanOrEqual=${searchByDate.start_date ? formattedDate(searchByDate.start_date) : formattedDate(new Date(1970,0,1))}&creationDate.lessThanOrEqual=${searchByDate.end_date ? formattedDate(searchByDate.end_date) : formattedDate(new Date())}&size=10&page=0`
             : `/api/order/search?user_uid.equals=${authCtx.user_uid}&creationDate.greaterThanOrEqual=${searchByDate.start_date ? formattedDate(searchByDate.start_date) : formattedDate(new Date(1970,0,1))}&creationDate.lessThanOrEqual=${searchByDate.end_date ? formattedDate(searchByDate.end_date) : formattedDate(new Date())}&sort=createdAt,desc&size=10&page=0`
-            post(`${getHost('sales', 8087)}${url}`).then(res =>{ 
+
+            if (barcodeSpecified) url += '&dsmf_barcode.specified=true'
+            if (barcode) url += `&dsmf_barcode.contains=${barcode}`
+
+            post(`${getHost('sales', 8087)}${url}`).then(res =>{
                 orderList(res, 0, "searchdate");
                 setPageState(res);
             }).catch(err => console.log(err))
@@ -213,14 +222,18 @@ const AllOrders = () => {
     }
 
     const statusFilter = (value, pageNumber) => {
+        let baseUrl = `${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${pageNumber}`
+        if (barcodeSpecified) baseUrl += '&dsmf_barcode.specified=true'
+        if (barcode) baseUrl += `&dsmf_barcode.contains=${barcode}`
+
         if(value==="all"){
-            post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&size=10&page=${pageNumber}`).then(res => {
+            post(baseUrl).then(res => {
                 setPageState(res);
                 setPage(pageNumber);
                 orderList(res, pageNumber, "filter");
             })
         }else{
-            post(`${getHost('sales', 8087)}/api/order/search?user_uid.equals=${authCtx.user_uid}&status.equals=${value}&size=10&page=${pageNumber}`).then(res => {
+            post(`${baseUrl}&status.equals=${value}`).then(res => {
                 setPageState(res);
                 setPage(pageNumber);
                 orderList(res, pageNumber,"filter");
@@ -376,11 +389,21 @@ const AllOrders = () => {
                         </div>
                     </div>
                     <div className="col-md-4">
-                        <h6 className="fm-poppins flex-1">Müştəri adı ilə axtarış</h6>
-                        <div className="">
-                            <input type="text" placeholder="min 3 simvol" onChange={(e) => handleNameSearch(e.target.value)} className="form-control"/>
-                        </div>
-                    </div>
+                       <h6 className="fm-poppins flex-1">Müştəri adı ilə axtarış</h6>
+                       <div className="">
+                           <input type="text" placeholder="min 3 simvol" onChange={(e) => handleNameSearch(e.target.value)} className="form-control"/>
+                       </div>
+                   </div>
+                   <div className="col-md-4">
+                       <h6 className="fm-poppins flex-1">Barkod ilə axtarış</h6>
+                       <div className="">
+                           <input type="text" placeholder="Barkod daxil edin" onChange={(e) => setBarcode(e.target.value)} className="form-control mb-2"/>
+                           <div className="form-check">
+                               <input className="form-check-input" type="checkbox" id="barcodeSpecified" onChange={(e) => setBarcodeSpecified(e.target.checked)} />
+                               <label className="form-check-label" for="barcodeSpecified">Barkod olan sifarişləri göstər</label>
+                           </div>
+                       </div>
+                   </div>
                 </div>
                 <div className="mt-3">
                     <div className="">
@@ -399,6 +422,7 @@ const AllOrders = () => {
                                         <th scope='col'>Ümumi Qiymət</th>
                                         <th scope='col'>Taksit məbləği</th>
                                         <th scope='col'>Kreditin statusu</th>
+                                        <th scope='col'>DSMF Barkodu</th>
                                         {/*<th scope='col'>1C Sifariş Nömrəsi</th>*/}
                                         <th scope='col'>Seçimlər</th>
                                     </tr>
@@ -499,11 +523,12 @@ const AllOrders = () => {
                                                             <span className='badge leo-no-status'>KREDİT MÖVCUD DEYİL</span>
                                                         ))
                                                     )
-                                                    
-                                                }
-                                            </td>
-                                            {/*<td>{order.orderNum}</td>*/}
-                                            <td>
+                                                    }
+    
+                                                </td>
+                                                <td>{order.dsmf_barcode}</td>
+                                                {/*<td>{order.orderNum}</td>*/}
+                                                <td>
                                                 <div className="d-flex align-items-center">
                                                     {
                                                         user?.roles?.includes('ACCOUNTANT') && ((
